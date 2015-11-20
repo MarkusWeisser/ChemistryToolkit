@@ -98,4 +98,6 @@ public interface ChemistryManipulator {
 	 */
 	public String canonicalize(String smiles) throws CTKException, CTKSmilesException;
 
+  public Molecule merge(Molecule first, MolAtom firstRgroup, Molecule second, MolAtom secondRgroup);
+
 }

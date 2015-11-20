@@ -26,8 +26,7 @@ import java.util.Map;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import chemaxon.struc.MolAtom;
-import chemaxon.struc.MolBond;
+
 
 /**
  * Molecule
@@ -43,7 +42,7 @@ public class Molecule {
 
 
   /**
-   * constructs with a given canonical SMILES a molecule
+   * constructs with a given canonical SMILES a molecule or a molfile!!!
    * 
    * @param canSMILES
    */
@@ -51,6 +50,7 @@ public class Molecule {
     this.canonicalSMILES = canSMILES;
     System.out.println("TODO-> check if Molecule can be built");
   }
+
 
   /**
    * dearomatize molecule
@@ -61,40 +61,22 @@ public class Molecule {
     return true;
   }
 
-  /* string-> R1 or R2 */
   /**
    * contains from the given canonical SMILES all Rgroups
    * 
    * @return
    */
   public Map<String, MolAtom> getRgroups() {
+    /* molecule dearomatizieren und dann getAtomArray aufrufen */
+
+    /* für jedes MolAtom überprüfen ob es eine Rgroup ist */
+
+    /* Rückgabe: <"R" + position, MolAtom> */
+
     return null;
   }
 
-  public MolAtom[] getAtomArray() {
-    return null;
-  }
-
-  public MolAtom[] getBondArray() {
-    return null;
-  }
 
 
-
-  public void implicitizeHydrogens() {
-
-  }
-
-  public void addExplicitHydrogens() {
-
-  }
-
-  public void clean() {
-
-  }
-
-  public String toFormat() {
-    return null;
-  }
 
 }

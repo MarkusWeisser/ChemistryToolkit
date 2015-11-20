@@ -17,4 +17,14 @@ public class MolAtom {
   public int getBondCount() {
     return 0;
   }
+
+  /**
+   * chemaxon.MolAtom.getRgroup
+   * 
+   * @return > 0 -> eine Rgroup, <= 0 nicht
+   */
+  public int getRgroup() {
+    /**/
+    return 0;
+  }
 }
