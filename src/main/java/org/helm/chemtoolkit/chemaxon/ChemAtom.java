@@ -19,50 +19,62 @@
  * TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
  * SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  ******************************************************************************/
-package org.helm.chemtoolkit;
+package org.helm.chemtoolkit.chemaxon;
 
-import org.helm.chemtoolkit.cdk.CDKManipulatorImpl;
-import org.helm.chemtoolkit.chemaxon.ChemaxonManipulatorImpl;
+import org.helm.chemtoolkit.IAtom;
+
+import chemaxon.struc.MolAtom;
 
 /**
  * @author chistyakov
  *
  */
-public class ChemicalToolKit {
+public class ChemAtom implements IAtom {
 
-	static ChemicalToolKit INSTANCE;
-	private ChemistryManipulator manipulator;
+	private MolAtom atom;
 
-	public ChemistryManipulator getManipulator() {
-		return manipulator;
+	public MolAtom getMolAtom() {
+		return atom;
 	}
 
-	private ChemicalToolKit() {
-		// todo get chemistry plugin
-		manipulator = new CDKManipulatorImpl();
-		// manipulator = new ChemaxonManipulatorImpl();
+	/**
+	 * @param arg0
+	 */
+	public ChemAtom(MolAtom atom) {
+		this.atom = atom;
 
 	}
 
-	private ChemicalToolKit(String type) {
-		if (type.equals("CDK")) {
-			manipulator = new CDKManipulatorImpl();
-		} else {
-			manipulator = new ChemaxonManipulatorImpl();
-		}
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.helm.chemtoolkit.IAtom#getBoundCount()
+	 */
+	@Override
+	public int getIBondCount() {
+		return atom.getBondCount();
 	}
 
-	public static ChemicalToolKit getINSTANCE() {
-		if (INSTANCE == null) {
-			INSTANCE = new ChemicalToolKit();
-		}
-		return INSTANCE;
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.helm.chemtoolkit.IAtom#getBound()
+	 */
+	@Override
+	public ChemBond getIBound(int arg0) {
+
+		return new ChemBond(atom.getBond(arg0));
 	}
 
-	public static ChemicalToolKit getTestINSTANCE(String type) {
-		if (INSTANCE == null) {
-			INSTANCE = new ChemicalToolKit(type);
-		}
-		return INSTANCE;
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.helm.chemtoolkit.IAtom#getIAtno()
+	 */
+	@Override
+	public int getIAtno() {
+
+		return atom.getAtno();
 	}
+
 }

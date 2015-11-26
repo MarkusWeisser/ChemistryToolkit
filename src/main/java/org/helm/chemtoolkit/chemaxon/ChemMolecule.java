@@ -19,50 +19,66 @@
  * TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
  * SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  ******************************************************************************/
-package org.helm.chemtoolkit;
+package org.helm.chemtoolkit.chemaxon;
 
-import org.helm.chemtoolkit.cdk.CDKManipulatorImpl;
-import org.helm.chemtoolkit.chemaxon.ChemaxonManipulatorImpl;
+import org.helm.chemtoolkit.IAtom;
+import org.helm.chemtoolkit.IChemObject;
+import org.helm.chemtoolkit.IMolecule;
+
+import chemaxon.struc.MolAtom;
+import chemaxon.struc.Molecule;
 
 /**
  * @author chistyakov
  *
  */
-public class ChemicalToolKit {
+public class ChemMolecule implements IMolecule {
 
-	static ChemicalToolKit INSTANCE;
-	private ChemistryManipulator manipulator;
+	private Molecule molecule;
 
-	public ChemistryManipulator getManipulator() {
-		return manipulator;
+	public ChemMolecule(Molecule molecule) {
+		this.molecule = molecule;
 	}
 
-	private ChemicalToolKit() {
-		// todo get chemistry plugin
-		manipulator = new CDKManipulatorImpl();
-		// manipulator = new ChemaxonManipulatorImpl();
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.helm.chemtoolkit.IMolecule#removeINode(org.helm.chemtoolkit.IAtom)
+	 */
+	@Override
+	public void removeINode(IAtom node) {
 
 	}
 
-	private ChemicalToolKit(String type) {
-		if (type.equals("CDK")) {
-			manipulator = new CDKManipulatorImpl();
-		} else {
-			manipulator = new ChemaxonManipulatorImpl();
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.helm.chemtoolkit.IMolecule#getIAtomArray()
+	 */
+	@Override
+	public IAtom[] getIAtomArray() {
+		MolAtom[] parent = molecule.getAtomArray();
+		ChemAtom[] target = new ChemAtom[parent.length];
+		for (int i = 0; i < target.length; i++) {
+			target[i] = new ChemAtom(parent[i]);
 		}
+		return target;
 	}
 
-	public static ChemicalToolKit getINSTANCE() {
-		if (INSTANCE == null) {
-			INSTANCE = new ChemicalToolKit();
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.helm.chemtoolkit.IMolecule#addI(org.helm.chemtoolkit.IChemObject)
+	 */
+	@Override
+	public void addI(IChemObject node) {
+		if (node instanceof IAtom) {
+			ChemAtom atom = (ChemAtom) node;
+			molecule.add(atom.getMolAtom());
 		}
-		return INSTANCE;
+
 	}
 
-	public static ChemicalToolKit getTestINSTANCE(String type) {
-		if (INSTANCE == null) {
-			INSTANCE = new ChemicalToolKit(type);
-		}
-		return INSTANCE;
-	}
 }

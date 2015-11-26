@@ -19,50 +19,24 @@
  * TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
  * SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  ******************************************************************************/
-package org.helm.chemtoolkit;
+package org.helm.chemtoolkit.chemaxon;
 
-import org.helm.chemtoolkit.cdk.CDKManipulatorImpl;
-import org.helm.chemtoolkit.chemaxon.ChemaxonManipulatorImpl;
+import org.helm.chemtoolkit.IChemObject;
+
+import chemaxon.struc.CEdge;
 
 /**
  * @author chistyakov
  *
  */
-public class ChemicalToolKit {
+public class ChemObject extends CEdge implements IChemObject {
 
-	static ChemicalToolKit INSTANCE;
-	private ChemistryManipulator manipulator;
-
-	public ChemistryManipulator getManipulator() {
-		return manipulator;
-	}
-
-	private ChemicalToolKit() {
-		// todo get chemistry plugin
-		manipulator = new CDKManipulatorImpl();
-		// manipulator = new ChemaxonManipulatorImpl();
+	/**
+	 * @param arg0
+	 */
+	protected ChemObject(CEdge arg0) {
+		super(arg0);
 
 	}
 
-	private ChemicalToolKit(String type) {
-		if (type.equals("CDK")) {
-			manipulator = new CDKManipulatorImpl();
-		} else {
-			manipulator = new ChemaxonManipulatorImpl();
-		}
-	}
-
-	public static ChemicalToolKit getINSTANCE() {
-		if (INSTANCE == null) {
-			INSTANCE = new ChemicalToolKit();
-		}
-		return INSTANCE;
-	}
-
-	public static ChemicalToolKit getTestINSTANCE(String type) {
-		if (INSTANCE == null) {
-			INSTANCE = new ChemicalToolKit(type);
-		}
-		return INSTANCE;
-	}
 }

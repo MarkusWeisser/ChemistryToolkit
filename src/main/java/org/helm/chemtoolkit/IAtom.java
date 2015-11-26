@@ -21,48 +21,16 @@
  ******************************************************************************/
 package org.helm.chemtoolkit;
 
-import org.helm.chemtoolkit.cdk.CDKManipulatorImpl;
-import org.helm.chemtoolkit.chemaxon.ChemaxonManipulatorImpl;
-
 /**
  * @author chistyakov
  *
  */
-public class ChemicalToolKit {
+public interface IAtom extends IChemObject {
 
-	static ChemicalToolKit INSTANCE;
-	private ChemistryManipulator manipulator;
+	public int getIBondCount();
 
-	public ChemistryManipulator getManipulator() {
-		return manipulator;
-	}
+	public IBond getIBound(int arg0);
 
-	private ChemicalToolKit() {
-		// todo get chemistry plugin
-		manipulator = new CDKManipulatorImpl();
-		// manipulator = new ChemaxonManipulatorImpl();
+	public int getIAtno();
 
-	}
-
-	private ChemicalToolKit(String type) {
-		if (type.equals("CDK")) {
-			manipulator = new CDKManipulatorImpl();
-		} else {
-			manipulator = new ChemaxonManipulatorImpl();
-		}
-	}
-
-	public static ChemicalToolKit getINSTANCE() {
-		if (INSTANCE == null) {
-			INSTANCE = new ChemicalToolKit();
-		}
-		return INSTANCE;
-	}
-
-	public static ChemicalToolKit getTestINSTANCE(String type) {
-		if (INSTANCE == null) {
-			INSTANCE = new ChemicalToolKit(type);
-		}
-		return INSTANCE;
-	}
 }

@@ -25,28 +25,53 @@ package org.helm.chemtoolkit.cdk;
  *
  */
 
+import java.awt.Color;
+import java.awt.Graphics2D;
+import java.awt.Image;
+import java.awt.Rectangle;
+import java.awt.geom.Rectangle2D;
+import java.awt.image.BufferedImage;
+import java.awt.image.RenderedImage;
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.StringReader;
 import java.io.StringWriter;
+import java.util.ArrayList;
+import java.util.List;
+
+import javax.imageio.ImageIO;
+import javax.imageio.stream.ImageOutputStream;
 
 import org.helm.chemtoolkit.CTKException;
 import org.helm.chemtoolkit.CTKSmilesException;
 import org.helm.chemtoolkit.ChemistryManipulator;
 import org.helm.chemtoolkit.MoleculeInfo;
-import org.helm.chemtoolkit.ChemistryManipulator.InputType;
 import org.openscience.cdk.DefaultChemObjectBuilder;
+import org.openscience.cdk.atomtype.CDKAtomTypeMatcher;
 import org.openscience.cdk.exception.CDKException;
-
 import org.openscience.cdk.exception.InvalidSmilesException;
+import org.openscience.cdk.interfaces.IAtom;
 import org.openscience.cdk.interfaces.IAtomContainer;
+import org.openscience.cdk.interfaces.IAtomType;
+import org.openscience.cdk.interfaces.IBioPolymer;
 import org.openscience.cdk.io.MDLV2000Reader;
 import org.openscience.cdk.io.MDLV2000Writer;
 import org.openscience.cdk.io.SMILESWriter;
 import org.openscience.cdk.layout.StructureDiagramGenerator;
+import org.openscience.cdk.renderer.AtomContainerRenderer;
+import org.openscience.cdk.renderer.font.AWTFontManager;
+import org.openscience.cdk.renderer.generators.BasicAtomGenerator;
+import org.openscience.cdk.renderer.generators.BasicBondGenerator;
+import org.openscience.cdk.renderer.generators.BasicSceneGenerator;
+import org.openscience.cdk.renderer.generators.IGenerator;
+import org.openscience.cdk.renderer.visitor.AWTDrawVisitor;
 import org.openscience.cdk.silent.SilentChemObjectBuilder;
 import org.openscience.cdk.smiles.SmilesGenerator;
 import org.openscience.cdk.smiles.SmilesParser;
+import org.openscience.cdk.tools.CDKHydrogenAdder;
+import org.openscience.cdk.tools.ProteinBuilderTool;
 import org.openscience.cdk.tools.manipulator.AtomContainerManipulator;
+import org.openscience.cdk.tools.manipulator.AtomTypeManipulator;
 import org.openscience.cdk.tools.manipulator.MolecularFormulaManipulator;
 
 public class CDKManipulatorImpl implements ChemistryManipulator {
@@ -200,6 +225,9 @@ public class CDKManipulatorImpl implements ChemistryManipulator {
 		case MOLFILE:
 			result = convertMolFile2SMILES(data);
 			break;
+		case SEQUENCE:
+			result = convertMolFile2SMILES(molecule2Smiles(getPolymer(data)));
+			break;
 		default:
 			break;
 		}
@@ -229,6 +257,124 @@ public class CDKManipulatorImpl implements ChemistryManipulator {
 			throw new CTKException("unable to canonicalize SMILES", e);
 		}
 		return result;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.helm.chemtoolkit.ChemistryManipulator#renderMol(java.lang.String,
+	 * int, int, int)
+	 */
+	@Override
+	public byte[] renderMol(String molFile, OutputType outputType, int width, int height, int rgb) throws CTKException {
+		byte[] result;
+
+		try (ByteArrayOutputStream baos = new ByteArrayOutputStream();
+				ImageOutputStream ios = ImageIO.createImageOutputStream(baos)) {
+
+			Rectangle drawArea = new Rectangle(width, height);
+
+			try (StringReader stringReader = new StringReader(molFile);
+					MDLV2000Reader reader = new MDLV2000Reader(stringReader)) {
+				IAtomContainer mol = (IAtomContainer) reader
+						.read(SilentChemObjectBuilder.getInstance().newInstance(IAtomContainer.class));
+
+				List<IGenerator<IAtomContainer>> generators = new ArrayList<>();
+
+				generators.add(new BasicSceneGenerator());
+				generators.add(new BasicBondGenerator());
+				generators.add(new BasicAtomGenerator());
+
+				AtomContainerRenderer renderer = new AtomContainerRenderer(generators, new AWTFontManager());
+
+				renderer.setup(mol, drawArea);
+
+				int scaledw = width / 2;
+				int scaledh = (scaledw * 3) / 4;
+				BufferedImage scaled = new BufferedImage(scaledw, scaledh, BufferedImage.TYPE_INT_ARGB);
+
+				Graphics2D g = scaled.createGraphics();
+				g.setBackground(new Color(rgb));
+				g.drawImage(scaled, scaledw, scaledh, null);
+
+				renderer.paint(mol, new AWTDrawVisitor(g), new Rectangle2D.Double(0, 0, scaledw, scaledh), true);
+
+				ImageIO.write((RenderedImage) scaled, outputType.toString(), ios);
+			} catch (IOException e) {
+				throw new CTKException("unable to invoke the reader", e);
+			} catch (CDKException e) {
+				throw new CTKException("invalid molfile", e);
+			}
+
+			result = baos.toByteArray();
+		} catch (IOException es) {
+			throw new CTKException("unable to invoke outputstream");
+		}
+		return result;
+
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.helm.chemtoolkit.ChemistryManipulator#renderSequence(java.lang.
+	 * String, org.helm.chemtoolkit.ChemistryManipulator.OutputType, int, int,
+	 * int)
+	 */
+	@Override
+	public byte[] renderSequence(String sequence, OutputType outputType, int width, int height, int rgb)
+			throws CTKException {
+		String molFile;
+		try {
+			IAtomContainer molecule = getPolymer(sequence);
+			molFile = convertSMILES2MolFile(molecule2Smiles(molecule));
+			System.out.println(molFile);
+		} catch (CTKException e) {
+			throw e;
+		}
+
+		return renderMol(molFile, outputType, width, height, rgb);
+
+	}
+
+	/**
+	 * @param molecule
+	 * @return
+	 */
+	private String molecule2Smiles(IAtomContainer molecule) {
+		String result = null;
+		try (StringWriter stringWriter = new StringWriter(); SMILESWriter writer = new SMILESWriter(stringWriter)) {
+			writer.write(molecule);
+			result = stringWriter.toString();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (CDKException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		return result;
+	}
+
+	private IAtomContainer getPolymer(String sequence) throws CTKException {
+		IAtomContainer polymer;
+		try {
+			polymer = ProteinBuilderTool.createProtein(sequence, SilentChemObjectBuilder.getInstance());
+			CDKAtomTypeMatcher matcher = CDKAtomTypeMatcher.getInstance(polymer.getBuilder());
+			for (IAtom atom : polymer.atoms()) {
+				IAtomType type = matcher.findMatchingAtomType(polymer, atom);
+				AtomTypeManipulator.configure(atom, type);
+			}
+			CDKHydrogenAdder hydrogenAdder = CDKHydrogenAdder.getInstance(polymer.getBuilder());
+			hydrogenAdder.addImplicitHydrogens(polymer);
+
+		} catch (CDKException e) {
+			throw new CTKException(e.getMessage(), e);
+		}
+
+		return polymer;
+
 	}
 
 }

@@ -21,18 +21,26 @@
  ******************************************************************************/
 package org.helm.chemtoolkit.chemaxon;
 
-import java.io.ByteArrayInputStream;
+import java.awt.Color;
+import java.awt.Graphics2D;
+import java.awt.Rectangle;
+import java.awt.image.BufferedImage;
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.io.InputStream;
+
+import javax.imageio.ImageIO;
+import javax.imageio.stream.ImageOutputStream;
 
 import org.helm.chemtoolkit.CTKException;
 import org.helm.chemtoolkit.CTKSmilesException;
 import org.helm.chemtoolkit.ChemistryManipulator;
 import org.helm.chemtoolkit.MoleculeInfo;
-import org.helm.chemtoolkit.ChemistryManipulator.InputType;
 
 import chemaxon.formats.MolImporter;
+import chemaxon.marvin.MolPrinter;
 import chemaxon.marvin.calculations.ElementalAnalyserPlugin;
+import chemaxon.marvin.io.MolExportException;
+import chemaxon.marvin.paint.DispOptConsts;
 import chemaxon.marvin.plugin.PluginException;
 import chemaxon.struc.MolAtom;
 import chemaxon.struc.Molecule;
@@ -42,6 +50,9 @@ import chemaxon.struc.Molecule;
  *
  */
 public class ChemaxonManipulatorImpl implements ChemistryManipulator {
+	public static final String UNIQUE_SMILES_FORMAT = "smiles:u";
+	public static final String SMILES_FORMAT = "smiles";
+	private static final String MOL_FORMAT = "mol";
 
 	/*
 	 * (non-Javadoc)
@@ -51,8 +62,42 @@ public class ChemaxonManipulatorImpl implements ChemistryManipulator {
 	 */
 	@Override
 	public String convert(String data, InputType type) throws CTKException {
-		// TODO Auto-generated method stub
-		return null;
+		String result = null;
+
+		switch (type) {
+		case SMILES:
+			result = convertSMILES2MolFile(data);
+			break;
+		case MOLFILE:
+			result = convertMolFile2SMILES(data);
+			break;
+		case SEQUENCE:
+			try {
+				result = molecule2MolFile(getMolecule(data));
+			} catch (MolExportException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			break;
+		default:
+			break;
+		}
+
+		return result;
+	}
+
+	/**
+	 * @param molecule
+	 * @return
+	 * @throws MolExportException
+	 */
+	private String molecule2MolFile(Molecule molecule) throws MolExportException {
+		molecule.clean(2, null);
+		molecule.dearomatize();
+		return molecule.exportToFormat(MOL_FORMAT);
 	}
 
 	/*
@@ -90,23 +135,23 @@ public class ChemaxonManipulatorImpl implements ChemistryManipulator {
 	public MoleculeInfo getMoleculeInfo(String smiles) throws CTKException {
 
 		Molecule molecule;
+		MoleculeInfo moleculeInfo;
 		try {
 			molecule = getMolecule(smiles);
 			ElementalAnalyserPlugin plugin = new ElementalAnalyserPlugin();
-			plugin.setDoublePrecision(2);
 			plugin.setMolecule(molecule);
 			plugin.run();
-			MoleculeInfo moleculeInfo = new MoleculeInfo();
+			moleculeInfo = new MoleculeInfo();
 			moleculeInfo.setMolecularFormula(plugin.getFormula());
 			moleculeInfo.setMolecularWeight(plugin.getMass());
 			moleculeInfo.setExactMass(plugin.getExactMass());
 		} catch (IOException e) {
-			throw new CTKException("unable to get molecule from SMILES", e);
+			throw new CTKSmilesException("invalid SMILES!", e);
 		} catch (PluginException e) {
 			throw new CTKException("unable to analyse molecule", e);
 		}
 
-		return null;
+		return moleculeInfo;
 	}
 
 	/*
@@ -118,8 +163,17 @@ public class ChemaxonManipulatorImpl implements ChemistryManipulator {
 	 */
 	@Override
 	public String convertSMILES2MolFile(String smiles) throws CTKException {
-		// TODO Auto-generated method stub
-		return null;
+		String result = null;
+		try {
+			Molecule molecule = getMolecule(smiles);
+			molecule.clean(2, null);
+			molecule.dearomatize();
+			result = molecule.exportToFormat(MOL_FORMAT);
+
+		} catch (IOException e) {
+			throw new CTKSmilesException("invalid SMILES!", e);
+		}
+		return result;
 	}
 
 	/*
@@ -131,8 +185,15 @@ public class ChemaxonManipulatorImpl implements ChemistryManipulator {
 	 */
 	@Override
 	public String convertMolFile2SMILES(String molfile) throws CTKException {
-		// TODO Auto-generated method stub
-		return null;
+		String result = null;
+		try {
+			Molecule molecule = getMolecule(molfile);
+			result = molecule.exportToFormat(SMILES_FORMAT);
+
+		} catch (IOException e) {
+			throw new CTKSmilesException("invalid molfile!", e);
+		}
+		return result;
 	}
 
 	/*
@@ -143,27 +204,92 @@ public class ChemaxonManipulatorImpl implements ChemistryManipulator {
 	 */
 	@Override
 	public String canonicalize(String smiles) throws CTKException, CTKSmilesException {
-		// TODO Auto-generated method stub
-		return null;
+		String result = null;
+		try {
+			Molecule molecule = getMolecule(smiles);
+			// result = getUniqueSmiles(molecule, UNIQUE_SMILES_FORMAT);
+			molecule.implicitizeHydrogens(MolAtom.ALL_H);
+			result = molecule.toFormat(UNIQUE_SMILES_FORMAT);
+		} catch (IOException e) {
+			throw new CTKSmilesException("invalid SMILES!", e);
+		}
+		return result;
 	}
 
 	/**
-	 * convert SMILES to Molecule
+	 * convert SMILES and MOLFiles to Molecule
 	 * 
 	 * @param smiles
-	 *            input SMILES string
+	 *            input data string
 	 * @return Molecule object
 	 * @throws java.io.IOException
 	 */
 
-	private Molecule getMolecule(String smiles) throws IOException {
+	private Molecule getMolecule(String data) throws IOException {
 		Molecule molecule = null;
-		if (null != smiles) {
-			InputStream is = new ByteArrayInputStream(smiles.getBytes());
-			MolImporter importer = new MolImporter(is);
-			molecule = importer.read();
+		if (data != null) {
+			molecule = MolImporter.importMol(data);
 		}
 		return molecule;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.helm.chemtoolkit.ChemistryManipulator#renderMol(java.lang.String,
+	 * int, int, int)
+	 */
+	@Override
+	public byte[] renderMol(String molFile, OutputType outputType, int width, int height, int rgb) throws CTKException {
+		byte[] result;
+
+		try (ByteArrayOutputStream baos = new ByteArrayOutputStream();
+				ImageOutputStream ios = ImageIO.createImageOutputStream(baos)) {
+
+			int scaledw = width / 2;
+			int scaledh = (scaledw * 3) / 6;
+			BufferedImage image = new BufferedImage(scaledw, scaledh, BufferedImage.TYPE_INT_ARGB);
+
+			Graphics2D g = image.createGraphics();
+			Rectangle drawArea = new Rectangle(-1, -1, scaledw + 1, scaledh + 1);
+
+			g.draw(drawArea);
+
+			Molecule mol = getMolecule(molFile);
+			mol.hydrogenize(false);
+
+			MolPrinter printer = new MolPrinter(mol);
+			printer.setImplicitH(DispOptConsts.IMPLICITH_OFF_S);
+			System.out.println(printer.getImplicitH());
+			printer.setScale(printer.maxScale(drawArea));
+			printer.setBackgroundColor(new Color(rgb));
+			g.setBackground(new Color(rgb));
+			printer.paint(g, drawArea);
+
+			ImageIO.write(image, outputType.toString(), ios);
+
+			result = baos.toByteArray();
+		} catch (IOException e) {
+			throw new CTKException("unable to invoke the outputstream");
+		}
+
+		return result;
+
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.helm.chemtoolkit.ChemistryManipulator#renderSequence(java.lang.
+	 * String, org.helm.chemtoolkit.ChemistryManipulator.OutputType, int, int,
+	 * int)
+	 */
+	@Override
+	public byte[] renderSequence(String sequence, OutputType outputType, int width, int height, int rgb)
+			throws CTKException {
+		// TODO Auto-generated method stub
+		return null;
 	}
 
 }
