@@ -292,4 +292,15 @@ public class ChemaxonManipulatorImpl implements ChemistryManipulator {
 		return null;
 	}
 
+	/* (non-Javadoc)
+	 * @see org.helm.chemtoolkit.ChemistryManipulator#merge(org.helm.chemtoolkit.Molecule, org.helm.chemtoolkit.MolAtom, org.helm.chemtoolkit.Molecule, org.helm.chemtoolkit.MolAtom)
+	 */
+	@Override
+	public org.helm.chemtoolkit.Molecule merge(org.helm.chemtoolkit.Molecule first,
+			org.helm.chemtoolkit.MolAtom firstRgroup, org.helm.chemtoolkit.Molecule second,
+			org.helm.chemtoolkit.MolAtom secondRgroup) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
 }

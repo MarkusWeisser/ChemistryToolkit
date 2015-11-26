@@ -126,7 +126,6 @@ public interface ChemistryManipulator {
 	 */
 	public byte[] renderMol(String molFile, OutputType outputType, int width, int height, int rgb) throws CTKException;
 
-<<<<<<< HEAD
 	/**
 	 * 
 	 * @param sequence
@@ -139,8 +138,7 @@ public interface ChemistryManipulator {
 	 */
 	public byte[] renderSequence(String sequence, OutputType outputType, int width, int height, int rgb)
 			throws CTKException;
-=======
+
   public Molecule merge(Molecule first, MolAtom firstRgroup, Molecule second, MolAtom secondRgroup);
 
->>>>>>> a73ad25bdaef578d5fdb870f9f655c4d3bf446f2
 }

@@ -45,6 +45,8 @@ import javax.imageio.stream.ImageOutputStream;
 import org.helm.chemtoolkit.CTKException;
 import org.helm.chemtoolkit.CTKSmilesException;
 import org.helm.chemtoolkit.ChemistryManipulator;
+import org.helm.chemtoolkit.MolAtom;
+import org.helm.chemtoolkit.Molecule;
 import org.helm.chemtoolkit.MoleculeInfo;
 import org.openscience.cdk.DefaultChemObjectBuilder;
 import org.openscience.cdk.atomtype.CDKAtomTypeMatcher;
@@ -375,6 +377,15 @@ public class CDKManipulatorImpl implements ChemistryManipulator {
 
 		return polymer;
 
+	}
+
+	/* (non-Javadoc)
+	 * @see org.helm.chemtoolkit.ChemistryManipulator#merge(org.helm.chemtoolkit.Molecule, org.helm.chemtoolkit.MolAtom, org.helm.chemtoolkit.Molecule, org.helm.chemtoolkit.MolAtom)
+	 */
+	@Override
+	public Molecule merge(Molecule first, MolAtom firstRgroup, Molecule second, MolAtom secondRgroup) {
+		// TODO Auto-generated method stub
+		return null;
 	}
 
 }

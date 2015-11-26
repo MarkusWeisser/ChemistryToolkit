@@ -19,7 +19,7 @@
  * TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
  * SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  ******************************************************************************/
-package org.helm.ChemistryToolkit;
+package org.helm.ChemistryToolkitrename;
 
 import java.io.FileOutputStream;
 import java.io.IOException;
