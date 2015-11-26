@@ -23,6 +23,7 @@ package org.helm.chemtoolkit;
 
 import java.io.IOException;
 
+import org.helm.chemtoolkit.ChemistryManipulator.InputType;
 import org.openscience.cdk.exception.CDKException;
 
 /**
@@ -30,9 +31,25 @@ import org.openscience.cdk.exception.CDKException;
  *
  */
 public interface ChemistryManipulator {
-	enum InputType {
-		SMILES, MOLFILE
+
+	public enum InputType {
+		SMILES, MOLFILE, SEQUENCE
 	}
+
+	public enum OutputType {
+		PNG("PNG"), GIF("GIF"), JPG("JPG");
+		private final String value;
+
+		private OutputType(final String value) {
+			this.value = value;
+		}
+
+		@Override
+		public String toString() {
+			return value;
+		}
+	}
+	
 
 	/**
 	 * 
@@ -96,6 +113,29 @@ public interface ChemistryManipulator {
 	 * @throws CTKException
 	 *             general ChemToolkit exception passed to HELMToolkit
 	 */
-	public String canonicalize(String smiles) throws CTKException, CTKSmilesException;
+	public String canonicalize(String data) throws CTKException, CTKSmilesException;
 
+	/**
+	 * 
+	 * @param molFile
+	 * @param width
+	 * @param height
+	 * @param rgb
+	 * @return
+	 * @throws CTKException
+	 */
+	public byte[] renderMol(String molFile, OutputType outputType, int width, int height, int rgb) throws CTKException;
+
+	/**
+	 * 
+	 * @param sequence
+	 * @param outputType
+	 * @param width
+	 * @param height
+	 * @param rgb
+	 * @return
+	 * @throws CTKException
+	 */
+	public byte[] renderSequence(String sequence, OutputType outputType, int width, int height, int rgb)
+			throws CTKException;
 }
