@@ -19,7 +19,7 @@
  * TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
  * SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  ******************************************************************************/
-package org.helm.chemstrytoolkit;
+package org.helm.chemstrytoolkit.chemaxon;
 
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -28,54 +28,43 @@ import org.helm.chemtoolkit.CTKException;
 import org.helm.chemtoolkit.CTKSmilesException;
 import org.helm.chemtoolkit.ChemicalToolKit;
 import org.helm.chemtoolkit.ChemistryManipulator;
+import org.helm.chemtoolkit.ChemistryManipulator.InputType;
 import org.helm.chemtoolkit.ChemistryManipulator.OutputType;
 import org.helm.chemtoolkit.MoleculeInfo;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 
-import bsh.Console;
-
 /**
  * @author chistyakov
  *
  */
-public class CDKTest {
-	private static String type = "CDK";
+public class ChemaxonTest {
+	private static String type = "chemaxon";
 
 	private static ChemistryManipulator getManipulator() {
 		return ChemicalToolKit.getTestINSTANCE(type).getManipulator();
 	}
 
 	@Test
-	public void validateSMILESTest() throws CTKException {
-		boolean res = false;
-		String smiles = "[$([#6])]C1=C([$(C=O),$([#7])])C=CC=C1[$(C=O),$([#7])] |$_R1;;;_R2;;;;;_R2$,c:1,4,6|";
-		res = getManipulator().validateSMILES(smiles);
-		Assert.assertEquals(res, true);
-
-	}
-
-	@Test
-	public void getMoleculeInfoTest() throws CTKException {
-		String smiles = "CCOC1=C(C=C(C=C1)S(=O)(=O)N1CCN(C)CC1)C1=NC2=C(N(C)N=C2CC)C(=O)N1";
-		MoleculeInfo moleculeInfo = getManipulator().getMoleculeInfo(smiles);
-		System.out.println("molecular weight=" + moleculeInfo.getMolecularWeight());
-		System.out.println("exact mass=" + moleculeInfo.getExactMass());
-		System.out.println("sum formula=" + moleculeInfo.getMolecularFormula());
-		Assert.assertEquals(moleculeInfo.getMolecularFormula(), "C21H28N6O4S");
-
-	}
-
-	@Test
-	public void convertSMILES2MolFile() throws CTKException, Exception {
+	void getMoleculeInfoTest() throws CTKException {
 		String smiles = "CCc1nn(C)c2c(=O)[nH]c(nc12)c3cc(ccc3OCC)S(=O)(=O)N4CCN(C)CC4";
-		String molFile = getManipulator().convertSMILES2MolFile(smiles);
-		System.out.println(molFile);
+		MoleculeInfo moleculeInfo = getManipulator().getMoleculeInfo(smiles);
+		System.out.println("exact mass=" + moleculeInfo.getExactMass());
+		System.out.println("molecular weight=" + moleculeInfo.getMolecularWeight());
+		System.out.println("formula=" + moleculeInfo.getMolecularFormula());
 
 	}
 
 	@Test
-	void convertMolFile2SMILES() throws CTKException, IOException {
+	public void smiles2MolTest() throws CTKException {
+		String result = getManipulator()
+				.convertSMILES2MolFile("CCc1nn(C)c2c(=O)[nH]c(nc12)c3cc(ccc3OCC)S(=O)(=O)N4CCN(C)CC4");
+		System.out.println(result);
+
+	}
+
+	@Test
+	public void mol2SmilesTest() throws CTKException {
 		String molFile = "\n" + "  ACCLDraw11131512172D\n" + "\n" + " 32 35  0  0  0  0  0  0  0  0999 V2000\n"
 				+ "    7.6862   -7.0367    0.0000 C   0  0  0  0  0  0  0  0  0  0  0  0\n"
 				+ "    6.6485   -6.4506    0.0000 C   0  0  0  0  0  0  0  0  0  0  0  0\n"
@@ -126,16 +115,17 @@ public class CDKTest {
 		System.out.println(result);
 		result = getManipulator().canonicalize(result);
 		System.out.println(result);
-		Assert.assertEquals(result, "O=C1NC(=NC=2C(=NN(C12)C)CC)C3=CC(=CC=C3OCC)S(=O)(=O)N4CCN(C)CC4");
+		Assert.assertEquals(result, "CCOc1ccc(cc1-c1nc2c(CC)nn(C)c2c(=O)[nH]1)S(=O)(=O)N1CCN(C)CC1");
 
 	}
 
 	@Test
 	public void canonicalizeTest() throws CTKSmilesException, CTKException {
-		String smiles = "CCOc1ccc(cc1-c1nc2c(CC)nn(C)c2c(=O)[nH]1)S(=O)(=O)N1CCN(C)CC1";
+		String smiles = "CCc1nn(C)c2c(=O)[nH]c(nc12)c3cc(ccc3OCC)S(=O)(=O)N4CCN(C)CC4";
 		String result = getManipulator().canonicalize(smiles);
 		System.out.println(result);
-		Assert.assertEquals(result, "O=C1NC(=NC=2C(=NN(C12)C)CC)C3=CC(=CC=C3OCC)S(=O)(=O)N4CCN(C)CC4");
+		result = getManipulator().canonicalize(smiles);
+		System.out.println(result);
 
 	}
 
@@ -188,20 +178,16 @@ public class CDKTest {
 				+ " 32 31  1  0  0  0  0\n" + "M  END";
 		byte[] result = getManipulator().renderMol(molFile, OutputType.PNG, 1000, 1000,
 				(int) Long.parseLong("D3D3D3", 16));
-		try (FileOutputStream out = new FileOutputStream("d:/CDKtesbild.png")) {
+		try (FileOutputStream out = new FileOutputStream("d:/ChemaxonTesbild.png")) {
 			out.write(result);
 		}
 
 	}
 
 	@Test
-	public void renderSequenceTest() throws NumberFormatException, CTKException, IOException {
+	public void convertSeq2MolFileTest() throws CTKException {
 		String sequence = "GGT";
-		byte[] result = getManipulator().renderSequence(sequence, OutputType.PNG, 1000, 1000,
-				(int) Long.parseLong("D3D3D3", 16));
-		try (FileOutputStream out = new FileOutputStream("d:/CDKsequnce.png")) {
-			out.write(result);
-		}
+		String result = getManipulator().convert(sequence, InputType.SEQUENCE);
+		System.out.println(result);
 	}
-
 }
