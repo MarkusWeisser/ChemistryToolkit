@@ -21,7 +21,7 @@
  ******************************************************************************/
 package org.helm.chemtoolkit.chemaxon;
 
-import org.helm.chemtoolkit.IChemObject;
+import org.helm.chemtoolkit.IChemObjectBase;
 
 import chemaxon.struc.CEdge;
 
@@ -29,7 +29,7 @@ import chemaxon.struc.CEdge;
  * @author chistyakov
  *
  */
-public class ChemObject extends CEdge implements IChemObject {
+public class ChemObject extends CEdge implements IChemObjectBase {
 
 	/**
 	 * @param arg0

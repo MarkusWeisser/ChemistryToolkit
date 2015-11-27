@@ -21,18 +21,23 @@
  ******************************************************************************/
 package org.helm.chemtoolkit.chemaxon;
 
-import org.helm.chemtoolkit.IAtom;
-import org.helm.chemtoolkit.IChemObject;
-import org.helm.chemtoolkit.IMolecule;
+import java.util.HashMap;
+import java.util.Map;
+
+import org.helm.chemtoolkit.IAtomBase;
+import org.helm.chemtoolkit.IBondBase;
+import org.helm.chemtoolkit.IChemObjectBase;
+import org.helm.chemtoolkit.IMoleculeBase;
 
 import chemaxon.struc.MolAtom;
+import chemaxon.struc.MolBond;
 import chemaxon.struc.Molecule;
 
 /**
  * @author chistyakov
  *
  */
-public class ChemMolecule implements IMolecule {
+public class ChemMolecule implements IMoleculeBase {
 
 	private Molecule molecule;
 
@@ -47,8 +52,10 @@ public class ChemMolecule implements IMolecule {
 	 * org.helm.chemtoolkit.IMolecule#removeINode(org.helm.chemtoolkit.IAtom)
 	 */
 	@Override
-	public void removeINode(IAtom node) {
-
+	public void removeINode(IAtomBase node) {
+		if (node instanceof ChemAtom) {
+			molecule.removeNode(((ChemAtom) node).getMolAtom());
+		}
 	}
 
 	/*
@@ -57,7 +64,7 @@ public class ChemMolecule implements IMolecule {
 	 * @see org.helm.chemtoolkit.IMolecule#getIAtomArray()
 	 */
 	@Override
-	public IAtom[] getIAtomArray() {
+	public IAtomBase[] getIAtomArray() {
 		MolAtom[] parent = molecule.getAtomArray();
 		ChemAtom[] target = new ChemAtom[parent.length];
 		for (int i = 0; i < target.length; i++) {
@@ -73,12 +80,68 @@ public class ChemMolecule implements IMolecule {
 	 * org.helm.chemtoolkit.IMolecule#addI(org.helm.chemtoolkit.IChemObject)
 	 */
 	@Override
-	public void addI(IChemObject node) {
-		if (node instanceof IAtom) {
-			ChemAtom atom = (ChemAtom) node;
-			molecule.add(atom.getMolAtom());
+	public void addI(IChemObjectBase node) {
+		if (node instanceof ChemAtom) {
+			molecule.add(((ChemAtom) node).getMolAtom());
+		} else if (node instanceof ChemBond) {
+			molecule.add(((ChemBond) node).getMolBond());
 		}
 
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.helm.chemtoolkit.IMolecule#dearomatize()
+	 */
+	@Override
+	public void dearomatize() {
+		molecule.dearomatize();
+
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.helm.chemtoolkit.IMolecule#getRgroups()
+	 */
+	@Override
+	public Map<String, IAtomBase> getRgroups() {
+		molecule.dearomatize();
+		Map<String, IAtomBase> rgroupMap = new HashMap<String, IAtomBase>();
+
+		IAtomBase[] atoms = getIAtomArray();
+		for (int i = 0; i < atoms.length; i++) {
+			int rId = atoms[i].getRgroup();
+			// found R group
+			if (rId > 0) {
+				rgroupMap.put("R" + rId, atoms[i]);
+			}
+		}
+
+		return rgroupMap;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.helm.chemtoolkit.IMolecule#getIBondArray()
+	 */
+	@Override
+	public IBondBase[] getIBondArray() {
+		MolBond[] parent = molecule.getBondArray();
+		ChemBond[] target = new ChemBond[parent.length];
+		for (int i = 0; i < target.length; i++) {
+			target[i] = new ChemBond(parent[i]);
+		}
+		return target;
+
+	}
+
+	@Override
+	public IMoleculeBase clone() {
+		ChemMolecule cloned = new ChemMolecule(molecule);
+		return cloned;
 	}
 
 }

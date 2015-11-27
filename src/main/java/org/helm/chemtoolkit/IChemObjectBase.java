@@ -25,10 +25,6 @@ package org.helm.chemtoolkit;
  * @author chistyakov
  *
  */
-public interface IBond extends IChemObject {
-
-	public IAtom getIAtom1();
-
-	public IAtom getIAtom2();
+public interface IChemObjectBase{
 
 }

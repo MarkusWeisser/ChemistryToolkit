@@ -21,8 +21,8 @@
  ******************************************************************************/
 package org.helm.chemtoolkit;
 
-import org.helm.chemtoolkit.cdk.CDKManipulatorImpl;
-import org.helm.chemtoolkit.chemaxon.ChemaxonManipulatorImpl;
+import org.helm.chemtoolkit.cdk.CDKManipulator;
+import org.helm.chemtoolkit.chemaxon.ChemaxonManipulator;
 
 /**
  * @author chistyakov
@@ -31,24 +31,24 @@ import org.helm.chemtoolkit.chemaxon.ChemaxonManipulatorImpl;
 public class ChemicalToolKit {
 
 	static ChemicalToolKit INSTANCE;
-	private ChemistryManipulator manipulator;
+	private AbstractChemistryManipulator manipulator;
 
-	public ChemistryManipulator getManipulator() {
+	public AbstractChemistryManipulator getManipulator() {
 		return manipulator;
 	}
 
 	private ChemicalToolKit() {
 		// todo get chemistry plugin
-		manipulator = new CDKManipulatorImpl();
+		manipulator = new CDKManipulator();
 		// manipulator = new ChemaxonManipulatorImpl();
 
 	}
 
 	private ChemicalToolKit(String type) {
 		if (type.equals("CDK")) {
-			manipulator = new CDKManipulatorImpl();
+			manipulator = new CDKManipulator();
 		} else {
-			manipulator = new ChemaxonManipulatorImpl();
+			manipulator = new ChemaxonManipulator();
 		}
 	}
 

@@ -22,15 +22,19 @@
 package org.helm.chemtoolkit;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 
-import org.helm.chemtoolkit.ChemistryManipulator.InputType;
+import org.helm.chemtoolkit.AbstractChemistryManipulator.InputType;
 import org.openscience.cdk.exception.CDKException;
+
+import chemaxon.struc.MolBond;
 
 /**
  * @author chistyakov
  *
  */
-public interface ChemistryManipulator {
+public abstract class AbstractChemistryManipulator {
 
 	public enum InputType {
 		SMILES, MOLFILE, SEQUENCE
@@ -49,7 +53,6 @@ public interface ChemistryManipulator {
 			return value;
 		}
 	}
-	
 
 	/**
 	 * 
@@ -61,7 +64,7 @@ public interface ChemistryManipulator {
 	 * @throws Exception
 	 * @throws CTKException
 	 */
-	public String convert(String data, InputType type) throws CTKException;
+	public abstract String convert(String data, InputType type) throws CTKException;
 
 	/**
 	 * 
@@ -69,7 +72,7 @@ public interface ChemistryManipulator {
 	 * @return true if smiles valid
 	 * @throws CTKException
 	 */
-	public boolean validateSMILES(String smiles) throws CTKException;
+	public abstract boolean validateSMILES(String smiles) throws CTKException;
 
 	/**
 	 * 
@@ -79,7 +82,7 @@ public interface ChemistryManipulator {
 	 *             general ChemToolKit exception passed to HELMToolKit
 	 */
 
-	public MoleculeInfo getMoleculeInfo(String smiles) throws CTKException;
+	public abstract MoleculeInfo getMoleculeInfo(String smiles) throws CTKException;
 
 	/**
 	 * 
@@ -91,7 +94,7 @@ public interface ChemistryManipulator {
 	 *             java exception
 	 */
 
-	public String convertSMILES2MolFile(String smiles) throws CTKException;
+	public abstract String convertSMILES2MolFile(String smiles) throws CTKException;
 
 	/**
 	 * 
@@ -104,7 +107,7 @@ public interface ChemistryManipulator {
 	 * @throws CDKException
 	 */
 
-	public String convertMolFile2SMILES(String molfile) throws CTKException;
+	public abstract String convertMolFile2SMILES(String molfile) throws CTKException;
 
 	/**
 	 * 
@@ -113,7 +116,7 @@ public interface ChemistryManipulator {
 	 * @throws CTKException
 	 *             general ChemToolkit exception passed to HELMToolkit
 	 */
-	public String canonicalize(String data) throws CTKException, CTKSmilesException;
+	public abstract String canonicalize(String data) throws CTKException, CTKSmilesException;
 
 	/**
 	 * 
@@ -124,7 +127,8 @@ public interface ChemistryManipulator {
 	 * @return
 	 * @throws CTKException
 	 */
-	public byte[] renderMol(String molFile, OutputType outputType, int width, int height, int rgb) throws CTKException;
+	public abstract byte[] renderMol(String molFile, OutputType outputType, int width, int height, int rgb)
+			throws CTKException;
 
 	/**
 	 * 
@@ -136,9 +140,66 @@ public interface ChemistryManipulator {
 	 * @return
 	 * @throws CTKException
 	 */
-	public byte[] renderSequence(String sequence, OutputType outputType, int width, int height, int rgb)
+	public abstract byte[] renderSequence(String sequence, OutputType outputType, int width, int height, int rgb)
 			throws CTKException;
 
-  public Molecule merge(Molecule first, MolAtom firstRgroup, Molecule second, MolAtom secondRgroup);
+	/**
+	 * 
+	 * @param first
+	 * @param firstRgroup
+	 * @param second
+	 * @param secondRgroup
+	 * @return
+	 */
+	public abstract IMoleculeBase merge(IMoleculeBase first, IAtomBase firstRgroup, IMoleculeBase second, IAtomBase secondRgroup);
+
+	/**
+	 * 
+	 * @param extendedSmiles
+	 * @return
+	 */
+
+	public List<String> getRGroupsFromExtendedSmiles(String extendedSmiles) {
+		List<String> list = new ArrayList<String>();
+		String[] tokens = extendedSmiles.split("R", -1);
+		if (tokens.length > 1) {
+			for (int i = 1; i < tokens.length; i++) {
+				String token = tokens[i];
+				char[] chars = token.toCharArray();
+				String numbers = "";
+				for (int j = 0; j < chars.length; j++) {
+					String letter = String.valueOf(chars[j]);
+					if (letter.matches("[0-9]")) {
+						numbers += letter;
+					} else {
+						break;
+					}
+				}
+
+				if (numbers.length() > 0) {
+					numbers = "R" + numbers;
+					list.add(numbers);
+				}
+			}
+		}
+
+		return list;
+	}
+
+	public IAtomBase removeRgroup(IMoleculeBase molecule, IAtomBase rgroup) {
+
+		IAtomBase atom = null;
+		if (rgroup.getIBondCount() == 1) {
+			IBondBase bond = rgroup.getIBond(0);
+			if (bond.getIAtom1().equals(rgroup)) {
+				atom = bond.getIAtom2();
+			} else {
+				atom = bond.getIAtom1();
+			}
+			molecule.removeINode(rgroup);
+
+		}
+		return atom;
+	}
 
 }

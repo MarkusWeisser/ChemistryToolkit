@@ -27,7 +27,6 @@ package org.helm.chemtoolkit.cdk;
 
 import java.awt.Color;
 import java.awt.Graphics2D;
-import java.awt.Image;
 import java.awt.Rectangle;
 import java.awt.geom.Rectangle2D;
 import java.awt.image.BufferedImage;
@@ -42,11 +41,11 @@ import java.util.List;
 import javax.imageio.ImageIO;
 import javax.imageio.stream.ImageOutputStream;
 
+import org.helm.chemtoolkit.AbstractChemistryManipulator;
 import org.helm.chemtoolkit.CTKException;
 import org.helm.chemtoolkit.CTKSmilesException;
-import org.helm.chemtoolkit.ChemistryManipulator;
-import org.helm.chemtoolkit.MolAtom;
-import org.helm.chemtoolkit.Molecule;
+import org.helm.chemtoolkit.IAtomBase;
+import org.helm.chemtoolkit.IMoleculeBase;
 import org.helm.chemtoolkit.MoleculeInfo;
 import org.openscience.cdk.DefaultChemObjectBuilder;
 import org.openscience.cdk.atomtype.CDKAtomTypeMatcher;
@@ -55,7 +54,6 @@ import org.openscience.cdk.exception.InvalidSmilesException;
 import org.openscience.cdk.interfaces.IAtom;
 import org.openscience.cdk.interfaces.IAtomContainer;
 import org.openscience.cdk.interfaces.IAtomType;
-import org.openscience.cdk.interfaces.IBioPolymer;
 import org.openscience.cdk.io.MDLV2000Reader;
 import org.openscience.cdk.io.MDLV2000Writer;
 import org.openscience.cdk.io.SMILESWriter;
@@ -76,7 +74,7 @@ import org.openscience.cdk.tools.manipulator.AtomContainerManipulator;
 import org.openscience.cdk.tools.manipulator.AtomTypeManipulator;
 import org.openscience.cdk.tools.manipulator.MolecularFormulaManipulator;
 
-public class CDKManipulatorImpl implements ChemistryManipulator {
+public class CDKManipulator extends AbstractChemistryManipulator {
 	private static final String SMILES_EXTENSION_SEPARATOR_REGEX = "\\|";
 
 	/**
@@ -379,11 +377,16 @@ public class CDKManipulatorImpl implements ChemistryManipulator {
 
 	}
 
-	/* (non-Javadoc)
-	 * @see org.helm.chemtoolkit.ChemistryManipulator#merge(org.helm.chemtoolkit.Molecule, org.helm.chemtoolkit.MolAtom, org.helm.chemtoolkit.Molecule, org.helm.chemtoolkit.MolAtom)
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.helm.chemtoolkit.AbstractChemistryManipulator#merge(org.helm.
+	 * chemtoolkit.IMoleculeBase, org.helm.chemtoolkit.IAtomBase,
+	 * org.helm.chemtoolkit.IMoleculeBase, org.helm.chemtoolkit.IAtomBase)
 	 */
 	@Override
-	public Molecule merge(Molecule first, MolAtom firstRgroup, Molecule second, MolAtom secondRgroup) {
+	public IMoleculeBase merge(IMoleculeBase first, IAtomBase firstRgroup, IMoleculeBase second,
+			IAtomBase secondRgroup) {
 		// TODO Auto-generated method stub
 		return null;
 	}

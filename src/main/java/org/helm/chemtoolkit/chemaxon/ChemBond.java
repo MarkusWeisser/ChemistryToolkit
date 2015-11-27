@@ -21,15 +21,16 @@
  ******************************************************************************/
 package org.helm.chemtoolkit.chemaxon;
 
-import org.helm.chemtoolkit.IBond;
+import org.helm.chemtoolkit.IBondBase;
 
+import chemaxon.struc.CNode;
 import chemaxon.struc.MolBond;
 
 /**
  * @author chistyakov
  *
  */
-public class ChemBond implements IBond {
+public class ChemBond implements IBondBase {
 
 	private MolBond bond;
 
@@ -47,7 +48,6 @@ public class ChemBond implements IBond {
 	 */
 	@Override
 	public ChemAtom getIAtom1() {
-		// TODO Auto-generated method stub
 		return new ChemAtom(bond.getAtom1());
 	}
 
@@ -59,6 +59,14 @@ public class ChemBond implements IBond {
 	@Override
 	public ChemAtom getIAtom2() {
 		return new ChemAtom(bond.getAtom2());
+	}
+
+	/**
+	 * @return
+	 */
+	public MolBond getMolBond() {
+
+		return bond;
 	}
 
 }

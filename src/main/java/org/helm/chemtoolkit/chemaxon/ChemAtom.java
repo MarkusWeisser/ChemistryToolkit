@@ -21,7 +21,8 @@
  ******************************************************************************/
 package org.helm.chemtoolkit.chemaxon;
 
-import org.helm.chemtoolkit.IAtom;
+import org.helm.chemtoolkit.IAtomBase;
+import org.helm.chemtoolkit.IBondBase;
 
 import chemaxon.struc.MolAtom;
 
@@ -29,7 +30,7 @@ import chemaxon.struc.MolAtom;
  * @author chistyakov
  *
  */
-public class ChemAtom implements IAtom {
+public class ChemAtom implements IAtomBase {
 
 	private MolAtom atom;
 
@@ -37,9 +38,6 @@ public class ChemAtom implements IAtom {
 		return atom;
 	}
 
-	/**
-	 * @param arg0
-	 */
 	public ChemAtom(MolAtom atom) {
 		this.atom = atom;
 
@@ -58,23 +56,33 @@ public class ChemAtom implements IAtom {
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see org.helm.chemtoolkit.IAtom#getBound()
-	 */
-	@Override
-	public ChemBond getIBound(int arg0) {
-
-		return new ChemBond(atom.getBond(arg0));
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
 	 * @see org.helm.chemtoolkit.IAtom#getIAtno()
 	 */
 	@Override
 	public int getIAtno() {
 
 		return atom.getAtno();
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.helm.chemtoolkit.IAtom#getRgroup()
+	 */
+	@Override
+	public int getRgroup() {
+
+		return atom.getRgroup();
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.helm.chemtoolkit.IAtom#getIBond(int)
+	 */
+	@Override
+	public IBondBase getIBond(int arg0) {
+		return new ChemBond(atom.getBond(arg0));
 	}
 
 }

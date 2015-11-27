@@ -33,7 +33,10 @@ import javax.imageio.stream.ImageOutputStream;
 
 import org.helm.chemtoolkit.CTKException;
 import org.helm.chemtoolkit.CTKSmilesException;
-import org.helm.chemtoolkit.ChemistryManipulator;
+import org.helm.chemtoolkit.IAtomBase;
+import org.helm.chemtoolkit.IBondBase;
+import org.helm.chemtoolkit.IMoleculeBase;
+import org.helm.chemtoolkit.AbstractChemistryManipulator;
 import org.helm.chemtoolkit.MoleculeInfo;
 
 import chemaxon.formats.MolImporter;
@@ -43,13 +46,14 @@ import chemaxon.marvin.io.MolExportException;
 import chemaxon.marvin.paint.DispOptConsts;
 import chemaxon.marvin.plugin.PluginException;
 import chemaxon.struc.MolAtom;
+import chemaxon.struc.MolBond;
 import chemaxon.struc.Molecule;
 
 /**
  * @author chistyakov
  *
  */
-public class ChemaxonManipulatorImpl implements ChemistryManipulator {
+public class ChemaxonManipulator extends AbstractChemistryManipulator {
 	public static final String UNIQUE_SMILES_FORMAT = "smiles:u";
 	public static final String SMILES_FORMAT = "smiles";
 	private static final String MOL_FORMAT = "mol";
@@ -292,15 +296,46 @@ public class ChemaxonManipulatorImpl implements ChemistryManipulator {
 		return null;
 	}
 
-	/* (non-Javadoc)
-	 * @see org.helm.chemtoolkit.ChemistryManipulator#merge(org.helm.chemtoolkit.Molecule, org.helm.chemtoolkit.MolAtom, org.helm.chemtoolkit.Molecule, org.helm.chemtoolkit.MolAtom)
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.helm.chemtoolkit.AbstractChemistryManipulator#merge(org.helm.
+	 * chemtoolkit.IMolecule, org.helm.chemtoolkit.IAtom,
+	 * org.helm.chemtoolkit.IMolecule, org.helm.chemtoolkit.IAtom)
 	 */
 	@Override
-	public org.helm.chemtoolkit.Molecule merge(org.helm.chemtoolkit.Molecule first,
-			org.helm.chemtoolkit.MolAtom firstRgroup, org.helm.chemtoolkit.Molecule second,
-			org.helm.chemtoolkit.MolAtom secondRgroup) {
-		// TODO Auto-generated method stub
-		return null;
+	public IMoleculeBase merge(IMoleculeBase firstMolecule, IAtomBase firstRgroup, IMoleculeBase secondMolecule, IAtomBase secondRgroup) {
+		// cyclization is allowed
+		IMoleculeBase first = firstMolecule.clone();
+		IMoleculeBase second = secondMolecule.clone();
+		if (first == second) {
+			first.dearomatize();
+			IAtomBase atom1 = removeRgroup(first, firstRgroup);
+			IAtomBase atom2 = removeRgroup(first, secondRgroup);
+			ChemBond bond = new ChemBond(new MolBond(((ChemAtom) atom1).getMolAtom(), ((ChemAtom) atom2).getMolAtom()));
+			first.addI(bond);
+		} else {
+			first.dearomatize();
+			second.dearomatize();
+
+			IAtomBase atom1 = removeRgroup(first, firstRgroup);
+
+			IAtomBase atom2 = removeRgroup(first, secondRgroup);
+
+			IAtomBase[] atoms = second.getIAtomArray();
+			for (int i = 0; i < atoms.length; i++) {
+				first.addI(atoms[i]);
+			}
+
+			IBondBase[] bonds = second.getIBondArray();
+			for (int i = 0; i < bonds.length; i++) {
+				first.addI(bonds[i]);
+			}
+
+			ChemBond bond = new ChemBond(new MolBond(((ChemAtom) atom1).getMolAtom(), ((ChemAtom) atom2).getMolAtom()));
+			first.addI(bond);
+		}
+		return first;
 	}
 
 }

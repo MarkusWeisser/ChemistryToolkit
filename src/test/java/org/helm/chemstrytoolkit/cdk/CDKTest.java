@@ -27,8 +27,8 @@ import java.io.IOException;
 import org.helm.chemtoolkit.CTKException;
 import org.helm.chemtoolkit.CTKSmilesException;
 import org.helm.chemtoolkit.ChemicalToolKit;
-import org.helm.chemtoolkit.ChemistryManipulator;
-import org.helm.chemtoolkit.ChemistryManipulator.OutputType;
+import org.helm.chemtoolkit.AbstractChemistryManipulator;
+import org.helm.chemtoolkit.AbstractChemistryManipulator.OutputType;
 import org.helm.chemtoolkit.MoleculeInfo;
 import org.testng.Assert;
 import org.testng.annotations.Test;
@@ -42,7 +42,7 @@ import bsh.Console;
 public class CDKTest {
 	private static String type = "CDK";
 
-	private static ChemistryManipulator getManipulator() {
+	private static AbstractChemistryManipulator getManipulator() {
 		return ChemicalToolKit.getTestINSTANCE(type).getManipulator();
 	}
 

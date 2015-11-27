@@ -25,12 +25,18 @@ package org.helm.chemtoolkit;
  * @author chistyakov
  *
  */
-public interface IMolecule {
+public interface IAtomBase extends IChemObjectBase {
+	
 
-	public void removeINode(IAtom node);
+	public int getIBondCount();
 
-	public IAtom[] getIAtomArray();
+	public IBondBase getIBond(int arg0);
+	
+	public int getRgroup();
 
-	public void addI(IChemObject object);
+	public int getIAtno();
+
+
 
 }
+

@@ -21,10 +21,28 @@
  ******************************************************************************/
 package org.helm.chemtoolkit;
 
+import java.util.Map;
+
+import chemaxon.struc.MolBond;
+
 /**
  * @author chistyakov
  *
  */
-public interface IChemObject{
+public interface IMoleculeBase {
+
+	public Map<String, IAtomBase> getRgroups();
+
+	public void dearomatize();
+
+	public void removeINode(IAtomBase node);
+
+	public IAtomBase[] getIAtomArray();
+
+	public void addI(IChemObjectBase object);
+
+	public IBondBase[] getIBondArray();
+	
+	public IMoleculeBase clone();
 
 }

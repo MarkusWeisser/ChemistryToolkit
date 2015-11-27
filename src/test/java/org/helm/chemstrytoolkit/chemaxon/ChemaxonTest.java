@@ -27,9 +27,9 @@ import java.io.IOException;
 import org.helm.chemtoolkit.CTKException;
 import org.helm.chemtoolkit.CTKSmilesException;
 import org.helm.chemtoolkit.ChemicalToolKit;
-import org.helm.chemtoolkit.ChemistryManipulator;
-import org.helm.chemtoolkit.ChemistryManipulator.InputType;
-import org.helm.chemtoolkit.ChemistryManipulator.OutputType;
+import org.helm.chemtoolkit.AbstractChemistryManipulator;
+import org.helm.chemtoolkit.AbstractChemistryManipulator.InputType;
+import org.helm.chemtoolkit.AbstractChemistryManipulator.OutputType;
 import org.helm.chemtoolkit.MoleculeInfo;
 import org.testng.Assert;
 import org.testng.annotations.Test;
@@ -41,7 +41,7 @@ import org.testng.annotations.Test;
 public class ChemaxonTest {
 	private static String type = "chemaxon";
 
-	private static ChemistryManipulator getManipulator() {
+	private static AbstractChemistryManipulator getManipulator() {
 		return ChemicalToolKit.getTestINSTANCE(type).getManipulator();
 	}
 
