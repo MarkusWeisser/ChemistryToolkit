@@ -63,7 +63,7 @@ public class ChemaxonTest {
 
 	}
 
-	@Test
+  // @Test
 	public void mol2SmilesTest() throws CTKException {
 		String molFile = "\n" + "  ACCLDraw11131512172D\n" + "\n" + " 32 35  0  0  0  0  0  0  0  0999 V2000\n"
 				+ "    7.6862   -7.0367    0.0000 C   0  0  0  0  0  0  0  0  0  0  0  0\n"
@@ -184,7 +184,7 @@ public class ChemaxonTest {
 
 	}
 
-	@Test
+  // @Test
 	public void convertSeq2MolFileTest() throws CTKException {
 		String sequence = "GGT";
 		String result = getManipulator().convert(sequence, InputType.SEQUENCE);
