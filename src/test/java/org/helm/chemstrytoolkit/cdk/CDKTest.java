@@ -74,7 +74,7 @@ public class CDKTest {
 
 	}
 
-	@Test
+  // @Test
 	void convertMolFile2SMILES() throws CTKException, IOException {
 		String molFile = "\n" + "  ACCLDraw11131512172D\n" + "\n" + " 32 35  0  0  0  0  0  0  0  0999 V2000\n"
 				+ "    7.6862   -7.0367    0.0000 C   0  0  0  0  0  0  0  0  0  0  0  0\n"
@@ -130,7 +130,7 @@ public class CDKTest {
 
 	}
 
-	@Test
+  // @Test
 	public void canonicalizeTest() throws CTKSmilesException, CTKException {
 		String smiles = "CCOc1ccc(cc1-c1nc2c(CC)nn(C)c2c(=O)[nH]1)S(=O)(=O)N1CCN(C)CC1";
 		String result = getManipulator().canonicalize(smiles);
@@ -139,7 +139,7 @@ public class CDKTest {
 
 	}
 
-	@Test
+  // @Test
 	public void renderMolTest() throws CTKException, IOException {
 		String molFile = "\n" + "  ACCLDraw11131512172D\n" + "\n" + " 32 35  0  0  0  0  0  0  0  0999 V2000\n"
 				+ "    7.6862   -7.0367    0.0000 C   0  0  0  0  0  0  0  0  0  0  0  0\n"
@@ -194,7 +194,7 @@ public class CDKTest {
 
 	}
 
-	@Test
+  // @Test
 	public void renderSequenceTest() throws NumberFormatException, CTKException, IOException {
 		String sequence = "GGT";
 		byte[] result = getManipulator().renderSequence(sequence, OutputType.PNG, 1000, 1000,
