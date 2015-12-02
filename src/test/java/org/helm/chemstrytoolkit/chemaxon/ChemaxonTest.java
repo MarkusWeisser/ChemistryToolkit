@@ -35,6 +35,7 @@ import org.testng.annotations.Test;
  *
  */
 public class ChemaxonTest {
+
   private static String type = "chemaxon";
 
   private static final Logger LOG = LoggerFactory.getLogger(ChemaxonTest.class);
@@ -186,4 +187,5 @@ public class ChemaxonTest {
    * @Test public void convertSeq2MolFileTest() throws CTKException { String sequence = "GGT"; String result =
    * getManipulator().convert(sequence, InputType.SEQUENCE); LOG.debug(result); }
    */
+
 }

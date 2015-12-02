@@ -36,6 +36,7 @@ import org.testng.annotations.Test;
  *
  */
 public class CDKTest {
+
   private static String type = "CDK";
 
   private static final Logger LOG = LoggerFactory.getLogger(CDKTest.class);
@@ -211,5 +212,4 @@ public class CDKTest {
     String result = manipulator.createRGroupMolFile(smiles);
     LOG.debug(result);
   }
-
 }
