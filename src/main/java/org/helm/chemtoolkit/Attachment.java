@@ -21,28 +21,62 @@
  ******************************************************************************/
 package org.helm.chemtoolkit;
 
-import java.util.Map;
-
-import chemaxon.struc.MolBond;
-
 /**
  * @author chistyakov
  *
  */
-public interface IMoleculeBase {
+public class Attachment {
 
-	public Map<String, IAtomBase> getRgroups();
+	private String id;
+	private String label;
+	private String name;
+	private String smiles;
 
-	public void dearomatize();
+	public String getId() {
+		return id;
+	}
 
-	public void removeINode(IAtomBase node);
+	public void setId(String id) {
+		this.id = id;
+	}
 
-	public IAtomBase[] getIAtomArray();
+	public String getLabel() {
+		return label;
+	}
 
-	public void addI(IChemObjectBase object);
+	public void setLabel(String label) {
+		this.label = label;
+	}
 
-	public IBondBase[] getIBondArray();
-	
-	public IMoleculeBase clone();
+	public String getName() {
+		return name;
+	}
+
+	public void setName(String name) {
+		this.name = name;
+	}
+
+	public String getSmiles() {
+		return smiles;
+	}
+
+	public void setSmiles(String smiles) {
+		this.smiles = smiles;
+	}
+
+	public Attachment() {
+	};
+
+	public Attachment cloneAttachment() {
+		return new Attachment(this.id, this.label, this.name, this.smiles);
+
+	}
+
+	public Attachment(String id, String label, String name, String smiles) {
+		this.id = id;
+		this.label = label;
+		this.name = name;
+		this.smiles = smiles;
+	}
 
 }

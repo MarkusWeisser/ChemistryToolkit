@@ -36,16 +36,21 @@ import java.io.IOException;
 import java.io.StringReader;
 import java.io.StringWriter;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 
 import javax.imageio.ImageIO;
 import javax.imageio.stream.ImageOutputStream;
 
 import org.helm.chemtoolkit.AbstractChemistryManipulator;
+import org.helm.chemtoolkit.AbstractMolecule;
+import org.helm.chemtoolkit.AttachmentList;
 import org.helm.chemtoolkit.CTKException;
 import org.helm.chemtoolkit.CTKSmilesException;
 import org.helm.chemtoolkit.IAtomBase;
-import org.helm.chemtoolkit.IMoleculeBase;
 import org.helm.chemtoolkit.MoleculeInfo;
 import org.openscience.cdk.DefaultChemObjectBuilder;
 import org.openscience.cdk.atomtype.CDKAtomTypeMatcher;
@@ -54,8 +59,11 @@ import org.openscience.cdk.exception.InvalidSmilesException;
 import org.openscience.cdk.interfaces.IAtom;
 import org.openscience.cdk.interfaces.IAtomContainer;
 import org.openscience.cdk.interfaces.IAtomType;
+import org.openscience.cdk.interfaces.IBond;
+import org.openscience.cdk.interfaces.IPseudoAtom;
 import org.openscience.cdk.io.MDLV2000Reader;
 import org.openscience.cdk.io.MDLV2000Writer;
+import org.openscience.cdk.io.RGroupQueryWriter;
 import org.openscience.cdk.io.SMILESWriter;
 import org.openscience.cdk.layout.StructureDiagramGenerator;
 import org.openscience.cdk.renderer.AtomContainerRenderer;
@@ -75,7 +83,7 @@ import org.openscience.cdk.tools.manipulator.AtomTypeManipulator;
 import org.openscience.cdk.tools.manipulator.MolecularFormulaManipulator;
 
 public class CDKManipulator extends AbstractChemistryManipulator {
-	private static final String SMILES_EXTENSION_SEPARATOR_REGEX = "\\|";
+	// private static final String SMILES_EXTENSION_SEPARATOR_REGEX = "\\|";
 
 	/**
 	 * 
@@ -89,6 +97,24 @@ public class CDKManipulator extends AbstractChemistryManipulator {
 		result = components[0];
 
 		return result;
+	}
+
+	private String normalize(String extendedSmiles, LinkedHashMap<Integer, String> groups) {
+		String smiles = null;
+		String result = "";
+		smiles = normalize(extendedSmiles);
+		Iterator<Integer> iterator = groups.keySet().iterator();
+		for (char item : smiles.toCharArray()) {
+			if (item == '*') {
+				result += groups.get(iterator.next());
+
+			} else
+				result += item;
+
+		}
+
+		return result;
+
 	}
 
 	/*
@@ -385,8 +411,110 @@ public class CDKManipulator extends AbstractChemistryManipulator {
 	 * org.helm.chemtoolkit.IMoleculeBase, org.helm.chemtoolkit.IAtomBase)
 	 */
 	@Override
-	public IMoleculeBase merge(IMoleculeBase first, IAtomBase firstRgroup, IMoleculeBase second,
+	public AbstractMolecule merge(AbstractMolecule first, IAtomBase firstRgroup, AbstractMolecule second,
 			IAtomBase secondRgroup) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	public String createRGroupMolFile(String extendedSmiles) throws CTKException {
+		String result = null;
+		LinkedHashMap<Integer, String> groups = getRGroupsFromExtendedSmiles(extendedSmiles);
+
+		/*
+		 * Parser<ParseState> parser = new
+		 * Parser<ParseState>(ParseState.EXTENSION); ByteArrayOutputStream baos
+		 * = new ByteArrayOutputStream(); parser.addAction(ParseState.EXTENSION,
+		 * new DefaultAction(baos)); InputStream is = new
+		 * ByteArrayInputStream(getExtension(extendedSmiles).getBytes());
+		 * parser.process(is); LinkedHashMap<Integer, String> groups =
+		 * ((DefaultAction) parser.getStateActionMap()
+		 * .get(parser.getStateActionMap().keySet().iterator().next())).
+		 * getGroups();
+		 */
+		extendedSmiles = normalize(extendedSmiles, groups);
+		try (StringWriter stringWriter = new StringWriter();
+				RGroupQueryWriter writer = new RGroupQueryWriter(stringWriter);
+				MDLV2000Writer writer2 = new MDLV2000Writer(stringWriter)) {
+			SmilesParser smilesParser = new SmilesParser(SilentChemObjectBuilder.getInstance());
+			IAtomContainer molecule = smilesParser.parseSmiles(extendedSmiles);
+
+			StructureDiagramGenerator sdg = new StructureDiagramGenerator();
+			sdg.setMolecule(molecule);
+			sdg.generateCoordinates();
+			molecule = sdg.getMolecule();
+
+			for (IAtom atom : molecule.atoms()) {
+				if (atom instanceof IPseudoAtom)
+					atom.setSymbol("R");
+			}
+			writer2.write(molecule);
+
+			result = stringWriter.toString();
+
+		} catch (InvalidSmilesException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (CDKException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (IOException e) {
+			throw new CTKException(e.getMessage(), e);
+		}
+
+		return result;
+
+	}
+
+	/**
+	 * @param pseudo
+	 * @param molecule
+	 * @param apoBonds
+	 */
+	private void chooseRootAttachmentBonds(IAtom atom, IAtomContainer molecule,
+			Map<IAtom, Map<Integer, IBond>> rootAttachmentPoints) {
+		int apoIdx = 1;
+		Map<Integer, IBond> apoBonds = new HashMap<Integer, IBond>();
+		Iterator<IBond> bonds = molecule.bonds().iterator();
+		// Pick up to two apo bonds randomly
+		while (bonds.hasNext() && apoIdx <= 2) {
+			IBond bond = bonds.next();
+			if (bond.contains(atom)) {
+				apoBonds.put((apoIdx), bond);
+				apoIdx++;
+			}
+		}
+		rootAttachmentPoints.put(atom, apoBonds);
+
+	}
+
+	private String convertExtendedSmiles(String extendedSmiles, List<String> groups) {
+
+		char[] parent = extendedSmiles.toCharArray();
+		String target = "";
+		int index = 1;
+		for (char item : parent) {
+			if (item == '*') {
+				target = target + groups.get(index);
+				index++;
+			} else
+				target = target + item;
+
+		}
+
+		return target;
+
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.helm.chemtoolkit.AbstractChemistryManipulator#getMolecule(java.lang.
+	 * String, org.helm.chemtoolkit.AttachmentList)
+	 */
+	@Override
+	public AbstractMolecule getMolecule(String smiles, AttachmentList attachments) {
 		// TODO Auto-generated method stub
 		return null;
 	}

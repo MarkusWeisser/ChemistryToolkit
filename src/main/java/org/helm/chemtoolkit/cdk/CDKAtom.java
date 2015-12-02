@@ -19,23 +19,79 @@
  * TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
  * SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  ******************************************************************************/
-package org.helm.chemtoolkit;
+package org.helm.chemtoolkit.cdk;
+
+import org.helm.chemtoolkit.IAtomBase;
+import org.helm.chemtoolkit.IBondBase;
+import org.openscience.cdk.interfaces.IAtom;
 
 /**
  * @author chistyakov
  *
  */
-public interface IAtomBase extends IChemObjectBase {
+public class CDKAtom implements IAtomBase {
+
+	protected IAtom atom;
+
+	protected int rGroup;
+	
+	protected int boundCount;
 	
 
-	public int getIBondCount();
 
-	public IBondBase getIBond(int arg0);
-	
-	public int getRgroup();
+	/**
+	 * @param atom
+	 */
+	public CDKAtom(IAtom atom) {
+		this.atom = atom;
+	}
 
-	public int getIAtno();
-	
+	public CDKAtom(IAtom atom, int rGroup) {
+		this.atom = atom;
+		this.rGroup = rGroup;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.helm.chemtoolkit.IAtomBase#getIBondCount()
+	 */
+	@Override
+	public int getIBondCount() {
+		return 0;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.helm.chemtoolkit.IAtomBase#getIBond(int)
+	 */
+	@Override
+	public IBondBase getIBond(int arg0) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.helm.chemtoolkit.IAtomBase#getRgroup()
+	 */
+	@Override
+	public int getRgroup() {
+
+		return rGroup;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.helm.chemtoolkit.IAtomBase#getIAtno()
+	 */
+	@Override
+	public int getIAtno() {
+		// TODO Auto-generated method stub
+		return 0;
+	}
 
 }
-

@@ -35,7 +35,8 @@ import org.helm.chemtoolkit.CTKException;
 import org.helm.chemtoolkit.CTKSmilesException;
 import org.helm.chemtoolkit.IAtomBase;
 import org.helm.chemtoolkit.IBondBase;
-import org.helm.chemtoolkit.IMoleculeBase;
+import org.helm.chemtoolkit.AbstractMolecule;
+import org.helm.chemtoolkit.AttachmentList;
 import org.helm.chemtoolkit.AbstractChemistryManipulator;
 import org.helm.chemtoolkit.MoleculeInfo;
 
@@ -79,11 +80,9 @@ public class ChemaxonManipulator extends AbstractChemistryManipulator {
 			try {
 				result = molecule2MolFile(getMolecule(data));
 			} catch (MolExportException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
+				new CTKException(e.getMessage(), e);
 			} catch (IOException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
+				new CTKException(e.getMessage(), e);
 			}
 			break;
 		default:
@@ -304,16 +303,18 @@ public class ChemaxonManipulator extends AbstractChemistryManipulator {
 	 * org.helm.chemtoolkit.IMolecule, org.helm.chemtoolkit.IAtom)
 	 */
 	@Override
-	public IMoleculeBase merge(IMoleculeBase firstMolecule, IAtomBase firstRgroup, IMoleculeBase secondMolecule, IAtomBase secondRgroup) {
+	public AbstractMolecule merge(AbstractMolecule firstMolecule, IAtomBase firstRgroup,
+			AbstractMolecule secondMolecule, IAtomBase secondRgroup) throws CTKException {
 		// cyclization is allowed
-		IMoleculeBase first = firstMolecule.clone();
-		IMoleculeBase second = secondMolecule.clone();
+
+		AbstractMolecule first = firstMolecule.cloneMolecule();
+		AbstractMolecule second = secondMolecule.cloneMolecule();
 		if (first == second) {
 			first.dearomatize();
 			IAtomBase atom1 = removeRgroup(first, firstRgroup);
 			IAtomBase atom2 = removeRgroup(first, secondRgroup);
 			ChemBond bond = new ChemBond(new MolBond(((ChemAtom) atom1).getMolAtom(), ((ChemAtom) atom2).getMolAtom()));
-			first.addI(bond);
+			first.addIBase(bond);
 		} else {
 			first.dearomatize();
 			second.dearomatize();
@@ -324,18 +325,31 @@ public class ChemaxonManipulator extends AbstractChemistryManipulator {
 
 			IAtomBase[] atoms = second.getIAtomArray();
 			for (int i = 0; i < atoms.length; i++) {
-				first.addI(atoms[i]);
+				first.addIBase(atoms[i]);
 			}
 
 			IBondBase[] bonds = second.getIBondArray();
 			for (int i = 0; i < bonds.length; i++) {
-				first.addI(bonds[i]);
+				first.addIBase(bonds[i]);
 			}
 
 			ChemBond bond = new ChemBond(new MolBond(((ChemAtom) atom1).getMolAtom(), ((ChemAtom) atom2).getMolAtom()));
-			first.addI(bond);
+			first.addIBase(bond);
 		}
 		return first;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.helm.chemtoolkit.AbstractChemistryManipulator#getMolecule(java.lang.
+	 * String, org.helm.chemtoolkit.AttachmentList)
+	 */
+	@Override
+	public AbstractMolecule getMolecule(String smiles, AttachmentList attachments) throws IOException {
+		ChemMolecule molecule = new ChemMolecule(getMolecule(smiles), attachments);
+		return molecule;
 	}
 
 }

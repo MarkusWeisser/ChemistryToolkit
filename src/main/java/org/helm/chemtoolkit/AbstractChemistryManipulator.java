@@ -23,7 +23,10 @@ package org.helm.chemtoolkit;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.helm.chemtoolkit.AbstractChemistryManipulator.InputType;
 import org.openscience.cdk.exception.CDKException;
@@ -35,6 +38,8 @@ import chemaxon.struc.MolBond;
  *
  */
 public abstract class AbstractChemistryManipulator {
+
+	protected static final String SMILES_EXTENSION_SEPARATOR_REGEX = "\\|";
 
 	public enum InputType {
 		SMILES, MOLFILE, SEQUENCE
@@ -143,6 +148,8 @@ public abstract class AbstractChemistryManipulator {
 	public abstract byte[] renderSequence(String sequence, OutputType outputType, int width, int height, int rgb)
 			throws CTKException;
 
+	public abstract AbstractMolecule getMolecule(String smiles, AttachmentList attachments) throws IOException;
+
 	/**
 	 * 
 	 * @param first
@@ -150,8 +157,11 @@ public abstract class AbstractChemistryManipulator {
 	 * @param second
 	 * @param secondRgroup
 	 * @return
+	 * @throws CTKException
+	 * @throws CloneNotSupportedException
 	 */
-	public abstract IMoleculeBase merge(IMoleculeBase first, IAtomBase firstRgroup, IMoleculeBase second, IAtomBase secondRgroup);
+	public abstract AbstractMolecule merge(AbstractMolecule first, IAtomBase firstRgroup, AbstractMolecule second,
+			IAtomBase secondRgroup) throws CTKException;
 
 	/**
 	 * 
@@ -159,8 +169,26 @@ public abstract class AbstractChemistryManipulator {
 	 * @return
 	 */
 
-	public List<String> getRGroupsFromExtendedSmiles(String extendedSmiles) {
-		List<String> list = new ArrayList<String>();
+	public LinkedHashMap<Integer, String> getRGroupsFromExtendedSmiles(String extendedSmiles) {
+		extendedSmiles = getExtension(extendedSmiles);
+		LinkedHashMap<Integer, String> list = new LinkedHashMap<Integer, String>();
+		Integer currIndex = 0;
+		char[] items = extendedSmiles.toCharArray();
+		List<Integer> indexes = new ArrayList<Integer>();
+		// currIndex = currIndex + extendedSmiles.indexOf("_R");
+		while (extendedSmiles.indexOf("_R", currIndex) > 0) {
+			currIndex = extendedSmiles.indexOf("_R", currIndex);
+			indexes.add(currIndex);
+			currIndex++;
+		}
+
+		for (int k = 0; k < items.length; k++) {
+			if (items[k] == 'R') {
+				indexes.add(currIndex + k);
+				currIndex++;
+			}
+		}
+
 		String[] tokens = extendedSmiles.split("R", -1);
 		if (tokens.length > 1) {
 			for (int i = 1; i < tokens.length; i++) {
@@ -177,8 +205,9 @@ public abstract class AbstractChemistryManipulator {
 				}
 
 				if (numbers.length() > 0) {
-					numbers = "R" + numbers;
-					list.add(numbers);
+					// numbers = "R" + numbers;
+					Integer value = Integer.valueOf(numbers);
+					list.put(indexes.get(value - 1) - value * 3, "R" + numbers);
 				}
 			}
 		}
@@ -186,7 +215,7 @@ public abstract class AbstractChemistryManipulator {
 		return list;
 	}
 
-	public IAtomBase removeRgroup(IMoleculeBase molecule, IAtomBase rgroup) {
+	public IAtomBase removeRgroup(AbstractMolecule molecule, IAtomBase rgroup) {
 
 		IAtomBase atom = null;
 		if (rgroup.getIBondCount() == 1) {
@@ -200,6 +229,14 @@ public abstract class AbstractChemistryManipulator {
 
 		}
 		return atom;
+	}
+
+	protected String getExtension(String smiles) {
+		String result = null;
+		String[] components = smiles.split(SMILES_EXTENSION_SEPARATOR_REGEX);
+		result = components[1];
+
+		return result;
 	}
 
 }

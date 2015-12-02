@@ -85,4 +85,15 @@ public class ChemAtom implements IAtomBase {
 		return new ChemBond(atom.getBond(arg0));
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.helm.chemtoolkit.IAtom#clone()
+	 */
+	@Override
+	public IAtomBase clone() {
+
+		return new ChemAtom(((MolAtom) atom.clone()));
+	}
+
 }

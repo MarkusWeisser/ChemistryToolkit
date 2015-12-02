@@ -19,23 +19,46 @@
  * TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
  * SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  ******************************************************************************/
-package org.helm.chemtoolkit;
+package org.helm.chemtoolkit.cdk;
+
+import org.helm.chemtoolkit.IAtomBase;
+import org.helm.chemtoolkit.IBondBase;
+import org.openscience.cdk.interfaces.IBond;
 
 /**
  * @author chistyakov
  *
  */
-public interface IAtomBase extends IChemObjectBase {
-	
+public class CDKBond implements IBondBase {
 
-	public int getIBondCount();
+	protected IBond bond;
 
-	public IBondBase getIBond(int arg0);
-	
-	public int getRgroup();
+	/**
+	 * @param bond
+	 */
+	public CDKBond(IBond bond) {
+		this.bond = bond;
+	}
 
-	public int getIAtno();
-	
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.helm.chemtoolkit.IBondBase#getIAtom1()
+	 */
+	@Override
+	public IAtomBase getIAtom1() {
+
+		return new CDKAtom(bond.getAtom(1));
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.helm.chemtoolkit.IBondBase#getIAtom2()
+	 */
+	@Override
+	public IAtomBase getIAtom2() {
+		return new CDKAtom(bond.getAtom(2));
+	}
 
 }
-

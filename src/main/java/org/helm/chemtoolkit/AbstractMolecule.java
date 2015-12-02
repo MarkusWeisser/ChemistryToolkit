@@ -16,53 +16,52 @@
  ******************************************************************************/
 package org.helm.chemtoolkit;
 
-import org.helm.chemtoolkit.cdk.CDKManipulator;
-import org.helm.chemtoolkit.chemaxon.ChemaxonManipulator;
+import java.util.HashMap;
+import java.util.Map;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * @author chistyakov
  *
  */
-public class ChemicalToolKit {
+public abstract class AbstractMolecule {
 
-  static ChemicalToolKit INSTANCE;
+  private static final Logger LOG = LoggerFactory.getLogger(AbstractMolecule.class);
 
-  private AbstractChemistryManipulator manipulator;
+  protected AttachmentList attachments;
 
-  private AbstractMolecule molecule;
-
-  public AbstractChemistryManipulator getManipulator() {
-    return manipulator;
+  public AttachmentList getAttachments() {
+    return attachments.cloneList();
   }
 
-  public AbstractMolecule getMolecule() {
-    return molecule;
+  public void setAttachments(AttachmentList attachments) {
+    this.attachments = attachments.cloneList();
   }
 
-  private ChemicalToolKit() {
-    // todo get chemistry plugin
-    // manipulator = new CDKManipulator();
-    // manipulator = new ChemaxonManipulatorImpl();
-
-  }
-
-  private ChemicalToolKit(String type) {
-    if (type.equals("CDK")) {
-      manipulator = new CDKManipulator();
-    } else {
-      manipulator = new ChemaxonManipulator();
+  public Map<String, IAtomBase> getRgroups() throws CTKException {
+    Map<String, IAtomBase> rgroupMap = new HashMap<String, IAtomBase>();
+    IAtomBase[] atoms = getIAtomArray();
+    for (int i = 0; i < atoms.length; i++) {
+      int rId = atoms[i].getRgroup();
+      if (rId > 0) {
+        rgroupMap.put("R" + rId, atoms[i]);
+      }
     }
+    return rgroupMap;
   }
 
-  public static ChemicalToolKit getINSTANCE() {
-    if (INSTANCE == null) {
-      INSTANCE = new ChemicalToolKit();
-    }
-    return INSTANCE;
-  }
+  public abstract void dearomatize() throws CTKException;
 
-  public static ChemicalToolKit getTestINSTANCE(String type) {
+  public abstract void removeINode(IAtomBase node);
 
-    return new ChemicalToolKit(type);
-  }
+  public abstract IAtomBase[] getIAtomArray();
+
+  public abstract void addIBase(IChemObjectBase object);
+
+  public abstract IBondBase[] getIBondArray();
+
+  public abstract AbstractMolecule cloneMolecule() throws CTKException;
+
 }

@@ -21,21 +21,35 @@
  ******************************************************************************/
 package org.helm.chemtoolkit;
 
+import java.util.ArrayList;
+
 /**
  * @author chistyakov
  *
  */
-public interface IAtomBase extends IChemObjectBase {
-	
+public class AttachmentList extends ArrayList<Attachment> {
 
-	public int getIBondCount();
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = -8489331560640955474L;
 
-	public IBondBase getIBond(int arg0);
-	
-	public int getRgroup();
+	public AttachmentList() {
+		super();
+	}
 
-	public int getIAtno();
-	
+	@Override
+	public Attachment get(int index) {
+		return super.get(index).cloneAttachment();
+	}
+
+	public AttachmentList cloneList() {
+		AttachmentList cloned = new AttachmentList();
+		for (int i = 0; i < this.size(); i++) {
+			cloned.add(this.get(i).cloneAttachment());
+		}
+		return cloned;
+
+	}
 
 }
-
