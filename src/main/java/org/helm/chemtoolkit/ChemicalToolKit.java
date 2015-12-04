@@ -29,14 +29,8 @@ public class ChemicalToolKit {
 
   private AbstractChemistryManipulator manipulator;
 
-  private AbstractMolecule molecule;
-
   public AbstractChemistryManipulator getManipulator() {
     return manipulator;
-  }
-
-  public AbstractMolecule getMolecule() {
-    return molecule;
   }
 
   private ChemicalToolKit() {

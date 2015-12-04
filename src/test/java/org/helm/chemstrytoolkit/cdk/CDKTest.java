@@ -55,10 +55,10 @@ public class CDKTest {
   }
 
   @Test
-  public void getMoleculeInfoTest() throws CTKException {
+  public void getMoleculeInfoTest() throws CTKException, IOException {
     String smiles = "CCOC1=C(C=C(C=C1)S(=O)(=O)N1CCN(C)CC1)C1=NC2=C(N(C)N=C2CC)C(=O)N1";
     // String smiles = "[*]N1CC[C@H]1C([*])=O |r,$_R2;;;;;;_R1;$|";
-    MoleculeInfo moleculeInfo = getManipulator().getMoleculeInfo(smiles);
+    MoleculeInfo moleculeInfo = getManipulator().getMoleculeInfo(getManipulator().getMolecule(smiles, null));
     LOG.debug("molecular weight=" + moleculeInfo.getMolecularWeight());
     LOG.debug("exact mass=" + moleculeInfo.getExactMass());
     LOG.debug("sum formula=" + moleculeInfo.getMolecularFormula());
@@ -210,6 +210,7 @@ public class CDKTest {
     String smiles = "[*]N1CC[C@H]1C([*])=O |r,$_R2;;;;;;_R1;$|";
     CDKManipulator manipulator = (CDKManipulator) getManipulator();
     String result = manipulator.createRGroupMolFile(smiles);
+
     LOG.debug(result);
   }
 }

@@ -19,16 +19,11 @@ package org.helm.chemtoolkit;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 /**
  * @author chistyakov
  *
  */
 public abstract class AbstractMolecule {
-
-  private static final Logger LOG = LoggerFactory.getLogger(AbstractMolecule.class);
 
   protected AttachmentList attachments;
 
@@ -38,6 +33,9 @@ public abstract class AbstractMolecule {
 
   public void setAttachments(AttachmentList attachments) {
     this.attachments = attachments.cloneList();
+  }
+
+  protected AbstractMolecule() {
   }
 
   public Map<String, IAtomBase> getRgroups() throws CTKException {
@@ -52,7 +50,22 @@ public abstract class AbstractMolecule {
     return rgroupMap;
   }
 
+  public static int getIdFromLabel(String label) {
+    int result = 0;
+    String[] array = label.split("R");
+    try {
+      result = Integer.parseInt(array[1]);
+    } catch (NumberFormatException e) {
+      //
+    }
+    return result;
+  }
+
+  public abstract IAtomBase getRGroupAtom(int groupId, boolean rgatom);
+
   public abstract void dearomatize() throws CTKException;
+
+  public abstract void generateCoordinates() throws CTKException;
 
   public abstract void removeINode(IAtomBase node);
 
