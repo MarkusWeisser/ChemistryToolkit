@@ -30,6 +30,17 @@ public class Attachment {
 
   private String smiles;
 
+  public int getCurrenIndex() {
+    int result = 0;
+    String[] array = label.split("R");
+    try {
+      result = Integer.parseInt(array[1]);
+    } catch (NumberFormatException e) {
+      //
+    }
+    return result;
+  }
+
   public String getId() {
     return id;
   }
@@ -62,7 +73,14 @@ public class Attachment {
     this.smiles = smiles;
   }
 
+  public void changeIndex(int index) {
+    String currIndex = String.valueOf(getCurrenIndex());
+    String toIndex = String.valueOf(index);
+    this.id = this.id.replace(currIndex, toIndex);
+    this.label = this.label.replace(currIndex, toIndex);
+    this.smiles = this.smiles.replace(currIndex, toIndex);
 
+  }
 
   public Attachment cloneAttachment() {
     return new Attachment(this.id, this.label, this.name, this.smiles);

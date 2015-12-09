@@ -16,6 +16,8 @@
  ******************************************************************************/
 package org.helm.chemtoolkit.chemaxon;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 
 import org.helm.chemtoolkit.AbstractMolecule;
@@ -40,6 +42,7 @@ public class ChemMolecule extends AbstractMolecule {
 
   private Molecule molecule;
 
+  @Override
   public Molecule getMolecule() {
     return this.molecule;
   }
@@ -81,11 +84,11 @@ public class ChemMolecule extends AbstractMolecule {
    * @see org.helm.chemtoolkit.AbstractMolecule#getIAtomArray()
    */
   @Override
-  public IAtomBase[] getIAtomArray() {
+  public List<IAtomBase> getIAtomArray() {
     MolAtom[] parent = molecule.getAtomArray();
-    ChemAtom[] target = new ChemAtom[parent.length];
-    for (int i = 0; i < target.length; i++) {
-      target[i] = new ChemAtom(parent[i]);
+    List<IAtomBase> target = new ArrayList<>();
+    for (int i = 0; i < parent.length; i++) {
+      target.add(new ChemAtom(parent[i]));
     }
     return target;
   }
@@ -97,6 +100,7 @@ public class ChemMolecule extends AbstractMolecule {
    */
   @Override
   public void addIBase(IChemObjectBase node) {
+
     if (node instanceof ChemAtom) {
       molecule.add(((ChemAtom) node).getMolAtom());
     } else if (node instanceof ChemBond) {
@@ -137,11 +141,11 @@ public class ChemMolecule extends AbstractMolecule {
    * @see org.helm.chemtoolkit.AbstractMolecule#getIBondArray()
    */
   @Override
-  public IBondBase[] getIBondArray() {
+  public List<IBondBase> getIBondArray() {
     MolBond[] parent = molecule.getBondArray();
-    ChemBond[] target = new ChemBond[parent.length];
-    for (int i = 0; i < target.length; i++) {
-      target[i] = new ChemBond(parent[i]);
+    List<IBondBase> target = new ArrayList<>();
+    for (int i = 0; i < parent.length; i++) {
+      target.add(new ChemBond(parent[i]));
     }
     return target;
 
@@ -177,27 +181,16 @@ public class ChemMolecule extends AbstractMolecule {
    * }
    */
 
-  @Override
-  public ChemAtom getRGroupAtom(int groupId, boolean rgatom) {
-    MolAtom result = null;
-    for (MolAtom atom : molecule.getAtomArray()) {
-      if (atom.getRgroup() == groupId) {
-        if (rgatom) {
-          result = atom;
-        } else {
-          MolBond bond = atom.getBond(0);
-          if (bond.getAtom1().equals(atom)) {
-            result = bond.getAtom2();
-          } else
-            result = bond.getAtom1();
-        }
-        LOG.debug("rgroup atom=" + result);
-      }
-    }
-
-    return new ChemAtom(result);
-
-  }
+  /*
+   * @Override public ChemAtom getRGroupAtom(int groupId, boolean rgatom) { MolAtom result = null; for (MolAtom atom :
+   * molecule.getAtomArray()) { if (atom.getRgroup() == groupId) { if (rgatom) { result = atom; } else { MolBond bond =
+   * atom.getBond(0); if (bond.getAtom1().equals(atom)) { result = bond.getAtom2(); } else result = bond.getAtom1(); }
+   * LOG.debug("rgroup atom=" + result); } }
+   * 
+   * return new ChemAtom(result);
+   * 
+   * }
+   */
 
   /**
    * {@inheritDoc}
@@ -205,6 +198,21 @@ public class ChemMolecule extends AbstractMolecule {
   @Override
   public void generateCoordinates() throws CTKException {
     molecule.clean(2, null);
+
+  }
+
+  /**
+   * {@inheritDoc}
+   * 
+   * @throws CTKException
+   */
+  @Override
+  public void changeAtomLabel(int index, int toIndex) throws CTKException {
+    for (IAtomBase atom : getIAtomArray()) {
+      if (atom.getRgroup() == index) {
+        atom.setRgroup(toIndex);
+      }
+    }
 
   }
 

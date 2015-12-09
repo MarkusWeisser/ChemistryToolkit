@@ -21,7 +21,6 @@ import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 
-import org.openscience.cdk.exception.CDKException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -35,7 +34,7 @@ public abstract class AbstractChemistryManipulator {
 
   protected static final String SMILES_EXTENSION_SEPARATOR_REGEX = "\\|";
 
-  public enum InputType {
+  public enum StType {
     SMILES, MOLFILE, SEQUENCE
   }
 
@@ -55,13 +54,21 @@ public abstract class AbstractChemistryManipulator {
 
   /**
    * 
+   * @param molecule
+   * @return
+   * @throws CTKException
+   */
+  public abstract String convertMolecule(AbstractMolecule container, StType type) throws CTKException;
+
+  /**
+   * 
    * @param data SMILES or Molfile
    * @param type type of input data
    * @return SMILES or Molfile
    * @throws Exception
    * @throws CTKException
    */
-  public abstract String convert(String data, InputType type) throws CTKException;
+  public abstract String convert(String data, StType type) throws CTKException;
 
   /**
    * 
@@ -78,7 +85,7 @@ public abstract class AbstractChemistryManipulator {
    * @throws CTKException general ChemToolKit exception passed to HELMToolKit
    */
 
-  public abstract MoleculeInfo getMoleculeInfo(AbstractMolecule molecule) throws CTKException;
+  public abstract MoleculeInfo getMoleculeInfo(AbstractMolecule container) throws CTKException;
 
   /**
    * 
@@ -88,7 +95,7 @@ public abstract class AbstractChemistryManipulator {
    * @throws Exception java exception
    */
 
-  public abstract String convertSMILES2MolFile(String smiles) throws CTKException;
+// public abstract String convertSMILES2MolFile(String smiles) throws CTKException;
 
   /**
    * 
@@ -99,7 +106,7 @@ public abstract class AbstractChemistryManipulator {
    * @throws CDKException
    */
 
-  public abstract String convertMolFile2SMILES(String molfile) throws CTKException;
+// public abstract String convertMolFile2SMILES(String molfile) throws CTKException;
 
   /**
    * 
@@ -134,7 +141,8 @@ public abstract class AbstractChemistryManipulator {
   public abstract byte[] renderSequence(String sequence, OutputType outputType, int width, int height, int rgb)
       throws CTKException;
 
-  public abstract AbstractMolecule getMolecule(String smiles, AttachmentList attachments) throws IOException;
+  public abstract AbstractMolecule getMolecule(String smiles, AttachmentList attachments) throws IOException,
+      CTKException;
 
   /**
    * 
@@ -146,8 +154,45 @@ public abstract class AbstractChemistryManipulator {
    * @throws CTKException
    * 
    */
-  public abstract AbstractMolecule merge(AbstractMolecule first, IAtomBase firstRgroup, AbstractMolecule second,
-      IAtomBase secondRgroup) throws CTKException;
+  public AbstractMolecule merge(AbstractMolecule firstContainer, IAtomBase firstRgroup,
+      AbstractMolecule secondContainer,
+      IAtomBase secondRgroup) throws CTKException {
+    if (firstContainer == secondContainer) {
+      firstContainer.dearomatize();
+      IAtomBase atom1 = getNeighborAtom(firstRgroup);
+      IAtomBase atom2 = getNeighborAtom(secondRgroup);
+
+      IBondBase bond = bindAtoms(atom1, atom2);
+      firstContainer.addIBase(bond);
+    } else {
+      firstContainer.dearomatize();
+      secondContainer.dearomatize();
+      IAtomBase atom1 = getNeighborAtom(firstRgroup);
+      IAtomBase atom2 = getNeighborAtom(secondRgroup);
+
+      firstContainer.removeAttachment(firstRgroup);
+      secondContainer.removeAttachment(secondRgroup);
+
+      firstContainer.removeINode(firstRgroup);
+      secondContainer.removeINode(secondRgroup);
+
+      List<IAtomBase> atoms = secondContainer.getIAtomArray();
+      for (int i = 0; i < atoms.size(); i++) {
+        firstContainer.addIBase(atoms.get(i));
+      }
+
+      List<IBondBase> bonds = secondContainer.getIBondArray();
+      for (int i = 0; i < bonds.size(); i++) {
+        firstContainer.addIBase(bonds.get(i));
+      }
+
+      IBondBase bond = bindAtoms(atom1, atom2);
+      firstContainer.addIBase(bond);
+      firstContainer.setAttachments(mergeAttachments(firstContainer, firstContainer.getAttachments(), secondContainer.getAttachments()));
+
+    }
+    return firstContainer;
+  }
 
   /**
    * 
@@ -158,42 +203,44 @@ public abstract class AbstractChemistryManipulator {
   public LinkedHashMap<Integer, String> getRGroupsFromExtendedSmiles(String extendedSmiles) {
     extendedSmiles = getExtension(extendedSmiles);
     LinkedHashMap<Integer, String> list = new LinkedHashMap<Integer, String>();
-    Integer currIndex = 0;
-    char[] items = extendedSmiles.toCharArray();
-    List<Integer> indexes = new ArrayList<Integer>();
-    // currIndex = currIndex + extendedSmiles.indexOf("_R");
-    while (extendedSmiles.indexOf("_R", currIndex) > 0) {
-      currIndex = extendedSmiles.indexOf("_R", currIndex);
-      indexes.add(currIndex);
-      currIndex++;
-    }
-
-    for (int k = 0; k < items.length; k++) {
-      if (items[k] == 'R') {
-        indexes.add(currIndex + k);
+    if (extendedSmiles != null) {
+      Integer currIndex = 0;
+      char[] items = extendedSmiles.toCharArray();
+      List<Integer> indexes = new ArrayList<Integer>();
+      // currIndex = currIndex + extendedSmiles.indexOf("_R");
+      while (extendedSmiles.indexOf("_R", currIndex) > 0) {
+        currIndex = extendedSmiles.indexOf("_R", currIndex);
+        indexes.add(currIndex);
         currIndex++;
       }
-    }
 
-    String[] tokens = extendedSmiles.split("R", -1);
-    if (tokens.length > 1) {
-      for (int i = 1; i < tokens.length; i++) {
-        String token = tokens[i];
-        char[] chars = token.toCharArray();
-        String numbers = "";
-        for (int j = 0; j < chars.length; j++) {
-          String letter = String.valueOf(chars[j]);
-          if (letter.matches("[0-9]")) {
-            numbers += letter;
-          } else {
-            break;
-          }
+      for (int k = 0; k < items.length; k++) {
+        if (items[k] == 'R') {
+          indexes.add(currIndex + k);
+          currIndex++;
         }
+      }
 
-        if (numbers.length() > 0) {
-          // numbers = "R" + numbers;
-          Integer value = Integer.valueOf(numbers);
-          list.put(indexes.get(value - 1) - value * 3, "R" + numbers);
+      String[] tokens = extendedSmiles.split("R", -1);
+      if (tokens.length > 1) {
+        for (int i = 1; i < tokens.length; i++) {
+          String token = tokens[i];
+          char[] chars = token.toCharArray();
+          String numbers = "";
+          for (int j = 0; j < chars.length; j++) {
+            String letter = String.valueOf(chars[j]);
+            if (letter.matches("[0-9]")) {
+              numbers += letter;
+            } else {
+              break;
+            }
+          }
+
+          if (numbers.length() > 0) {
+            // numbers = "R" + numbers;
+            Integer value = Integer.valueOf(numbers);
+            list.put(indexes.get(value - 1) - value * 3, "R" + numbers);
+          }
         }
       }
     }
@@ -201,14 +248,83 @@ public abstract class AbstractChemistryManipulator {
     return list;
   }
 
-  public abstract IAtomBase removeRgroup(AbstractMolecule molecule, IAtomBase rgroup);
+  public IAtomBase getNeighborAtom(IAtomBase rgroup) throws CTKException {
+    IAtomBase atom = null;
+    if (rgroup.getIBondCount() == 1) {
+      IBondBase bond = rgroup.getIBond(0);
+
+      if ((bond.getIAtom1()).compare(rgroup)) {
+        atom = bond.getIAtom2();
+
+      } else {
+        atom = bond.getIAtom1();
+
+      }
+
+    }
+
+    return atom;
+
+  }
 
   protected String getExtension(String smiles) {
     String result = null;
-    String[] components = smiles.split(SMILES_EXTENSION_SEPARATOR_REGEX);
-    result = components[1];
+    try {
+
+      String[] components = smiles.split(SMILES_EXTENSION_SEPARATOR_REGEX);
+      result = components[1];
+    } catch (ArrayIndexOutOfBoundsException e) {
+// not extended SMILES
+    }
 
     return result;
   }
+
+  /**
+   * @param atom1
+   * @param atom2
+   * @return
+   * @throws CTKException
+   */
+  public abstract IBondBase bindAtoms(IAtomBase atom1, IAtomBase atom2) throws CTKException;
+
+  /**
+   * @param first
+   * @param second
+   * @return
+   * @throws CTKException
+   */
+
+  public AttachmentList mergeAttachments(AbstractMolecule container, AttachmentList first, AttachmentList second)
+      throws CTKException {
+    AttachmentList result = new AttachmentList();
+    int index = 1;
+    for (Attachment item : first) {
+      Attachment a = item.cloneAttachment();
+      container.changeAtomLabel(a.getCurrenIndex(), index);
+      a.changeIndex(index);
+      result.add(a);
+      index++;
+    }
+
+    for (Attachment item : second) {
+      Attachment a = item.cloneAttachment();
+      a.changeIndex(index);
+      result.add(a);
+      index++;
+    }
+
+    return result;
+  }
+
+  // public abstract void changeAtomLabel(AbstractMolecule container, int index, int toIndex);
+
+  /**
+   * @param molecule
+   * @param rGroup
+   * @param atom
+   * @return
+   */
+  public abstract IStereoElementBase getStereoInformation(AbstractMolecule container, IAtomBase rGroup, IAtomBase atom);
 
 }

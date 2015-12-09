@@ -33,6 +33,7 @@ import org.helm.chemtoolkit.CTKException;
 import org.helm.chemtoolkit.CTKSmilesException;
 import org.helm.chemtoolkit.IAtomBase;
 import org.helm.chemtoolkit.IBondBase;
+import org.helm.chemtoolkit.IStereoElementBase;
 import org.helm.chemtoolkit.MoleculeInfo;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -70,7 +71,7 @@ public class ChemaxonManipulator extends AbstractChemistryManipulator {
    * org.helm.chemtoolkit.ChemistryManipulator.InputType)
    */
   @Override
-  public String convert(String data, InputType type) throws CTKException {
+  public String convert(String data, StType type) throws CTKException {
     String result = null;
 
     switch (type) {
@@ -105,6 +106,21 @@ public class ChemaxonManipulator extends AbstractChemistryManipulator {
     molecule.clean(2, null);
     molecule.dearomatize();
     return molecule.exportToFormat(MOL_FORMAT);
+  }
+
+  /**
+   * 
+   * @param molecule
+   * @return
+   * @throws CTKException
+   * @throws MolExportException
+   */
+  private String molecule2SMILES(Molecule molecule) throws MolExportException {
+
+    molecule.dearomatize();
+
+    return molecule.exportToFormat(SMILES_FORMAT);
+
   }
 
   /*
@@ -158,13 +174,7 @@ public class ChemaxonManipulator extends AbstractChemistryManipulator {
     return moleculeInfo;
   }
 
-  /*
-   * (non-Javadoc)
-   * 
-   * @see org.helm.chemtoolkit.ChemistryManipulator#convertSMILES2MolFile(java.lang .String)
-   */
-  @Override
-  public String convertSMILES2MolFile(String smiles) throws CTKException {
+  private String convertSMILES2MolFile(String smiles) throws CTKException {
     String result = null;
     try {
       Molecule molecule = getMolecule(smiles);
@@ -178,13 +188,7 @@ public class ChemaxonManipulator extends AbstractChemistryManipulator {
     return result;
   }
 
-  /*
-   * (non-Javadoc)
-   * 
-   * @see org.helm.chemtoolkit.ChemistryManipulator#convertMolFile2SMILES(java.lang .String)
-   */
-  @Override
-  public String convertMolFile2SMILES(String molfile) throws CTKException {
+  private String convertMolFile2SMILES(String molfile) throws CTKException {
     String result = null;
     try {
       Molecule molecule = getMolecule(molfile);
@@ -293,61 +297,52 @@ public class ChemaxonManipulator extends AbstractChemistryManipulator {
    * @see org.helm.chemtoolkit.AbstractChemistryManipulator#merge(org.helm. chemtoolkit.IMolecule,
    * org.helm.chemtoolkit.IAtom, org.helm.chemtoolkit.IMolecule, org.helm.chemtoolkit.IAtom)
    */
-  @Override
-  public AbstractMolecule merge(AbstractMolecule firstMolecule, IAtomBase firstRgroup,
-      AbstractMolecule secondMolecule, IAtomBase secondRgroup) throws CTKException {
-    // cyclization is allowed
+  // @Override
+//
+// public AbstractMolecule merge(AbstractMolecule firstMolecule, IAtomBase firstRgroup,
+// AbstractMolecule secondMolecule, IAtomBase secondRgroup) throws CTKException {
+// return null;
+// if (firstMolecule == secondMolecule) {
+// firstMolecule.dearomatize();
+// IAtomBase atom1 = removeRgroup(firstMolecule, firstRgroup);
+// IAtomBase atom2 = removeRgroup(secondMolecule, secondRgroup);
+// // ChemBond bond = new ChemBond(new MolBond(((ChemAtom) atom1).getMolAtom(), ((ChemAtom) atom2).getMolAtom()));
+// IBondBase bond = bindAtoms(atom1, atom2);
+// firstMolecule.addIBase(bond);
+// } else {
+// firstMolecule.dearomatize();
+// secondMolecule.dearomatize();
+//
+// IAtomBase atom1 = removeRgroup(firstMolecule, firstRgroup);
+// IAtomBase atom2 = removeRgroup(secondMolecule, secondRgroup);
+//
+// IAtomBase[] atoms = secondMolecule.getIAtomArray();
+// for (int i = 0; i < atoms.length; i++) {
+// firstMolecule.addIBase(atoms[i]);
+// }
+//
+// IBondBase[] bonds = secondMolecule.getIBondArray();
+// for (int i = 0; i < bonds.length; i++) {
+// firstMolecule.addIBase(bonds[i]);
+// }
+//
+// // ChemBond bond = new ChemBond(new MolBond(((ChemAtom) atom1).getMolAtom(), ((ChemAtom) atom2).getMolAtom()));
+// IBondBase bond = bindAtoms(atom1, atom2);
+// firstMolecule.addIBase(bond);
+// }
+// return firstMolecule;
+// }
 
-    // AbstractMolecule first = ((ChemAtom) rgroup).cloneMolecule();
-    // AbstractMolecule second = secondMolecule.cloneMolecule();
-    if (firstMolecule == secondMolecule) {
-      firstMolecule.dearomatize();
-      IAtomBase atom1 = removeRgroup(firstMolecule, firstRgroup);
-      IAtomBase atom2 = removeRgroup(secondMolecule, secondRgroup);
-      ChemBond bond = new ChemBond(new MolBond(((ChemAtom) atom1).getMolAtom(), ((ChemAtom) atom2).getMolAtom()));
-      firstMolecule.addIBase(bond);
-    } else {
-      firstMolecule.dearomatize();
-      secondMolecule.dearomatize();
-      // LOG.debug("before= " + second.getIAtomArray().length);
-      IAtomBase atom1 = removeRgroup(firstMolecule, firstRgroup);
-      // LOG.debug("before= " + secondMolecule.getIAtomArray().length);
-      IAtomBase atom2 = removeRgroup(secondMolecule, secondRgroup);
-      // LOG.debug("after= " + secondMolecule.getIAtomArray().length);
-      IAtomBase[] atoms = secondMolecule.getIAtomArray();
-      for (int i = 0; i < atoms.length; i++) {
-        firstMolecule.addIBase(atoms[i]);
-      }
-
-      IBondBase[] bonds = secondMolecule.getIBondArray();
-      for (int i = 0; i < bonds.length; i++) {
-        firstMolecule.addIBase(bonds[i]);
-      }
-
-      ChemBond bond = new ChemBond(new MolBond(((ChemAtom) atom1).getMolAtom(), ((ChemAtom) atom2).getMolAtom()));
-      firstMolecule.addIBase(bond);
-    }
-    return firstMolecule;
-  }
-
-  @Override
-  public IAtomBase removeRgroup(AbstractMolecule molecule, IAtomBase rgroup) {
-
-    IAtomBase atom = null;
-    if (rgroup.getIBondCount() == 1) {
-      ChemBond bond = (ChemBond) rgroup.getIBond(0);
-
-      if ((bond.getIAtom1().getMolAtom()).equals((((ChemAtom) rgroup).getMolAtom()))) {
-        atom = bond.getIAtom2();
-      } else {
-        atom = bond.getIAtom1();
-      }
-      molecule.removeINode(rgroup);
-
-    }
-    return atom;
-  }
-
+  /*
+   * @Override public IAtomBase removeRgroup(AbstractMolecule molecule, IAtomBase rgroup) throws CTKException {
+   * 
+   * IAtomBase atom = null; if (rgroup.getIBondCount() == 1) { ChemBond bond = (ChemBond) rgroup.getIBond(0);
+   * 
+   * if ((bond.getIAtom1().getMolAtom()).equals((((ChemAtom) rgroup).getMolAtom()))) { atom = bond.getIAtom2(); } else {
+   * atom = bond.getIAtom1(); } molecule.removeINode(rgroup);
+   * 
+   * } return atom; }
+   */
   /*
    * (non-Javadoc)
    * 
@@ -359,6 +354,77 @@ public class ChemaxonManipulator extends AbstractChemistryManipulator {
 
     ChemMolecule molecule = new ChemMolecule(getMolecule(smiles), attachments);
     return molecule;
+  }
+
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public IBondBase bindAtoms(IAtomBase atom1, IAtomBase atom2) throws CTKException {
+    IBondBase bond = null;
+    if ((atom1 instanceof ChemAtom) && (atom1 instanceof ChemAtom)) {
+      bond = new ChemBond(new MolBond(((ChemAtom) atom1).getMolAtom(), ((ChemAtom) atom2).getMolAtom()));
+    } else {
+      throw new CTKException("invalid atoms");
+    }
+
+    return bond;
+  }
+
+  /**
+   * {@inheritDoc}
+   */
+// @Override
+// public void changeAtomLabel(AbstractMolecule molecule, int index, int toIndex) {
+// for (IAtomBase atom : molecule.getIAtomArray()) {
+// if (atom.getRgroup() == index) {
+// ((ChemAtom) atom).getMolAtom().setRgroup(toIndex);
+// }
+// }
+//
+// }
+
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public IStereoElementBase getStereoInformation(AbstractMolecule molecule, IAtomBase rGroup, IAtomBase atom) {
+    // TODO Auto-generated method stub
+    return null;
+  }
+
+  /**
+   * {@inheritDoc}
+   * 
+   * @throws CTKException
+   * 
+   * @throws MolExportException
+   */
+  @Override
+  public String convertMolecule(AbstractMolecule container, StType type) throws CTKException {
+    String result = null;
+    Molecule molecule = (Molecule) container.getMolecule();
+    switch (type) {
+    case SMILES:
+      try {
+        result = molecule2SMILES(molecule);
+      } catch (MolExportException e) {
+        throw new CTKException("unable to export molecule to SMILES!", e);
+      }
+      break;
+    case MOLFILE:
+      try {
+        result = molecule2MolFile(molecule);
+      } catch (MolExportException e) {
+        throw new CTKException("unable to export molecule to molfile!", e);
+      }
+      break;
+    default:
+      break;
+
+    }
+
+    return result;
   }
 
 }

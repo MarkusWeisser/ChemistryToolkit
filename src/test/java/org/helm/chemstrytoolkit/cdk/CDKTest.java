@@ -21,6 +21,10 @@ import java.io.IOException;
 
 import org.helm.chemtoolkit.AbstractChemistryManipulator;
 import org.helm.chemtoolkit.AbstractChemistryManipulator.OutputType;
+import org.helm.chemtoolkit.AbstractChemistryManipulator.StType;
+import org.helm.chemtoolkit.AbstractMolecule;
+import org.helm.chemtoolkit.Attachment;
+import org.helm.chemtoolkit.AttachmentList;
 import org.helm.chemtoolkit.CTKException;
 import org.helm.chemtoolkit.CTKSmilesException;
 import org.helm.chemtoolkit.ChemicalToolKit;
@@ -71,64 +75,75 @@ public class CDKTest {
     // String smiles =
     // "CCc1nn(C)c2c(=O)[nH]c(nc12)c3cc(ccc3OCC)S(=O)(=O)N4CCN(C)CC4";
     String smiles = "[*]N1CC[C@H]1C([*])=O |r,$_R1;;;;;;_R2;$|";
-    String molFile = getManipulator().convertSMILES2MolFile(smiles);
+    // String molFile = getManipulator().convertSMILES2MolFile(smiles);
+    String molFile = getManipulator().convert(smiles, StType.SMILES);
     LOG.debug(molFile);
 
   }
 
   @Test
   void convertMolFile2SMILES() throws CTKException, IOException {
-    String molFile = "\n" + "  ACCLDraw11131512172D\n" + "\n" + " 32 35  0  0  0  0  0  0  0  0999 V2000\n"
-        + "    7.6862   -7.0367    0.0000 C   0  0  0  0  0  0  0  0  0  0  0  0\n"
-        + "    6.6485   -6.4506    0.0000 C   0  0  0  0  0  0  0  0  0  0  0  0\n"
-        + "    5.6213   -4.6864    0.0000 C   0  0  0  0  0  0  0  0  0  0  0  0\n"
-        + "    6.6485   -5.2695    0.0000 N   0  0  3  0  0  0  0  0  0  0  0  0\n"
-        + "    7.6653   -4.6687    0.0000 C   0  0  0  0  0  0  0  0  0  0  0  0\n"
-        + "    8.7132   -5.2548    0.0000 C   0  0  0  0  0  0  0  0  0  0  0  0\n"
-        + "    8.7132   -6.4417    0.0000 N   0  0  3  0  0  0  0  0  0  0  0  0\n"
-        + "   10.3235   -5.9976    0.0000 O   0  0  0  0  0  0  0  0  0  0  0  0\n"
-        + "    9.1573   -8.0519    0.0000 O   0  0  0  0  0  0  0  0  0  0  0  0\n"
-        + "    9.7404   -7.0246    0.0000 S   0  0  3  0  0  0  0  0  0  0  0  0\n"
-        + "   15.8922   -9.3677    0.0000 C   0  0  0  0  0  0  0  0  0  0  0  0\n"
-        + "   14.8676   -8.7801    0.0000 C   0  0  0  0  0  0  0  0  0  0  0  0\n"
-        + "   13.8465   -9.3736    0.0000 O   0  0  0  0  0  0  0  0  0  0  0  0\n"
-        + "   12.8167   -8.7860    0.0000 C   0  0  0  0  0  0  0  0  0  0  0  0\n"
-        + "   11.7999   -9.3781    0.0000 C   0  0  0  0  0  0  0  0  0  0  0  0\n"
-        + "   10.7675   -8.7950    0.0000 C   0  0  0  0  0  0  0  0  0  0  0  0\n"
-        + "   10.7675   -7.6078    0.0000 C   0  0  0  0  0  0  0  0  0  0  0  0\n"
-        + "   11.7895   -7.0036    0.0000 C   0  0  0  0  0  0  0  0  0  0  0  0\n"
-        + "   12.8167   -7.5988    0.0000 C   0  0  0  0  0  0  0  0  0  0  0  0\n"
-        + "   15.8892   -7.0083    0.0000 C   0  0  0  0  0  0  0  0  0  0  0  0\n"
-        + "   14.8640   -7.5949    0.0000 N   0  0  0  0  0  0  0  0  0  0  0  0\n"
-        + "   13.8388   -7.0068    0.0000 C   0  0  0  0  0  0  0  0  0  0  0  0\n"
-        + "   13.8388   -5.8189    0.0000 N   0  0  3  0  0  0  0  0  0  0  0  0\n"
-        + "   14.8640   -4.0379    0.0000 O   0  0  0  0  0  0  0  0  0  0  0  0\n"
-        + "   14.8640   -5.2190    0.0000 C   0  0  0  0  0  0  0  0  0  0  0  0\n"
-        + "   15.8892   -5.8189    0.0000 C   0  0  0  0  0  0  0  0  0  0  0  0\n"
-        + "   17.3854   -4.3283    0.0000 C   0  0  0  0  0  0  0  0  0  0  0  0\n"
-        + "   17.0205   -5.4515    0.0000 N   0  0  3  0  0  0  0  0  0  0  0  0\n"
-        + "   17.7197   -6.4137    0.0000 N   0  0  0  0  0  0  0  0  0  0  0  0\n"
-        + "   17.0205   -7.3760    0.0000 C   0  0  0  0  0  0  0  0  0  0  0  0\n"
-        + "   17.3853   -8.4994    0.0000 C   0  0  0  0  0  0  0  0  0  0  0  0\n"
-        + "   18.5407   -8.7449    0.0000 C   0  0  0  0  0  0  0  0  0  0  0  0\n" + "  2  1  1  0  0  0  0\n"
-        + "  4  2  1  0  0  0  0\n" + "  4  3  1  0  0  0  0\n" + "  5  4  1  0  0  0  0\n"
-        + "  6  5  1  0  0  0  0\n" + "  7  6  1  0  0  0  0\n" + "  7  1  1  0  0  0  0\n"
-        + " 10  7  1  0  0  0  0\n" + " 10  8  2  0  0  0  0\n" + " 10  9  2  0  0  0  0\n"
-        + " 17 10  1  0  0  0  0\n" + " 12 11  1  0  0  0  0\n" + " 13 12  1  0  0  0  0\n"
-        + " 14 13  1  0  0  0  0\n" + " 15 14  1  0  0  0  0\n" + " 16 15  2  0  0  0  0\n"
-        + " 17 16  1  0  0  0  0\n" + " 18 17  2  0  0  0  0\n" + " 19 18  1  0  0  0  0\n"
-        + " 19 14  2  0  0  0  0\n" + " 22 19  1  0  0  0  0\n" + " 21 20  1  0  0  0  0\n"
-        + " 22 21  2  0  0  0  0\n" + " 23 22  1  0  0  0  0\n" + " 25 23  1  0  0  0  0\n"
-        + " 25 24  2  0  0  0  0\n" + " 26 25  1  0  0  0  0\n" + " 26 20  2  0  0  0  0\n"
-        + " 28 26  1  0  0  0  0\n" + " 28 27  1  0  0  0  0\n" + " 29 28  1  0  0  0  0\n"
-        + " 30 29  2  0  0  0  0\n" + " 30 20  1  0  0  0  0\n" + " 31 30  1  0  0  0  0\n"
-        + " 32 31  1  0  0  0  0\n" + "M  END";
+    String molFile = "\n" +
+        "  Marvin  12081516212D\n" +
+        "\n" +
+        " 22 24  0  0  1  0            999 V2000\n" +
+        "   -0.6534    1.5387    0.0000 H   0  0  0  0  0  0  0  0  0  0  0  0\n" +
+        "   -0.3984    0.7541    0.0000 C   0  0  2  0  0  0  0  0  0  0  0  0\n" +
+        "   -1.1831    1.0091    0.0000 O   0  0  0  0  0  0  0  0  0  0  0  0\n" +
+        "   -1.1831    1.8341    0.0000 C   0  0  2  0  0  0  0  0  0  0  0  0\n" +
+        "   -1.8505    2.3190    0.0000 C   0  0  0  0  0  0  0  0  0  0  0  0\n" +
+        "   -2.6042    1.9834    0.0000 O   0  0  0  0  0  0  0  0  0  0  0  0\n" +
+        "   -3.2716    2.4683    0.0000 R#  0  0  0  0  0  0  0  0  0  0  0  0\n" +
+        "   -0.3984    2.0890    0.0000 C   0  0  1  0  0  0  0  0  0  0  0  0\n" +
+        "   -0.1435    2.8736    0.0000 O   0  0  0  0  0  0  0  0  0  0  0  0\n" +
+        "    0.6635    3.0451    0.0000 R#  0  0  0  0  0  0  0  0  0  0  0  0\n" +
+        "    0.0865    1.4216    0.0000 C   0  0  1  0  0  0  0  0  0  0  0  0\n" +
+        "    0.9115    1.4216    0.0000 O   0  0  0  0  0  0  0  0  0  0  0  0\n" +
+        "   -0.1435   -0.0305    0.0000 N   0  0  0  0  0  0  0  0  0  0  0  0\n" +
+        "   -0.6284   -0.6979    0.0000 C   0  0  0  0  0  0  0  0  0  0  0  0\n" +
+        "   -0.1435   -1.3654    0.0000 N   0  0  0  0  0  0  0  0  0  0  0  0\n" +
+        "    0.6411   -1.1104    0.0000 C   0  0  0  0  0  0  0  0  0  0  0  0\n" +
+        "    0.6411   -0.2854    0.0000 C   0  0  0  0  0  0  0  0  0  0  0  0\n" +
+        "    1.3556    0.1271    0.0000 N   0  0  0  0  0  0  0  0  0  0  0  0\n" +
+        "    2.0701   -0.2854    0.0000 C   0  0  0  0  0  0  0  0  0  0  0  0\n" +
+        "    2.0701   -1.1104    0.0000 N   0  0  0  0  0  0  0  0  0  0  0  0\n" +
+        "    1.3556   -1.5229    0.0000 C   0  0  0  0  0  0  0  0  0  0  0  0\n" +
+        "    1.3556   -2.3479    0.0000 N   0  0  0  0  0  0  0  0  0  0  0  0\n" +
+        "  2  1  1  1  0  0  0\n" +
+        "  2  3  1  0  0  0  0\n" +
+        "  3  4  1  0  0  0  0\n" +
+        "  4  5  1  6  0  0  0\n" +
+        "  5  6  1  0  0  0  0\n" +
+        "  6  7  1  0  0  0  0\n" +
+        "  4  8  1  0  0  0  0\n" +
+        "  8  9  1  1  0  0  0\n" +
+        "  9 10  1  0  0  0  0\n" +
+        "  8 11  1  0  0  0  0\n" +
+        "  2 11  1  0  0  0  0\n" +
+        " 11 12  1  1  0  0  0\n" +
+        " 13 14  1  0  0  0  0\n" +
+        " 14 15  2  0  0  0  0\n" +
+        " 15 16  1  0  0  0  0\n" +
+        " 16 17  2  0  0  0  0\n" +
+        " 13 17  1  0  0  0  0\n" +
+        " 17 18  1  0  0  0  0\n" +
+        " 18 19  2  0  0  0  0\n" +
+        " 19 20  1  0  0  0  0\n" +
+        " 20 21  2  0  0  0  0\n" +
+        " 16 21  1  0  0  0  0\n" +
+        " 21 22  1  0  0  0  0\n" +
+        "  2 13  1  0  0  0  0\n" +
+        "M  RGP  2   7   1  10   2\n" +
+        "M  END";
 
-    String result = getManipulator().convertMolFile2SMILES(molFile);
-    LOG.debug(result);
+    // String result = getManipulator().convertMolFile2SMILES(molFile);
+
+    String result = getManipulator().convert(molFile, StType.MOLFILE);
+
+    LOG.debug("res=" + result);
     result = getManipulator().canonicalize(result);
-    LOG.debug(result);
-    Assert.assertEquals(result, "O=C1NC(=NC=2C(=NN(C12)C)CC)C3=CC(=CC=C3OCC)S(=O)(=O)N4CCN(C)CC4");
+    LOG.debug("cann=" + result);
+    // Assert.assertEquals(result, "O=C1NC(=NC=2C(=NN(C12)C)CC)C3=CC(=CC=C3OCC)S(=O)(=O)N4CCN(C)CC4");
 
   }
 
@@ -209,8 +224,51 @@ public class CDKTest {
   public void createGroupMolFile() throws CTKException {
     String smiles = "[*]N1CC[C@H]1C([*])=O |r,$_R2;;;;;;_R1;$|";
     CDKManipulator manipulator = (CDKManipulator) getManipulator();
-    String result = manipulator.createRGroupMolFile(smiles);
+    String result = manipulator.convertMolecule(manipulator.getMolecule(smiles, null), StType.MOLFILE);
 
     LOG.debug(result);
   }
+
+  @Test
+  public void adeninRiboseMerge() throws IOException, CTKException {
+
+    String ribose = "[H][C@@]1([*])O[C@H](CO[*])[C@@H](O[*])[C@H]1O |$;;_R1;;;;;_R3;;;_R2;;$|";
+
+    String adenin = "[*]n1cnc2c1ncnc2N |r,$_R1;;;;;;;;;;;;$|";
+
+    String riboseR1 = "[*][H] |$_R3;$|";
+    String riboseR2 = "[*][H] |$_R2;$|";
+    String riboseR3 = "O[*] |$;_R1$|";
+    String adeninR1 = "[*][H] |$_R1;$|";
+    AbstractChemistryManipulator manipulator = getManipulator();
+    AttachmentList groupsAdenin = new AttachmentList();
+    AttachmentList groupsRibose = new AttachmentList();
+    groupsAdenin.add(new Attachment("R1-H", "R1", "H", adeninR1));
+    groupsRibose.add(new Attachment("R3-H", "R3", "H", riboseR1));
+    groupsRibose.add(new Attachment("R2-H", "R2", "H", riboseR2));
+    groupsRibose.add(new Attachment("R1-OH", "R1", "OH", riboseR3));
+
+    AbstractMolecule adeninMolecule = manipulator.getMolecule(adenin, groupsAdenin);
+
+    AbstractMolecule riboseMolecule = manipulator.getMolecule(ribose, groupsRibose);
+
+    AbstractMolecule molecule =
+        manipulator.merge(riboseMolecule, riboseMolecule.getRGroupAtom(1, true), adeninMolecule, adeninMolecule.getRGroupAtom(1, true));
+    // molecule.dearomatize();
+    // AtomContainerManipulator.clearAtomConfigurations(((CDKMolecule) molecule).getMolecule());
+    molecule.generateCoordinates();
+    String result = manipulator.convertMolecule(molecule, StType.SMILES);
+
+    LOG.debug(result);
+
+    for (Attachment attachment : molecule.getAttachments()) {
+      LOG.debug("id=" + attachment.getId());
+      LOG.debug("label=" + attachment.getLabel());
+      LOG.debug("name=" + attachment.getName());
+      LOG.debug("smiles=" + attachment.getSmiles());
+
+    }
+
+  }
+
 }

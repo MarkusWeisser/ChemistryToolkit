@@ -17,13 +17,19 @@
 package org.helm.chemtoolkit;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * @author chistyakov
  *
  */
-public abstract class AbstractMolecule {
+public abstract class AbstractMolecule implements IChemObjectBase {
+
+  private static final Logger LOG = LoggerFactory.getLogger(AbstractMolecule.class);
 
   protected AttachmentList attachments;
 
@@ -40,11 +46,11 @@ public abstract class AbstractMolecule {
 
   public Map<String, IAtomBase> getRgroups() throws CTKException {
     Map<String, IAtomBase> rgroupMap = new HashMap<String, IAtomBase>();
-    IAtomBase[] atoms = getIAtomArray();
-    for (int i = 0; i < atoms.length; i++) {
-      int rId = atoms[i].getRgroup();
+    List<IAtomBase> atoms = getIAtomArray();
+    for (int i = 0; i < atoms.size(); i++) {
+      int rId = atoms.get(i).getRgroup();
       if (rId > 0) {
-        rgroupMap.put("R" + rId, atoms[i]);
+        rgroupMap.put("R" + rId, atoms.get(i));
       }
     }
     return rgroupMap;
@@ -55,26 +61,70 @@ public abstract class AbstractMolecule {
     String[] array = label.split("R");
     try {
       result = Integer.parseInt(array[1]);
-    } catch (NumberFormatException e) {
+    } catch (NumberFormatException | ArrayIndexOutOfBoundsException e) {
       //
     }
     return result;
   }
 
-  public abstract IAtomBase getRGroupAtom(int groupId, boolean rgatom);
+  public IAtomBase getRGroupAtom(int groupId, boolean rgatom) throws CTKException {
+    IAtomBase result = null;
+    for (IAtomBase atom : getIAtomArray()) {
+      if (atom.getRgroup() == groupId) {
+        if (rgatom) {
+          result = atom;
+        } else {
+          IBondBase bond = atom.getIBond(0);
+
+          if (bond.getIAtom1().compare(atom)) {
+            result = bond.getIAtom2();
+          } else
+            result = bond.getIAtom1();
+        }
+
+      }
+    }
+
+    return result;
+
+  }
+
+  public abstract Object getMolecule();
 
   public abstract void dearomatize() throws CTKException;
 
   public abstract void generateCoordinates() throws CTKException;
 
-  public abstract void removeINode(IAtomBase node);
+  public abstract void removeINode(IAtomBase node) throws CTKException;
 
-  public abstract IAtomBase[] getIAtomArray();
+  public abstract List<IAtomBase> getIAtomArray();
 
   public abstract void addIBase(IChemObjectBase object);
 
-  public abstract IBondBase[] getIBondArray();
+  public abstract List<IBondBase> getIBondArray();
 
   public abstract AbstractMolecule cloneMolecule() throws CTKException;
+
+  public abstract void changeAtomLabel(int index, int toIndex) throws CTKException;
+
+  /**
+   * @param firstRgroup
+   * @throws CTKException
+   */
+  public void removeAttachment(IAtomBase toRemove) throws CTKException {
+
+    Map<String, IAtomBase> groups = getRgroups();
+    for (String key : groups.keySet()) {
+
+      if (groups.get(key).compare(toRemove)) {
+        for (int i = 0; i < attachments.size(); i++) {
+          if (attachments.get(i).getLabel().equals(key)) {
+            attachments.remove(i);
+            break;
+          }
+        }
+      }
+    }
+  }
 
 }

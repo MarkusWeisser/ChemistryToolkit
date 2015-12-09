@@ -21,6 +21,7 @@ import java.io.IOException;
 
 import org.helm.chemtoolkit.AbstractChemistryManipulator;
 import org.helm.chemtoolkit.AbstractChemistryManipulator.OutputType;
+import org.helm.chemtoolkit.AbstractChemistryManipulator.StType;
 import org.helm.chemtoolkit.AbstractMolecule;
 import org.helm.chemtoolkit.Attachment;
 import org.helm.chemtoolkit.AttachmentList;
@@ -62,7 +63,9 @@ public class ChemaxonTest {
   @Test
   public void smiles2MolTest() throws CTKException {
     String smiles = "[*]N1CC[C@H]1C([*])=O |r,$_R2;;;;;;_R1;$";
-    String result = getManipulator().convertSMILES2MolFile(smiles);
+    // String smiles = "[H]C1(OC(CO*)C(O*)C1O)N2C=NC3=C2N=CN=C3N";
+    // String result = getManipulator().convertSMILES2MolFile(smiles);
+    String result = getManipulator().convert(smiles, StType.SMILES);
     LOG.debug(result);
 
   }
@@ -102,7 +105,8 @@ public class ChemaxonTest {
         "M  RGP  3   9   3  11   1  12   2\n" +
         "M  END";
 
-    String result = getManipulator().convertMolFile2SMILES(molFile);
+    // String result = getManipulator().convertMolFile2SMILES(molFile);
+    String result = getManipulator().convert(molFile, StType.MOLFILE);
     LOG.debug(result);
     result = getManipulator().canonicalize(result);
     LOG.debug(result);
@@ -209,28 +213,44 @@ public class ChemaxonTest {
 
   @Test
   public void adeninRiboseMerge() throws IOException, CTKException {
-    // String ribose = "[*]OC[C@@H]1[C@H]([C@H]([C@@H](O1)[*])O)O[*] |r,$_R1;;;;;;;;;;;_R3;;_R2$|";
-    String ribose = "[H][C@@]1([*])O[C@H](CO[*])[C@@H](O[*])[C@H]1O |$;;_R3;;;;;_R1;;;_R2;;$|";
-    // String ribose = "O[C@H]1[C@H](*)O[C@H](CO*)[C@H]1O* |r,;;;;;$_R3;;;;; _R1$|";
+// // String ribose = "[*]OC[C@@H]1[C@H]([C@H]([C@@H](O1)[*])O)O[*] |r,$_R1;;;;;;;;;;;_R3;;_R2$|";
+// String ribose = "[H][C@@]1([*])O[C@H](CO[*])[C@@H](O[*])[C@H]1O |$;;_R3;;;;;_R1;;;_R2;;$|";
+// // String ribose = "O[C@H]1[C@H](*)O[C@H](CO*)[C@H]1O* |r,;;;;;$_R3;;;;; _R1$|";
+// String adenin = "[*]n1cnc2c1ncnc2N |r,$_R1;;;;;;;;;;;;$|";
+//
+// String riboseR1 = "[*][H] |$_R1;$|";
+// String riboseR2 = "[*][H] |$_R2;$|";
+// String riboseR3 = "O[*] |$;_R3$|";
+// String adeninR1 = "[*][H] |$_R1;$|";
+// AbstractChemistryManipulator manipulator = getManipulator();
+// AttachmentList groupsAdenin = new AttachmentList();
+// AttachmentList groupsRibose = new AttachmentList();
+// groupsAdenin.add(new Attachment("R1-H", "R1", "H", adeninR1));
+// groupsRibose.add(new Attachment("R1-H", "R1", "H", riboseR1));
+// groupsRibose.add(new Attachment("R2-H", "R2", "H", riboseR2));
+// groupsRibose.add(new Attachment("R3-OH", "R3", "OH", riboseR3));
+
+    String ribose = "[H][C@@]1([*])O[C@H](CO[*])[C@@H](O[*])[C@H]1O |$;;_R1;;;;;_R3;;;_R2;;$|";
+
     String adenin = "[*]n1cnc2c1ncnc2N |r,$_R1;;;;;;;;;;;;$|";
 
-    String riboseR1 = "[*][H] |$_R1;$|";
+    String riboseR1 = "[*][H] |$_R3;$|";
     String riboseR2 = "[*][H] |$_R2;$|";
-    String riboseR3 = "O[*] |$;_R3$|";
+    String riboseR3 = "O[*] |$;_R1$|";
     String adeninR1 = "[*][H] |$_R1;$|";
     AbstractChemistryManipulator manipulator = getManipulator();
     AttachmentList groupsAdenin = new AttachmentList();
     AttachmentList groupsRibose = new AttachmentList();
     groupsAdenin.add(new Attachment("R1-H", "R1", "H", adeninR1));
-    groupsRibose.add(new Attachment("R1-H", "R1", "H", riboseR1));
+    groupsRibose.add(new Attachment("R3-H", "R3", "H", riboseR1));
     groupsRibose.add(new Attachment("R2-H", "R2", "H", riboseR2));
-    groupsRibose.add(new Attachment("R3-OH", "R3", "OH", riboseR3));
+    groupsRibose.add(new Attachment("R1-OH", "R1", "OH", riboseR3));
 
     AbstractMolecule adeninMolecule = manipulator.getMolecule(adenin, groupsAdenin);
     AbstractMolecule riboseMolecule = manipulator.getMolecule(ribose, groupsRibose);
 
     AbstractMolecule molecule =
-        manipulator.merge(riboseMolecule, riboseMolecule.getRGroupAtom(3, true), adeninMolecule, adeninMolecule.getRGroupAtom(1, true));
+        manipulator.merge(riboseMolecule, riboseMolecule.getRGroupAtom(1, true), adeninMolecule, adeninMolecule.getRGroupAtom(1, true));
     molecule.dearomatize();
     molecule.generateCoordinates();
     String result = ((ChemMolecule) molecule).getMolecule().exportToFormat("mol");

@@ -16,38 +16,62 @@
  ******************************************************************************/
 package org.helm.chemtoolkit.cdk;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 
 import org.helm.chemtoolkit.AbstractMolecule;
+import org.helm.chemtoolkit.AttachmentList;
 import org.helm.chemtoolkit.CTKException;
 import org.helm.chemtoolkit.IAtomBase;
 import org.helm.chemtoolkit.IBondBase;
 import org.helm.chemtoolkit.IChemObjectBase;
 import org.openscience.cdk.aromaticity.Kekulization;
 import org.openscience.cdk.exception.CDKException;
+import org.openscience.cdk.interfaces.IAtom;
 import org.openscience.cdk.interfaces.IAtomContainer;
+import org.openscience.cdk.interfaces.IBond;
+import org.openscience.cdk.interfaces.IPseudoAtom;
 import org.openscience.cdk.layout.StructureDiagramGenerator;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * @author chistyakov
  *
  */
-public class CDKMolecule extends AbstractMolecule implements IAtomBase {
+public class CDKMolecule extends AbstractMolecule {
+  private static final Logger LOG = LoggerFactory.getLogger(CDKMolecule.class);
 
   protected IAtomContainer molecule;
 
-  protected int rGroup;
+  protected List<IAtomBase> atomArray;
 
   public CDKMolecule(IAtomContainer molecule) {
-    this.molecule = molecule;
-    this.rGroup = 0;
+    this(molecule, new AttachmentList());
 
   }
 
-  public CDKMolecule(IAtomContainer molecule, int rGroup) {
+  public CDKMolecule(IAtomContainer molecule, AttachmentList attachments) {
     this.molecule = molecule;
-    this.rGroup = rGroup;
+    this.attachments = attachments;
+    atomArray = new ArrayList<>();
+    for (IAtom atom : molecule.atoms()) {
+      int rGroupId = 0;
+      // IAtom atom = molecule.getAtom(i);
+      if (atom instanceof IPseudoAtom) {
+        atom.setSymbol("R");
+        rGroupId = AbstractMolecule.getIdFromLabel(((IPseudoAtom) atom).getLabel());
+      }
+      List<IBond> bonds = molecule.getConnectedBondsList(atom);
+      atomArray.add(new CDKAtom(atom, rGroupId, bonds));
+    }
+
   }
+
+  /*
+   * public CDKMolecule(IAtomContainer molecule, int rGroup) { this.molecule = molecule; this.rGroup = rGroup; }
+   */
 
   /*
    * (non-Javadoc)
@@ -56,7 +80,7 @@ public class CDKMolecule extends AbstractMolecule implements IAtomBase {
    */
   @Override
   public Map<String, IAtomBase> getRgroups() throws CTKException {
-    dearomatize();
+    // dearomatize();
 
     return super.getRgroups();
   }
@@ -84,9 +108,18 @@ public class CDKMolecule extends AbstractMolecule implements IAtomBase {
    * @see org.helm.chemtoolkit.AbstractMolecule#removeINode(org.helm.chemtoolkit. IAtomBase)
    */
   @Override
-  public void removeINode(IAtomBase node) {
+  public void removeINode(IAtomBase node) throws CTKException {
     if (node instanceof CDKAtom) {
-      molecule.removeAtom(((CDKAtom) node).atom);
+
+      molecule.removeAtomAndConnectedElectronContainers(((CDKAtom) node).atom);
+
+      for (int i = 0; i < atomArray.size(); i++) {
+        if (((CDKAtom) atomArray.get(i)).compare(node)) {
+          atomArray.remove(i);
+          break;
+        }
+      }
+
     }
 
   }
@@ -97,12 +130,20 @@ public class CDKMolecule extends AbstractMolecule implements IAtomBase {
    * @see org.helm.chemtoolkit.AbstractMolecule#getIAtomArray()
    */
   @Override
-  public IAtomBase[] getIAtomArray() {
-    CDKAtom[] array = new CDKAtom[molecule.getAtomCount()];
-    for (int i = 0; i < array.length; i++) {
-      array[i] = new CDKAtom(molecule.getAtom(i));
-    }
-    return array;
+  public List<IAtomBase> getIAtomArray() {
+// List<IAtomBase> atomArray = new ArrayList<>();
+// for (IAtom atom : molecule.atoms()) {
+// int rGroupId = 0;
+//// IAtom atom = molecule.getAtom(i);
+// if (atom instanceof IPseudoAtom) {
+// atom.setSymbol("R");
+//// LOG.debug("label=" + ((IPseudoAtom) atom).getLabel());
+// rGroupId = AbstractMolecule.getIdFromLabel(((IPseudoAtom) atom).getLabel());
+// }
+// List<IBond> bonds = molecule.getConnectedBondsList(atom);
+// atomArray.add(new CDKAtom(atom, rGroupId, bonds));
+// }
+    return atomArray;
   }
 
   /*
@@ -115,8 +156,11 @@ public class CDKMolecule extends AbstractMolecule implements IAtomBase {
     if (object instanceof CDKMolecule) {
       molecule.add(((CDKMolecule) object).molecule);
     } else if (object instanceof CDKAtom) {
+      // ((CDKAtom) object).atom.setFlag(CDKConstants.VISITED, true);
+
       molecule.addAtom(((CDKAtom) object).atom);
     } else if (object instanceof CDKBond) {
+      // ((CDKBond) object).bond.setFlag(CDKConstants.VISITED, true);
       molecule.addBond(((CDKBond) object).bond);
     }
 
@@ -128,10 +172,11 @@ public class CDKMolecule extends AbstractMolecule implements IAtomBase {
    * @see org.helm.chemtoolkit.AbstractMolecule#getIBondArray()
    */
   @Override
-  public IBondBase[] getIBondArray() {
-    CDKBond[] array = new CDKBond[molecule.getBondCount()];
-    for (int i = 0; i < array.length; i++) {
-      array[i] = new CDKBond(molecule.getBond(i));
+  public List<IBondBase> getIBondArray() {
+    List<IBondBase> array = new ArrayList<>();
+
+    for (IBond item : molecule.bonds()) {
+      array.add(new CDKBond(item));
     }
     return array;
   }
@@ -152,57 +197,6 @@ public class CDKMolecule extends AbstractMolecule implements IAtomBase {
     return cloned;
   }
 
-  /*
-   * (non-Javadoc)
-   * 
-   * @see org.helm.chemtoolkit.IAtomBase#getIBondCount()
-   */
-  @Override
-  public int getIBondCount() {
-    return molecule.getBondCount();
-  }
-
-  /*
-   * (non-Javadoc)
-   * 
-   * @see org.helm.chemtoolkit.IAtomBase#getIBond(int)
-   */
-  @Override
-  public IBondBase getIBond(int arg0) {
-
-    return new CDKBond(molecule.getBond(arg0));
-  }
-
-  /*
-   * (non-Javadoc)
-   * 
-   * @see org.helm.chemtoolkit.IAtomBase#getRgroup()
-   */
-  @Override
-  public int getRgroup() {
-    return rGroup;
-  }
-
-  /*
-   * (non-Javadoc)
-   * 
-   * @see org.helm.chemtoolkit.IAtomBase#getIAtno()
-   */
-  @Override
-  public int getIAtno() {
-
-    return molecule.getAtom(0).getAtomicNumber();
-  }
-
-  /**
-   * {@inheritDoc}
-   */
-  @Override
-  public CDKAtom getRGroupAtom(int groupId, boolean rgatom) {
-    // TODO Auto-generated method stub
-    return null;
-  }
-
   /**
    * {@inheritDoc}
    * 
@@ -210,6 +204,7 @@ public class CDKMolecule extends AbstractMolecule implements IAtomBase {
    */
   @Override
   public void generateCoordinates() throws CTKException {
+
     StructureDiagramGenerator sdg = new StructureDiagramGenerator();
     sdg.setMolecule(molecule);
     try {
@@ -218,6 +213,31 @@ public class CDKMolecule extends AbstractMolecule implements IAtomBase {
       throw new CTKException("unable generate coordinates", e);
     }
     molecule = sdg.getMolecule();
+
+  }
+
+  /**
+   * @return
+   */
+  @Override
+  public IAtomContainer getMolecule() {
+    return molecule;
+  }
+
+  /**
+   * {@inheritDoc}
+   * 
+   * @throws CTKException
+   */
+  @Override
+  public void changeAtomLabel(int index, int toIndex) throws CTKException {
+    for (IAtomBase atom : getIAtomArray()) {
+      if (atom.getMolAtom() instanceof IPseudoAtom) {
+        int currIndex = AbstractMolecule.getIdFromLabel(((IPseudoAtom) atom.getMolAtom()).getLabel());
+        if (currIndex == index)
+          atom.setRgroup(toIndex);
+      }
+    }
 
   }
 
