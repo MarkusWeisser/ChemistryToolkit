@@ -46,28 +46,23 @@ public class CDKBond implements IBondBase {
     bonds.add(bond);
   }
 
-  /*
-   * (non-Javadoc)
+  /**
    * 
-   * @see org.helm.chemtoolkit.IBondBase#getIAtom1()
+   * {@inheritDoc}
    */
   @Override
   public IAtomBase getIAtom1() {
 
-// List<IBond> bonds = new ArrayList<>();
-// bonds.add(bond);
     return new CDKAtom(bond.getAtom(0), 0, bonds);
   }
 
-  /*
-   * (non-Javadoc)
+  /**
    * 
-   * @see org.helm.chemtoolkit.IBondBase#getIAtom2()
+   * {@inheritDoc}
    */
   @Override
   public IAtomBase getIAtom2() {
-// List<IBond> bonds = new ArrayList<>();
-// bonds.add(bond);
+
     return new CDKAtom(bond.getAtom(1), 0, bonds);
   }
 

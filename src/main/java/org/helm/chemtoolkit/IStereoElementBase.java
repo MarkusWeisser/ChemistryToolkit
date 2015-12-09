@@ -16,7 +16,7 @@
 package org.helm.chemtoolkit;
 
 /**
- * {@code IStereoElement} TODO comment me
+ * {@code IStereoElement} The container for a stereo element in the molecule.
  * 
  * @author <a href="mailto:chistyakov@quattro-research.com">Dmitry Chistyakov</a>
  * @version $Id$

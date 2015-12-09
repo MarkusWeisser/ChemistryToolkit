@@ -61,10 +61,9 @@ public class ChemMolecule extends AbstractMolecule {
       this.attachments = new AttachmentList();
   }
 
-  /*
-   * (non-Javadoc)
+  /**
    * 
-   * @see org.helm.chemtoolkit.AbstractMolecule#removeINode(org.helm.chemtoolkit. IAtom)
+   * {@inheritDoc}
    */
   @Override
   public void removeINode(IAtomBase node) {
@@ -78,10 +77,9 @@ public class ChemMolecule extends AbstractMolecule {
     }
   }
 
-  /*
-   * (non-Javadoc)
+  /**
    * 
-   * @see org.helm.chemtoolkit.AbstractMolecule#getIAtomArray()
+   * {@inheritDoc}
    */
   @Override
   public List<IAtomBase> getIAtomArray() {
@@ -93,10 +91,9 @@ public class ChemMolecule extends AbstractMolecule {
     return target;
   }
 
-  /*
-   * (non-Javadoc)
+  /**
    * 
-   * @see org.helm.chemtoolkit.AbstractMolecule#addI(org.helm.chemtoolkit. IChemObject)
+   * {@inheritDoc}
    */
   @Override
   public void addIBase(IChemObjectBase node) {
@@ -109,10 +106,9 @@ public class ChemMolecule extends AbstractMolecule {
 
   }
 
-  /*
-   * (non-Javadoc)
+  /**
    * 
-   * @see org.helm.chemtoolkit.AbstractMolecule#dearomatize()
+   * {@inheritDoc}
    */
   @Override
   public void dearomatize() throws CTKException {
@@ -124,10 +120,9 @@ public class ChemMolecule extends AbstractMolecule {
 
   }
 
-  /*
-   * (non-Javadoc)
+  /**
    * 
-   * @see org.helm.chemtoolkit.AbstractMolecule#getRgroups()
+   * {@inheritDoc}
    */
   @Override
   public Map<String, IAtomBase> getRgroups() throws CTKException {
@@ -135,10 +130,9 @@ public class ChemMolecule extends AbstractMolecule {
     return super.getRgroups();
   }
 
-  /*
-   * (non-Javadoc)
+  /**
    * 
-   * @see org.helm.chemtoolkit.AbstractMolecule#getIBondArray()
+   * {@inheritDoc}
    */
   @Override
   public List<IBondBase> getIBondArray() {
@@ -151,10 +145,9 @@ public class ChemMolecule extends AbstractMolecule {
 
   }
 
-  /*
-   * (non-Javadoc)
+  /**
    * 
-   * @see org.helm.chemtoolkit.AbstractMoleculeBase#cloneMolecule()
+   * {@inheritDoc}
    */
   @Override
   public AbstractMolecule cloneMolecule() {
@@ -162,35 +155,6 @@ public class ChemMolecule extends AbstractMolecule {
 
     return cloned;
   }
-
-  /**
-   * {@inheritDoc}
-   */
-  /*
-   * @Override public void replaceRGroups(List<AbstractMolecule> groups) { for (int i = 0; i < groups.size(); i++) {
-   * ChemMolecule group = (ChemMolecule) groups.get(i); int groupId =
-   * getIdFromLabel(group.getAttachments().get(i).getLabel()); MolAtom pseudo = getRGroupAtom(groupId); for (MolAtom
-   * item : molecule.getAtomArray()) { if (item.getRgroup() == groupId) {
-   * 
-   * }
-   * 
-   * }
-   * 
-   * }
-   * 
-   * }
-   */
-
-  /*
-   * @Override public ChemAtom getRGroupAtom(int groupId, boolean rgatom) { MolAtom result = null; for (MolAtom atom :
-   * molecule.getAtomArray()) { if (atom.getRgroup() == groupId) { if (rgatom) { result = atom; } else { MolBond bond =
-   * atom.getBond(0); if (bond.getAtom1().equals(atom)) { result = bond.getAtom2(); } else result = bond.getAtom1(); }
-   * LOG.debug("rgroup atom=" + result); } }
-   * 
-   * return new ChemAtom(result);
-   * 
-   * }
-   */
 
   /**
    * {@inheritDoc}

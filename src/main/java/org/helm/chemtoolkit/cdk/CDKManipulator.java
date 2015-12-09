@@ -119,11 +119,9 @@ public class CDKManipulator extends AbstractChemistryManipulator {
 
   }
 
-  /*
-   * (non-Javadoc)
+  /**
    * 
-   * 
-   * @see org.helm.chemtoolkit.ChemistryManipulator#validateSMILES(java.lang. String)
+   * {@inheritDoc}
    */
   @Override
   public boolean validateSMILES(String smiles) {
@@ -141,29 +139,20 @@ public class CDKManipulator extends AbstractChemistryManipulator {
     return true;
   }
 
-  /*
-   * (non-Javadoc)
+  /**
    * 
-   * 
-   * @see org.helm.chemtoolkit.ChemistryManipulator#getMoleculeInfo(java.lang. String)
+   * {@inheritDoc}
    */
   @Override
   public MoleculeInfo getMoleculeInfo(AbstractMolecule aMolecule) throws CTKException {
     IAtomContainer molecule = (IAtomContainer) aMolecule.getMolecule();
     MoleculeInfo moleculeInfo = new MoleculeInfo();
-// SmilesParser smilesParser = new SmilesParser(SilentChemObjectBuilder.getInstance());
-// try {
 
-    // IAtomContainer molecule = smilesParser.parseSmiles(smiles);
     moleculeInfo.setMolecularWeight(AtomContainerManipulator.getNaturalExactMass(molecule));
     moleculeInfo.setMolecularFormula(MolecularFormulaManipulator.getString(MolecularFormulaManipulator.getMolecularFormula(molecule)));
 
     moleculeInfo.setExactMass(MolecularFormulaManipulator.getMajorIsotopeMass(MolecularFormulaManipulator.getMolecularFormula(molecule)));
 
-    // } catch (InvalidSmilesException e) {
-    // throw new CTKSmilesException("smiles is invalid", e);
-
-// }
     return moleculeInfo;
   }
 
@@ -228,11 +217,9 @@ public class CDKManipulator extends AbstractChemistryManipulator {
     return result;
   }
 
-  /*
-   * (non-Javadoc)
+  /**
    * 
-   * @see org.helm.chemtoolkit.ChemistryManipulator#convert(java.lang.String,
-   * org.helm.chemtoolkit.ChemistryManipulator.InputType)
+   * {@inheritDoc}
    */
   @Override
   public String convert(String data, StType type) throws CTKException {
@@ -255,10 +242,9 @@ public class CDKManipulator extends AbstractChemistryManipulator {
     return result;
   }
 
-  /*
-   * (non-Javadoc)
+  /**
    * 
-   * @see org.helm.chemtoolkit.ChemistryManipulator#canonicalize(java.lang.String)
+   * {@inheritDoc}
    */
   @Override
   public String canonicalize(String smiles) throws CTKException, CTKSmilesException {
@@ -273,10 +259,9 @@ public class CDKManipulator extends AbstractChemistryManipulator {
     return result;
   }
 
-  /*
-   * (non-Javadoc)
+  /**
    * 
-   * @see org.helm.chemtoolkit.ChemistryManipulator#renderMol(java.lang.String, int, int, int)
+   * {@inheritDoc}
    */
   @Override
   public byte[] renderMol(String molFile, OutputType outputType, int width, int height, int rgb) throws CTKException {
@@ -327,11 +312,9 @@ public class CDKManipulator extends AbstractChemistryManipulator {
 
   }
 
-  /*
-   * (non-Javadoc)
+  /**
    * 
-   * @see org.helm.chemtoolkit.ChemistryManipulator#renderSequence(java.lang. String,
-   * org.helm.chemtoolkit.ChemistryManipulator.OutputType, int, int, int)
+   * {@inheritDoc}
    */
   @Override
   public byte[] renderSequence(String sequence, OutputType outputType, int width, int height, int rgb)
@@ -385,102 +368,9 @@ public class CDKManipulator extends AbstractChemistryManipulator {
 
   }
 
-// public String createRGroupMolFile(String extendedSmiles) throws CTKException {
-// String result = null;
-// LinkedHashMap<Integer, String> groups = getRGroupsFromExtendedSmiles(extendedSmiles);
-//
-// extendedSmiles = normalize(extendedSmiles, groups);
-//
-// try (StringWriter stringWriter = new StringWriter();
-// // RGroupQueryWriter writer = new RGroupQueryWriter(stringWriter);
-// MDLV2000Writer writer2 = new MDLV2000Writer(stringWriter)) {
-// SmilesParser smilesParser = new SmilesParser(SilentChemObjectBuilder.getInstance());
-// IAtomContainer molecule = smilesParser.parseSmiles(extendedSmiles);
-//
-// StructureDiagramGenerator sdg = new StructureDiagramGenerator();
-// sdg.setMolecule(molecule);
-// sdg.generateCoordinates();
-// molecule = sdg.getMolecule();
-//
-// for (IAtom atom : molecule.atoms()) {
-// if (atom instanceof IPseudoAtom)
-// atom.setSymbol("R");
-//
-// }
-// writer2.write(molecule);
-//
-// result = stringWriter.toString();
-//
-// } catch (
-//
-// InvalidSmilesException e)
-//
-// {
-// throw new CTKSmilesException("invalid smiles", e);
-//
-// } catch (
-//
-// CDKException e)
-//
-// {
-// throw new CTKException(e.getMessage(), e);
-// } catch (
-//
-// IOException e)
-//
-// {
-// throw new CTKException(e.getMessage(), e);
-// }
-//
-// return result;
-//
-// }
-
-// /**
-// * @param pseudo
-// * @param molecule
-// * @param apoBonds
-// */
-// private void chooseRootAttachmentBonds(IAtom atom, IAtomContainer molecule,
-// Map<IAtom, Map<Integer, IBond>> rootAttachmentPoints) {
-// int apoIdx = 1;
-// Map<Integer, IBond> apoBonds = new HashMap<Integer, IBond>();
-// Iterator<IBond> bonds = molecule.bonds().iterator();
-// // Pick up to two apo bonds randomly
-// while (bonds.hasNext() && apoIdx <= 2) {
-// IBond bond = bonds.next();
-// if (bond.contains(atom)) {
-// apoBonds.put((apoIdx), bond);
-// apoIdx++;
-// }
-// }
-// rootAttachmentPoints.put(atom, apoBonds);
-//
-// }
-//
-// private String convertExtendedSmiles(String extendedSmiles, List<String> groups) {
-//
-// char[] parent = extendedSmiles.toCharArray();
-// String target = "";
-// int index = 1;
-// for (char item : parent) {
-// if (item == '*') {
-// target = target + groups.get(index);
-// index++;
-// } else
-// target = target + item;
-//
-// }
-//
-// return target;
-//
-// }
-
-  /*
-   * (non-Javadoc)
+  /**
    * 
-   * @see org.helm.chemtoolkit.AbstractChemistryManipulator#getMolecule(java.lang. String,
-   * org.helm.chemtoolkit.AttachmentList)
+   * {@inheritDoc}
    */
   @Override
   public AbstractMolecule getMolecule(String smiles, AttachmentList attachments) throws CTKException {

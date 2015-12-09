@@ -73,20 +73,18 @@ public class CDKAtom implements IAtomBase {
     }
   }
 
-  /*
-   * (non-Javadoc)
+  /**
    * 
-   * @see org.helm.chemtoolkit.IAtomBase#getIBondCount()
+   * {@inheritDoc}
    */
   @Override
   public int getIBondCount() {
     return bonds.size();
   }
 
-  /*
-   * (non-Javadoc)
+  /**
    * 
-   * @see org.helm.chemtoolkit.IAtomBase#getIBond(int)
+   * {@inheritDoc}
    */
   @Override
   public IBondBase getIBond(int arg0) throws CTKException {
@@ -101,10 +99,9 @@ public class CDKAtom implements IAtomBase {
     return bond;
   }
 
-  /*
-   * (non-Javadoc)
+  /**
    * 
-   * @see org.helm.chemtoolkit.IAtomBase#getRgroup()
+   * {@inheritDoc}
    */
   @Override
   public int getRgroup() {
@@ -112,10 +109,9 @@ public class CDKAtom implements IAtomBase {
     return rGroup;
   }
 
-  /*
-   * (non-Javadoc)
+  /**
    * 
-   * @see org.helm.chemtoolkit.IAtomBase#getIAtno()
+   * {@inheritDoc}
    */
   @Override
   public int getIAtno() {
@@ -124,6 +120,10 @@ public class CDKAtom implements IAtomBase {
 
   }
 
+  /**
+   * 
+   * {@inheritDoc}
+   */
   @Override
   public boolean compare(Object obj) {
     if (!(obj instanceof CDKAtom)) {
@@ -154,7 +154,7 @@ public class CDKAtom implements IAtomBase {
       ((IPseudoAtom) atom).setLabel(((IPseudoAtom) atom).getLabel().replace(String.valueOf(this.rGroup), String.valueOf(rGroup)));
       this.rGroup = rGroup;
     } else
-      throw new CTKException("unable to set group id, the atom is not a group");
+      throw new CTKException("unable to set group id, the atom is not a PseudoAtom");
 
   }
 

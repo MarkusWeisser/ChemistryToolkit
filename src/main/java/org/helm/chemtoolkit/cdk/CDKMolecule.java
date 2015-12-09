@@ -69,26 +69,18 @@ public class CDKMolecule extends AbstractMolecule {
 
   }
 
-  /*
-   * public CDKMolecule(IAtomContainer molecule, int rGroup) { this.molecule = molecule; this.rGroup = rGroup; }
-   */
-
-  /*
-   * (non-Javadoc)
+  /**
    * 
-   * @see org.helm.chemtoolkit.AbstractMolecule#getRgroups()
+   * {@inheritDoc}
    */
   @Override
   public Map<String, IAtomBase> getRgroups() throws CTKException {
-    // dearomatize();
-
     return super.getRgroups();
   }
 
-  /*
-   * (non-Javadoc)
+  /**
    * 
-   * @see org.helm.chemtoolkit.AbstractMolecule#dearomatize()
+   * {@inheritDoc}
    */
 
   @Override
@@ -102,10 +94,9 @@ public class CDKMolecule extends AbstractMolecule {
 
   }
 
-  /*
-   * (non-Javadoc)
+  /**
    * 
-   * @see org.helm.chemtoolkit.AbstractMolecule#removeINode(org.helm.chemtoolkit. IAtomBase)
+   * {@inheritDoc}
    */
   @Override
   public void removeINode(IAtomBase node) throws CTKException {
@@ -124,52 +115,37 @@ public class CDKMolecule extends AbstractMolecule {
 
   }
 
-  /*
-   * (non-Javadoc)
+  /**
    * 
-   * @see org.helm.chemtoolkit.AbstractMolecule#getIAtomArray()
+   * {@inheritDoc}
    */
   @Override
   public List<IAtomBase> getIAtomArray() {
-// List<IAtomBase> atomArray = new ArrayList<>();
-// for (IAtom atom : molecule.atoms()) {
-// int rGroupId = 0;
-//// IAtom atom = molecule.getAtom(i);
-// if (atom instanceof IPseudoAtom) {
-// atom.setSymbol("R");
-//// LOG.debug("label=" + ((IPseudoAtom) atom).getLabel());
-// rGroupId = AbstractMolecule.getIdFromLabel(((IPseudoAtom) atom).getLabel());
-// }
-// List<IBond> bonds = molecule.getConnectedBondsList(atom);
-// atomArray.add(new CDKAtom(atom, rGroupId, bonds));
-// }
+
     return atomArray;
   }
 
-  /*
-   * (non-Javadoc)
+  /**
    * 
-   * @see org.helm.chemtoolkit.AbstractMolecule#addIBase(org.helm.chemtoolkit. IChemObjectBase)
+   * {@inheritDoc}
    */
   @Override
   public void addIBase(IChemObjectBase object) {
     if (object instanceof CDKMolecule) {
       molecule.add(((CDKMolecule) object).molecule);
     } else if (object instanceof CDKAtom) {
-      // ((CDKAtom) object).atom.setFlag(CDKConstants.VISITED, true);
 
       molecule.addAtom(((CDKAtom) object).atom);
     } else if (object instanceof CDKBond) {
-      // ((CDKBond) object).bond.setFlag(CDKConstants.VISITED, true);
+
       molecule.addBond(((CDKBond) object).bond);
     }
 
   }
 
-  /*
-   * (non-Javadoc)
+  /**
    * 
-   * @see org.helm.chemtoolkit.AbstractMolecule#getIBondArray()
+   * {@inheritDoc}
    */
   @Override
   public List<IBondBase> getIBondArray() {
@@ -181,10 +157,9 @@ public class CDKMolecule extends AbstractMolecule {
     return array;
   }
 
-  /*
-   * (non-Javadoc)
+  /**
    * 
-   * @see org.helm.chemtoolkit.AbstractMolecule#cloneMolecule()
+   * {@inheritDoc}
    */
   @Override
   public AbstractMolecule cloneMolecule() throws CTKException {

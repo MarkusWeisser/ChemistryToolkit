@@ -64,11 +64,9 @@ public class ChemaxonManipulator extends AbstractChemistryManipulator {
 
   public static final String CHEMAXON_EXTENDEND_SMILES_FORMAT = "cxsmiles:u-e";
 
-  /*
-   * (non-Javadoc)
+  /**
    * 
-   * @see org.helm.chemtoolkit.ChemistryManipulator#convert(java.lang.String,
-   * org.helm.chemtoolkit.ChemistryManipulator.InputType)
+   * {@inheritDoc}
    */
   @Override
   public String convert(String data, StType type) throws CTKException {
@@ -123,10 +121,9 @@ public class ChemaxonManipulator extends AbstractChemistryManipulator {
 
   }
 
-  /*
-   * (non-Javadoc)
+  /**
    * 
-   * @see org.helm.chemtoolkit.ChemistryManipulator#validateSMILES(java.lang. String)
+   * {@inheritDoc}
    */
   @Override
   public boolean validateSMILES(String smiles) throws CTKException {
@@ -147,10 +144,9 @@ public class ChemaxonManipulator extends AbstractChemistryManipulator {
     return true;
   }
 
-  /*
-   * (non-Javadoc)
+  /**
    * 
-   * @see org.helm.chemtoolkit.ChemistryManipulator#getMoleculeInfo(java.lang. String)
+   * {@inheritDoc}
    */
   @Override
   public MoleculeInfo getMoleculeInfo(AbstractMolecule aMolecule) throws CTKException {
@@ -200,17 +196,15 @@ public class ChemaxonManipulator extends AbstractChemistryManipulator {
     return result;
   }
 
-  /*
-   * (non-Javadoc)
+  /**
    * 
-   * @see org.helm.chemtoolkit.ChemistryManipulator#canonicalize(java.lang.String)
+   * {@inheritDoc}
    */
   @Override
   public String canonicalize(String smiles) throws CTKException, CTKSmilesException {
     String result = null;
     try {
       Molecule molecule = getMolecule(smiles);
-      // result = getUniqueSmiles(molecule, UNIQUE_SMILES_FORMAT);
       molecule.implicitizeHydrogens(MolAtom.ALL_H);
       result = molecule.toFormat(UNIQUE_SMILES_FORMAT);
     } catch (IOException e) {
@@ -235,10 +229,9 @@ public class ChemaxonManipulator extends AbstractChemistryManipulator {
     return molecule;
   }
 
-  /*
-   * (non-Javadoc)
+  /**
    * 
-   * @see org.helm.chemtoolkit.ChemistryManipulator#renderMol(java.lang.String, int, int, int)
+   * {@inheritDoc}
    */
   @Override
   public byte[] renderMol(String molFile, OutputType outputType, int width, int height, int rgb) throws CTKException {
@@ -278,11 +271,9 @@ public class ChemaxonManipulator extends AbstractChemistryManipulator {
 
   }
 
-  /*
-   * (non-Javadoc)
+  /**
    * 
-   * @see org.helm.chemtoolkit.ChemistryManipulator#renderSequence(java.lang. String,
-   * org.helm.chemtoolkit.ChemistryManipulator.OutputType, int, int, int)
+   * {@inheritDoc}
    */
   @Override
   public byte[] renderSequence(String sequence, OutputType outputType, int width, int height, int rgb)
@@ -291,63 +282,9 @@ public class ChemaxonManipulator extends AbstractChemistryManipulator {
     return null;
   }
 
-  /*
-   * (non-Javadoc)
+  /**
    * 
-   * @see org.helm.chemtoolkit.AbstractChemistryManipulator#merge(org.helm. chemtoolkit.IMolecule,
-   * org.helm.chemtoolkit.IAtom, org.helm.chemtoolkit.IMolecule, org.helm.chemtoolkit.IAtom)
-   */
-  // @Override
-//
-// public AbstractMolecule merge(AbstractMolecule firstMolecule, IAtomBase firstRgroup,
-// AbstractMolecule secondMolecule, IAtomBase secondRgroup) throws CTKException {
-// return null;
-// if (firstMolecule == secondMolecule) {
-// firstMolecule.dearomatize();
-// IAtomBase atom1 = removeRgroup(firstMolecule, firstRgroup);
-// IAtomBase atom2 = removeRgroup(secondMolecule, secondRgroup);
-// // ChemBond bond = new ChemBond(new MolBond(((ChemAtom) atom1).getMolAtom(), ((ChemAtom) atom2).getMolAtom()));
-// IBondBase bond = bindAtoms(atom1, atom2);
-// firstMolecule.addIBase(bond);
-// } else {
-// firstMolecule.dearomatize();
-// secondMolecule.dearomatize();
-//
-// IAtomBase atom1 = removeRgroup(firstMolecule, firstRgroup);
-// IAtomBase atom2 = removeRgroup(secondMolecule, secondRgroup);
-//
-// IAtomBase[] atoms = secondMolecule.getIAtomArray();
-// for (int i = 0; i < atoms.length; i++) {
-// firstMolecule.addIBase(atoms[i]);
-// }
-//
-// IBondBase[] bonds = secondMolecule.getIBondArray();
-// for (int i = 0; i < bonds.length; i++) {
-// firstMolecule.addIBase(bonds[i]);
-// }
-//
-// // ChemBond bond = new ChemBond(new MolBond(((ChemAtom) atom1).getMolAtom(), ((ChemAtom) atom2).getMolAtom()));
-// IBondBase bond = bindAtoms(atom1, atom2);
-// firstMolecule.addIBase(bond);
-// }
-// return firstMolecule;
-// }
-
-  /*
-   * @Override public IAtomBase removeRgroup(AbstractMolecule molecule, IAtomBase rgroup) throws CTKException {
-   * 
-   * IAtomBase atom = null; if (rgroup.getIBondCount() == 1) { ChemBond bond = (ChemBond) rgroup.getIBond(0);
-   * 
-   * if ((bond.getIAtom1().getMolAtom()).equals((((ChemAtom) rgroup).getMolAtom()))) { atom = bond.getIAtom2(); } else {
-   * atom = bond.getIAtom1(); } molecule.removeINode(rgroup);
-   * 
-   * } return atom; }
-   */
-  /*
-   * (non-Javadoc)
-   * 
-   * @see org.helm.chemtoolkit.AbstractChemistryManipulator#getMolecule(java.lang. String,
-   * org.helm.chemtoolkit.AttachmentList)
+   * {@inheritDoc}
    */
   @Override
   public AbstractMolecule getMolecule(String smiles, AttachmentList attachments) throws IOException {
@@ -370,19 +307,6 @@ public class ChemaxonManipulator extends AbstractChemistryManipulator {
 
     return bond;
   }
-
-  /**
-   * {@inheritDoc}
-   */
-// @Override
-// public void changeAtomLabel(AbstractMolecule molecule, int index, int toIndex) {
-// for (IAtomBase atom : molecule.getIAtomArray()) {
-// if (atom.getRgroup() == index) {
-// ((ChemAtom) atom).getMolAtom().setRgroup(toIndex);
-// }
-// }
-//
-// }
 
   /**
    * {@inheritDoc}
