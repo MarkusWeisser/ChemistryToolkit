@@ -277,6 +277,7 @@ public class CDKManipulator extends AbstractChemistryManipulator {
         IAtomContainer mol =
             reader.read(SilentChemObjectBuilder.getInstance().newInstance(IAtomContainer.class));
 
+
         List<IGenerator<IAtomContainer>> generators = new ArrayList<>();
 
         generators.add(new BasicSceneGenerator());

@@ -18,6 +18,7 @@ package org.helm.chemstrytoolkit.cdk;
 
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.lang.reflect.InvocationTargetException;
 
 import org.helm.chemtoolkit.AbstractChemistryManipulator;
 import org.helm.chemtoolkit.AbstractChemistryManipulator.OutputType;
@@ -27,9 +28,9 @@ import org.helm.chemtoolkit.Attachment;
 import org.helm.chemtoolkit.AttachmentList;
 import org.helm.chemtoolkit.CTKException;
 import org.helm.chemtoolkit.CTKSmilesException;
-import org.helm.chemtoolkit.ChemicalToolKit;
+import org.helm.chemtoolkit.ManipulatorFactory;
+import org.helm.chemtoolkit.ManipulatorFactory.ManipulatorType;
 import org.helm.chemtoolkit.MoleculeInfo;
-import org.helm.chemtoolkit.cdk.CDKManipulator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.testng.Assert;
@@ -46,10 +47,19 @@ public class CDKTest {
   private static final Logger LOG = LoggerFactory.getLogger(CDKTest.class);
 
   private static AbstractChemistryManipulator getManipulator() {
-    return ChemicalToolKit.getTestINSTANCE(type).getManipulator();
+    AbstractChemistryManipulator result = null;
+
+    try {
+      result = ManipulatorFactory.buildManipulator(ManipulatorType.CDK);
+    } catch (ClassNotFoundException | NoSuchMethodException | SecurityException | InstantiationException
+        | IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
+      // TODO Auto-generated catch block
+      e.printStackTrace();
+    }
+    return result;
   }
 
-  @Test
+  @Test(groups = {"CDKTest"})
   public void validateSMILESTest() throws CTKException {
     boolean res = false;
     String smiles = "[*]N1CC[C@H]1C([*])=O |r,$_R1;;;;;;_R2;$|";
@@ -221,9 +231,9 @@ public class CDKTest {
   }
 
   @Test
-  public void createGroupMolFile() throws CTKException {
+  public void createGroupMolFile() throws CTKException, IOException {
     String smiles = "[*]N1CC[C@H]1C([*])=O |r,$_R2;;;;;;_R1;$|";
-    CDKManipulator manipulator = (CDKManipulator) getManipulator();
+    AbstractChemistryManipulator manipulator = getManipulator();
     String result = manipulator.convertMolecule(manipulator.getMolecule(smiles, null), StType.MOLFILE);
 
     LOG.debug(result);

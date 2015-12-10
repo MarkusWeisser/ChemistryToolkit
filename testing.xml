@@ -1,0 +1,28 @@
+<suite>
+	<test name="Tests">
+		<groups>
+			<run>
+				<include name="CDKTest" />
+			</run>
+		</groups>
+		<packages>
+			<package name="org.helm.chemstrytoolkit" />
+		</packages>
+		<classes>
+			<class name="org.helm.chemstrytoolkit.cdk.CDKTest" />
+		</classes>
+	</test>
+	<test name="Marvin">
+		<groups>
+			<run>
+				<include name="MarvinTest" />
+			</run>
+		</groups>
+		<packages>
+			<package name="org.helm.chemstrytoolkit" />
+		</packages>
+		<classes>
+			<class name="org.helm.chemstrytoolkit.chemaxon.ChemaxonTest" />
+		</classes>
+	</test>
+</suite>

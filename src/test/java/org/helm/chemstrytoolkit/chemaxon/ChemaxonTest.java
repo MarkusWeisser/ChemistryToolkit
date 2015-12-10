@@ -18,6 +18,7 @@ package org.helm.chemstrytoolkit.chemaxon;
 
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.lang.reflect.InvocationTargetException;
 
 import org.helm.chemtoolkit.AbstractChemistryManipulator;
 import org.helm.chemtoolkit.AbstractChemistryManipulator.OutputType;
@@ -27,9 +28,9 @@ import org.helm.chemtoolkit.Attachment;
 import org.helm.chemtoolkit.AttachmentList;
 import org.helm.chemtoolkit.CTKException;
 import org.helm.chemtoolkit.CTKSmilesException;
-import org.helm.chemtoolkit.ChemicalToolKit;
+import org.helm.chemtoolkit.ManipulatorFactory;
+import org.helm.chemtoolkit.ManipulatorFactory.ManipulatorType;
 import org.helm.chemtoolkit.MoleculeInfo;
-import org.helm.chemtoolkit.chemaxon.ChemMolecule;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.testng.Assert;
@@ -46,7 +47,17 @@ public class ChemaxonTest {
   private static final Logger LOG = LoggerFactory.getLogger(ChemaxonTest.class);
 
   private static AbstractChemistryManipulator getManipulator() {
-    return ChemicalToolKit.getTestINSTANCE(type).getManipulator();
+    // return ChemicalToolKit.getTestINSTANCE(type).getManipulator();
+    AbstractChemistryManipulator result = null;
+
+    try {
+      result = ManipulatorFactory.buildManipulator(ManipulatorType.MARVIN);
+    } catch (ClassNotFoundException | NoSuchMethodException | SecurityException | InstantiationException
+        | IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
+      // TODO Auto-generated catch block
+      e.printStackTrace();
+    }
+    return result;
   }
 
   @Test
@@ -172,7 +183,7 @@ public class ChemaxonTest {
         + " 30 29  2  0  0  0  0\n" + " 30 20  1  0  0  0  0\n" + " 31 30  1  0  0  0  0\n"
         + " 32 31  1  0  0  0  0\n" + "M  END";
     byte[] result = getManipulator().renderMol(molFile, OutputType.PNG, 1000, 1000, (int) Long.parseLong("D3D3D3", 16));
-    try (FileOutputStream out = new FileOutputStream("test-output\\ChemaxonTesbild.png")) {
+    try (FileOutputStream out = new FileOutputStream("test-output\\ChemaxonTestbild.png")) {
       out.write(result);
     }
 
@@ -204,31 +215,16 @@ public class ChemaxonTest {
     LOG.debug("exact mass=" + moleculeInfo.getExactMass());
     LOG.debug("molecular weight=" + moleculeInfo.getMolecularWeight());
     LOG.debug("formula=" + moleculeInfo.getMolecularFormula());
-    ((ChemMolecule) molecule).getMolecule().clean(2, null);
+    ((AbstractMolecule) molecule.getMolecule()).generateCoordinates();
     molecule.dearomatize();
-    String result = ((ChemMolecule) molecule).getMolecule().exportToFormat("mol");
+    String result = manipulator.convertMolecule(molecule, StType.MOLFILE);
     LOG.debug(result);
 
   }
 
-  @Test
+  @Test(groups = {"MarvinTest"})
   public void adeninRiboseMerge() throws IOException, CTKException {
-// // String ribose = "[*]OC[C@@H]1[C@H]([C@H]([C@@H](O1)[*])O)O[*] |r,$_R1;;;;;;;;;;;_R3;;_R2$|";
-// String ribose = "[H][C@@]1([*])O[C@H](CO[*])[C@@H](O[*])[C@H]1O |$;;_R3;;;;;_R1;;;_R2;;$|";
-// // String ribose = "O[C@H]1[C@H](*)O[C@H](CO*)[C@H]1O* |r,;;;;;$_R3;;;;; _R1$|";
-// String adenin = "[*]n1cnc2c1ncnc2N |r,$_R1;;;;;;;;;;;;$|";
-//
-// String riboseR1 = "[*][H] |$_R1;$|";
-// String riboseR2 = "[*][H] |$_R2;$|";
-// String riboseR3 = "O[*] |$;_R3$|";
-// String adeninR1 = "[*][H] |$_R1;$|";
-// AbstractChemistryManipulator manipulator = getManipulator();
-// AttachmentList groupsAdenin = new AttachmentList();
-// AttachmentList groupsRibose = new AttachmentList();
-// groupsAdenin.add(new Attachment("R1-H", "R1", "H", adeninR1));
-// groupsRibose.add(new Attachment("R1-H", "R1", "H", riboseR1));
-// groupsRibose.add(new Attachment("R2-H", "R2", "H", riboseR2));
-// groupsRibose.add(new Attachment("R3-OH", "R3", "OH", riboseR3));
+
 
     String ribose = "[H][C@@]1([*])O[C@H](CO[*])[C@@H](O[*])[C@H]1O |$;;_R1;;;;;_R3;;;_R2;;$|";
 
@@ -253,7 +249,7 @@ public class ChemaxonTest {
         manipulator.merge(riboseMolecule, riboseMolecule.getRGroupAtom(1, true), adeninMolecule, adeninMolecule.getRGroupAtom(1, true));
     molecule.dearomatize();
     molecule.generateCoordinates();
-    String result = ((ChemMolecule) molecule).getMolecule().exportToFormat("mol");
+    String result = manipulator.convertMolecule(molecule, StType.MOLFILE);
     LOG.debug(result);
 
   }
