@@ -176,6 +176,8 @@ public abstract class AbstractChemistryManipulator {
       firstContainer.removeINode(firstRgroup);
       secondContainer.removeINode(secondRgroup);
 
+      AttachmentList mergedAttachments = mergeAttachments(firstContainer, secondContainer);
+
       List<IAtomBase> atoms = secondContainer.getIAtomArray();
       for (int i = 0; i < atoms.size(); i++) {
         firstContainer.addIBase(atoms.get(i));
@@ -188,7 +190,7 @@ public abstract class AbstractChemistryManipulator {
 
       IBondBase bond = bindAtoms(atom1, atom2);
       firstContainer.addIBase(bond);
-      firstContainer.setAttachments(mergeAttachments(firstContainer, firstContainer.getAttachments(), secondContainer.getAttachments()));
+      firstContainer.setAttachments(mergedAttachments);
 
     }
     return firstContainer;
@@ -295,11 +297,11 @@ public abstract class AbstractChemistryManipulator {
    * @throws CTKException
    */
 
-  public AttachmentList mergeAttachments(AbstractMolecule container, AttachmentList first, AttachmentList second)
+  public AttachmentList mergeAttachments(AbstractMolecule container, AbstractMolecule secondContainer)
       throws CTKException {
     AttachmentList result = new AttachmentList();
     int index = 1;
-    for (Attachment item : first) {
+    for (Attachment item : container.getAttachments()) {
       Attachment a = item.cloneAttachment();
       container.changeAtomLabel(a.getCurrenIndex(), index);
       a.changeIndex(index);
@@ -307,8 +309,9 @@ public abstract class AbstractChemistryManipulator {
       index++;
     }
 
-    for (Attachment item : second) {
+    for (Attachment item : secondContainer.getAttachments()) {
       Attachment a = item.cloneAttachment();
+      secondContainer.changeAtomLabel(a.getCurrenIndex(), index);
       a.changeIndex(index);
       result.add(a);
       index++;

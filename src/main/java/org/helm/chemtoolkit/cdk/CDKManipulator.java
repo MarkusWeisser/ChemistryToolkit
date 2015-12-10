@@ -277,7 +277,6 @@ public class CDKManipulator extends AbstractChemistryManipulator {
         IAtomContainer mol =
             reader.read(SilentChemObjectBuilder.getInstance().newInstance(IAtomContainer.class));
 
-
         List<IGenerator<IAtomContainer>> generators = new ArrayList<>();
 
         generators.add(new BasicSceneGenerator());
@@ -428,7 +427,8 @@ public class CDKManipulator extends AbstractChemistryManipulator {
   }
 
   @Override
-  public AbstractMolecule merge(AbstractMolecule firstMolecule, IAtomBase firstRgroup, AbstractMolecule secondMolecule,
+  public AbstractMolecule merge(AbstractMolecule firstContainer, IAtomBase firstRgroup,
+      AbstractMolecule secondContainer,
       IAtomBase secondRgroup) throws CTKException {
 // if (firstMolecule == secondMolecule) {
 // firstMolecule.dearomatize();
@@ -440,27 +440,27 @@ public class CDKManipulator extends AbstractChemistryManipulator {
 // } else
 //
 // {
-    firstMolecule.dearomatize();
-    secondMolecule.dearomatize();
+    firstContainer.dearomatize();
+    secondContainer.dearomatize();
     IAtomBase atom1 = getNeighborAtom(firstRgroup);
     IAtomBase atom2 = getNeighborAtom(secondRgroup);
     // create a new bond
     IBondBase bond = bindAtoms(atom1, atom2);
     IStereoElement elementToAdd =
-        (IStereoElement) getStereoInformation(firstMolecule, firstRgroup, atom1).getStereoElement();
-    firstMolecule.removeAttachment(firstRgroup);
-    secondMolecule.removeAttachment(secondRgroup);
+        (IStereoElement) getStereoInformation(firstContainer, firstRgroup, atom1).getStereoElement();
+    firstContainer.removeAttachment(firstRgroup);
+    secondContainer.removeAttachment(secondRgroup);
 
-    firstMolecule.removeINode(firstRgroup);
-    secondMolecule.removeINode(secondRgroup);
+    firstContainer.removeINode(firstRgroup);
+    secondContainer.removeINode(secondRgroup);
+    AttachmentList mergedAttacments = mergeAttachments(firstContainer, secondContainer);
+    firstContainer.addIBase(secondContainer);
+    firstContainer.addIBase(bond);
+    ((CDKMolecule) firstContainer).getMolecule().addStereoElement(elementToAdd);
 
-    firstMolecule.addIBase(secondMolecule);
-    firstMolecule.addIBase(bond);
-    ((CDKMolecule) firstMolecule).getMolecule().addStereoElement(elementToAdd);
+    firstContainer.setAttachments(mergedAttacments);
 
-    firstMolecule.setAttachments(mergeAttachments(firstMolecule, firstMolecule.getAttachments(), secondMolecule.getAttachments()));
-
-    return firstMolecule;
+    return firstContainer;
 
   }
 
