@@ -20,7 +20,7 @@ package org.helm.chemtoolkit;
  * @author chistyakov
  *
  */
-public class Attachment {
+public class Attachment implements Comparable<Attachment> {
 
   private String id;
 
@@ -30,7 +30,7 @@ public class Attachment {
 
   private String smiles;
 
-  public int getCurrenIndex() {
+  public int getCurrentIndex() {
     int result = 0;
     String[] array = label.split("R");
     try {
@@ -74,7 +74,7 @@ public class Attachment {
   }
 
   public void changeIndex(int index) {
-    String currIndex = String.valueOf(getCurrenIndex());
+    String currIndex = String.valueOf(getCurrentIndex());
     String toIndex = String.valueOf(index);
     this.id = this.id.replace(currIndex, toIndex);
     this.label = this.label.replace(currIndex, toIndex);
@@ -93,6 +93,21 @@ public class Attachment {
     this.name = name;
     this.smiles = smiles;
 
+  }
+
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public int compareTo(Attachment o) {
+    int result = this.label.compareTo(o.getLabel());
+    if (result != 0)
+      return result;
+    result = this.getCurrentIndex() - o.getCurrentIndex();
+    if (result != 0) {
+      return result / Math.abs(result);
+    }
+    return 0;
   }
 
 }

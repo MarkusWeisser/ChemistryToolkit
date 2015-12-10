@@ -95,7 +95,6 @@ public abstract class AbstractChemistryManipulator {
    * @throws Exception java exception
    */
 
-// public abstract String convertSMILES2MolFile(String smiles) throws CTKException;
 
   /**
    * 
@@ -106,7 +105,6 @@ public abstract class AbstractChemistryManipulator {
    * @throws CDKException
    */
 
-// public abstract String convertMolFile2SMILES(String molfile) throws CTKException;
 
   /**
    * 
@@ -191,6 +189,7 @@ public abstract class AbstractChemistryManipulator {
       IBondBase bond = bindAtoms(atom1, atom2);
       firstContainer.addIBase(bond);
       firstContainer.setAttachments(mergedAttachments);
+
 
     }
     return firstContainer;
@@ -303,7 +302,7 @@ public abstract class AbstractChemistryManipulator {
     int index = 1;
     for (Attachment item : container.getAttachments()) {
       Attachment a = item.cloneAttachment();
-      container.changeAtomLabel(a.getCurrenIndex(), index);
+      container.changeAtomLabel(a.getCurrentIndex(), index);
       a.changeIndex(index);
       result.add(a);
       index++;
@@ -311,7 +310,7 @@ public abstract class AbstractChemistryManipulator {
 
     for (Attachment item : secondContainer.getAttachments()) {
       Attachment a = item.cloneAttachment();
-      secondContainer.changeAtomLabel(a.getCurrenIndex(), index);
+      secondContainer.changeAtomLabel(a.getCurrentIndex(), index);
       a.changeIndex(index);
       result.add(a);
       index++;

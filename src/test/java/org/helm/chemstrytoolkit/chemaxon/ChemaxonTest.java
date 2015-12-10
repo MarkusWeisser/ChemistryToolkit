@@ -28,6 +28,7 @@ import org.helm.chemtoolkit.Attachment;
 import org.helm.chemtoolkit.AttachmentList;
 import org.helm.chemtoolkit.CTKException;
 import org.helm.chemtoolkit.CTKSmilesException;
+import org.helm.chemtoolkit.IAtomBase;
 import org.helm.chemtoolkit.ManipulatorFactory;
 import org.helm.chemtoolkit.ManipulatorFactory.ManipulatorType;
 import org.helm.chemtoolkit.MoleculeInfo;
@@ -225,33 +226,113 @@ public class ChemaxonTest {
   @Test(groups = {"MarvinTest"})
   public void adeninRiboseMerge() throws IOException, CTKException {
 
-
-    String ribose = "[H][C@@]1([*])O[C@H](CO[*])[C@@H](O[*])[C@H]1O |$;;_R1;;;;;_R3;;;_R2;;$|";
+    String ribose = "[H][C@@]1([*])O[C@H](CO[*])[C@@H](O[*])[C@H]1O |$;;_R3;;;;;_R1;;;_R2;;$|";
 
     String adenin = "[*]n1cnc2c1ncnc2N |r,$_R1;;;;;;;;;;;;$|";
 
-    String riboseR1 = "[*][H] |$_R3;$|";
+    String riboseR1 = "[*][H] |$_R1;$|";
     String riboseR2 = "[*][H] |$_R2;$|";
-    String riboseR3 = "O[*] |$;_R1$|";
+    String riboseR3 = "O[*] |$;_R3$|";
     String adeninR1 = "[*][H] |$_R1;$|";
     AbstractChemistryManipulator manipulator = getManipulator();
     AttachmentList groupsAdenin = new AttachmentList();
     AttachmentList groupsRibose = new AttachmentList();
     groupsAdenin.add(new Attachment("R1-H", "R1", "H", adeninR1));
-    groupsRibose.add(new Attachment("R3-H", "R3", "H", riboseR1));
+    groupsRibose.add(new Attachment("R1-H", "R1", "H", riboseR1));
     groupsRibose.add(new Attachment("R2-H", "R2", "H", riboseR2));
-    groupsRibose.add(new Attachment("R1-OH", "R1", "OH", riboseR3));
+    groupsRibose.add(new Attachment("R3-OH", "R3", "OH", riboseR3));
 
     AbstractMolecule adeninMolecule = manipulator.getMolecule(adenin, groupsAdenin);
+
     AbstractMolecule riboseMolecule = manipulator.getMolecule(ribose, groupsRibose);
 
+    for (IAtomBase atom : riboseMolecule.getIAtomArray()) {
+      LOG.debug("rGroup atom=" + atom.getRgroup());
+
+    }
+
     AbstractMolecule molecule =
-        manipulator.merge(riboseMolecule, riboseMolecule.getRGroupAtom(1, true), adeninMolecule, adeninMolecule.getRGroupAtom(1, true));
+        manipulator.merge(riboseMolecule, riboseMolecule.getRGroupAtom(3, true), adeninMolecule, adeninMolecule.getRGroupAtom(1, true));
     molecule.dearomatize();
     molecule.generateCoordinates();
     String result = manipulator.convertMolecule(molecule, StType.MOLFILE);
     LOG.debug(result);
 
+    //
+
+    for (IAtomBase atom : molecule.getIAtomArray()) {
+      LOG.debug("rGroup atom=" + atom.getRgroup());
+
+    }
+
+    LOG.debug("atom" + molecule.getRGroupAtom(1, false).getMolAtom());
+    LOG.debug("atom" + molecule.getRGroupAtom(2, false).getMolAtom());
   }
 
+  @Test(groups = {"MarvinTest"})
+  public void mergePhosphatRiboseTest() throws ClassNotFoundException, NoSuchMethodException, SecurityException,
+      InstantiationException, IllegalAccessException, IllegalArgumentException, InvocationTargetException, IOException,
+      CTKException {
+
+    String ribose = "O[C@H]1[C@H]([*])O[C@H](CO[*])[C@H]1O[*] |$;;;_R3;;;;;_R1;;;_R2$|";
+    String phosphat = "OP([*])([*])=O |$;;_R1;_R2;$|";
+    String riboseR1 = "[*][H] |$_R1;$|";
+    String riboseR2 = "[*][H] |$_R2;$|";
+    String riboseR3 = "O[*] |$;_R3$|";
+    String phosphatR1 = "O[*] |$;_R1$|";
+    String phosphatR2 = "O[*] |$;_R2$|";
+    AttachmentList groupsRibose = new AttachmentList();
+    groupsRibose.add(new Attachment("R3-OH", "R3", "OH", riboseR3));
+    groupsRibose.add(new Attachment("R1-H", "R1", "H", riboseR1));
+    groupsRibose.add(new Attachment("R2-H", "R2", "H", riboseR2));
+
+    for (Attachment attachment : groupsRibose) {
+
+      LOG.debug("id=" + attachment.getId());
+      LOG.debug("name=" + attachment.getName());
+      LOG.debug("label=" + attachment.getLabel());
+      LOG.debug("smiles=" + attachment.getSmiles());
+
+    }
+    LOG.debug("after sort:");
+    for (Attachment attachment : groupsRibose.cloneList()) {
+
+      LOG.debug("id=" + attachment.getId());
+      LOG.debug("name=" + attachment.getName());
+      LOG.debug("label=" + attachment.getLabel());
+      LOG.debug("smiles=" + attachment.getSmiles());
+    }
+    AttachmentList groupsPhosphat = new AttachmentList();
+    groupsPhosphat.add(new Attachment("R1-H", "R1", "OH", phosphatR1));
+    groupsPhosphat.add(new Attachment("R2-H", "R2", "OH", phosphatR2));
+
+    AbstractChemistryManipulator manipulator = ManipulatorFactory.buildManipulator(ManipulatorType.MARVIN);
+    AbstractMolecule riboseMolecule = manipulator.getMolecule(ribose, groupsRibose);
+    AbstractMolecule phosphatMolecule = manipulator.getMolecule(phosphat, groupsPhosphat);
+    AbstractMolecule molecule =
+        manipulator.merge(riboseMolecule, riboseMolecule.getRGroupAtom(2, true), phosphatMolecule, phosphatMolecule.getRGroupAtom(1, true));
+
+    for (IAtomBase atom : molecule.getIAtomArray()) {
+      LOG.debug("rGroup atom=" + atom.getRgroup());
+
+    }
+    LOG.debug("atom" + molecule.getRGroupAtom(1, false).getMolAtom());
+    LOG.debug("atom" + molecule.getRGroupAtom(2, false).getMolAtom());
+    LOG.debug("atom" + molecule.getRGroupAtom(3, false).getMolAtom());
+    LOG.debug("atom R" + molecule.getRGroupAtom(1, true).getMolAtom());
+    LOG.debug("atom R" + molecule.getRGroupAtom(2, true).getMolAtom());
+    LOG.debug("atom R" + molecule.getRGroupAtom(3, true).getMolAtom());
+
+// LOG.debug(manipulator.convertMolecule(molecule, StType.MOLFILE));
+
+    for (Attachment attachment : molecule.getAttachments()) {
+
+      LOG.debug("id=" + attachment.getId());
+      LOG.debug("name=" + attachment.getName());
+      LOG.debug("label=" + attachment.getLabel());
+      LOG.debug("smiles=" + attachment.getSmiles());
+
+    }
+
+  }
 }
