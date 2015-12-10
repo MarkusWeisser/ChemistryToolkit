@@ -19,6 +19,8 @@ package org.helm.chemstrytoolkit.chemaxon;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
+import java.util.HashMap;
+import java.util.Map;
 
 import org.helm.chemtoolkit.AbstractChemistryManipulator;
 import org.helm.chemtoolkit.AbstractChemistryManipulator.OutputType;
@@ -202,22 +204,30 @@ public class ChemaxonTest {
     groups.add(new Attachment("R1-H", "R1", "H", "[*][H] |$_R1;$|"));
     AbstractChemistryManipulator manipulator = getManipulator();
     AbstractMolecule molecule = manipulator.getMolecule("[*]N1CC[C@H]1C([*])=O |r,$_R2;;;;;;_R1;$|", groups);
+    Map<AbstractMolecule, Map<IAtomBase, IAtomBase>> groupsToMerge = new HashMap<>();
     for (Attachment attachment : molecule.getAttachments()) {
       int groupId = AbstractMolecule.getIdFromLabel(attachment.getLabel());
       String smiles = attachment.getSmiles();
       LOG.debug(smiles);
       AbstractMolecule rMol = manipulator.getMolecule(smiles, null);
-      molecule =
-          manipulator.merge(molecule, molecule.getRGroupAtom(groupId, true), rMol, rMol.getRGroupAtom(groupId, true));
-
+      Map<IAtomBase, IAtomBase> atoms = new HashMap<>();
+      atoms.put(molecule.getRGroupAtom(groupId, true), rMol.getRGroupAtom(groupId, true));
+      groupsToMerge.put(rMol, atoms);
     }
-
-    MoleculeInfo moleculeInfo = manipulator.getMoleculeInfo(molecule);
+    for (AbstractMolecule mol : groupsToMerge.keySet()) {
+      for (IAtomBase atom : groupsToMerge.get(mol).keySet()) {
+        molecule =
+            manipulator.merge(molecule, atom, mol, groupsToMerge.get(mol).get(atom));
+      }
+    }
+    MoleculeInfo moleculeInfo =
+        manipulator.getMoleculeInfo(molecule);
     LOG.debug("exact mass=" + moleculeInfo.getExactMass());
     LOG.debug("molecular weight=" + moleculeInfo.getMolecularWeight());
     LOG.debug("formula=" + moleculeInfo.getMolecularFormula());
-    ((AbstractMolecule) molecule.getMolecule()).generateCoordinates();
     molecule.dearomatize();
+    molecule.generateCoordinates();
+
     String result = manipulator.convertMolecule(molecule, StType.MOLFILE);
     LOG.debug(result);
 
