@@ -187,7 +187,7 @@ public class CDKMolecule extends AbstractMolecule {
   public AbstractMolecule cloneMolecule() throws CTKException {
     CDKMolecule cloned = null;
     try {
-      cloned = new CDKMolecule(molecule.clone());
+      cloned = new CDKMolecule(molecule.clone(), attachments.cloneList());
     } catch (CloneNotSupportedException e) {
       throw new CTKException(e.getMessage(), e);
     }

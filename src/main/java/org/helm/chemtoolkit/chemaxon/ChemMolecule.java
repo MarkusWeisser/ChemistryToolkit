@@ -166,7 +166,7 @@ public class ChemMolecule extends AbstractMolecule {
    */
   @Override
   public AbstractMolecule cloneMolecule() {
-    ChemMolecule cloned = new ChemMolecule(molecule.cloneMolecule());
+    ChemMolecule cloned = new ChemMolecule(molecule.cloneMolecule(), attachments.cloneList());
 
     return cloned;
   }
