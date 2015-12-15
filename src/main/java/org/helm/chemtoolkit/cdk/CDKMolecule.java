@@ -57,7 +57,10 @@ public class CDKMolecule extends AbstractMolecule {
 
   public CDKMolecule(IAtomContainer molecule, AttachmentList attachments) {
     this.molecule = molecule;
-    this.attachments = attachments;
+    if (attachments != null)
+      this.attachments = attachments;
+    else
+      this.attachments = new AttachmentList();
     atomArray = new ArrayList<>();
     for (IAtom atom : molecule.atoms()) {
       int rGroupId = 0;
@@ -137,8 +140,9 @@ public class CDKMolecule extends AbstractMolecule {
   @Override
   public void addIBase(IChemObjectBase object) {
     if (object instanceof CDKMolecule) {
-      molecule.add(((CDKMolecule) object).molecule);
-      for (IAtom atom : molecule.atoms()) {
+      IAtomContainer container = ((CDKMolecule) object).molecule;
+      molecule.add(container);
+      for (IAtom atom : container.atoms()) {
         int rGroupId = 0;
         if (atom instanceof IPseudoAtom) {
           atom.setSymbol("R");
@@ -207,7 +211,7 @@ public class CDKMolecule extends AbstractMolecule {
     try {
       sdg.generateCoordinates();
     } catch (CDKException e) {
-      throw new CTKException("unable generate coordinates", e);
+      throw new CTKException(e.getMessage(), e);
     }
     molecule = sdg.getMolecule();
 

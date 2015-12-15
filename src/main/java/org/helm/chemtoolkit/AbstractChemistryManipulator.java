@@ -18,7 +18,6 @@ package org.helm.chemtoolkit;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.LinkedHashMap;
 import java.util.List;
 
 import org.slf4j.Logger;
@@ -173,7 +172,7 @@ public abstract class AbstractChemistryManipulator {
     firstContainer.addIBase(secondContainer);
 
     firstContainer.setAttachments(mergedAttachments);
-    firstContainer.generateCoordinates();
+    // firstContainer.generateCoordinates();
     // }
     return firstContainer;
   }
@@ -210,9 +209,9 @@ public abstract class AbstractChemistryManipulator {
    * @return
    */
 
-  protected LinkedHashMap<Integer, String> getRGroupsFromExtendedSmiles(String extendedSmiles) {
+  protected List<String> getRGroupsFromExtendedSmiles(String extendedSmiles) {
     extendedSmiles = getExtension(extendedSmiles);
-    LinkedHashMap<Integer, String> list = new LinkedHashMap<Integer, String>();
+    List<String> list = new ArrayList<>();
     if (extendedSmiles != null) {
       Integer currIndex = 0;
       char[] items = extendedSmiles.toCharArray();
@@ -248,8 +247,8 @@ public abstract class AbstractChemistryManipulator {
 
           if (numbers.length() > 0) {
             // numbers = "R" + numbers;
-            Integer value = Integer.valueOf(numbers);
-            list.put(indexes.get(value - 1) - value * 3, "R" + numbers);
+            // Integer value = Integer.valueOf(numbers);
+            list.add("R" + numbers);
           }
         }
       }

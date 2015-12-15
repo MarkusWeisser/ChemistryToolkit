@@ -74,14 +74,14 @@ public class ChemMolecule extends AbstractMolecule {
    */
   @Override
   public void removeINode(IAtomBase node) throws CTKException {
-
     if (node instanceof ChemAtom) {
       if (atoms.contains(node)) {
         molecule.removeNode(((ChemAtom) node).getMolAtom());
         atoms.remove(node);
       } else
         throw new CTKException("the atom not found in the molecule");
-    }
+    } else
+      throw new CTKException("invalid atom");
   }
 
   /**

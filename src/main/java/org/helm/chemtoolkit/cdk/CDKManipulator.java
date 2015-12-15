@@ -31,7 +31,6 @@ import java.io.StringReader;
 import java.io.StringWriter;
 import java.util.ArrayList;
 import java.util.Iterator;
-import java.util.LinkedHashMap;
 import java.util.List;
 
 import javax.imageio.ImageIO;
@@ -101,14 +100,14 @@ public class CDKManipulator extends AbstractChemistryManipulator {
     return result;
   }
 
-  private String normalize(String extendedSmiles, LinkedHashMap<Integer, String> groups) {
+  private String normalize(String extendedSmiles, List<String> groups) {
     String smiles = null;
     String result = "";
     smiles = normalize(extendedSmiles);
-    Iterator<Integer> iterator = groups.keySet().iterator();
+    Iterator<String> iterator = groups.iterator();
     for (char item : smiles.toCharArray()) {
       if (item == '*' && iterator.hasNext()) {
-        result += groups.get(iterator.next());
+        result += groups.get(groups.indexOf(iterator.next()));
 
       } else
         result += item;
@@ -414,8 +413,7 @@ public class CDKManipulator extends AbstractChemistryManipulator {
     IBondBase bond = null;
     if ((atom1 instanceof CDKAtom) && (atom1 instanceof CDKAtom)) {
 
-      IBond newBond = new Bond(((CDKAtom) atom1).getMolAtom(), ((CDKAtom) atom2).getMolAtom(), IBond.Order.SINGLE,
-          IBond.Stereo.UP);
+      IBond newBond = new Bond(((CDKAtom) atom1).getMolAtom(), ((CDKAtom) atom2).getMolAtom());
       // newBond.setStereo(stereo);
       bond = new CDKBond(newBond);
 
@@ -546,4 +544,5 @@ public class CDKManipulator extends AbstractChemistryManipulator {
     firstContainer.addIBase(bindAtoms(atom1, atom2));
     return isStereo;
   }
+
 }

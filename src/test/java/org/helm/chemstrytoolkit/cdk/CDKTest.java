@@ -19,6 +19,8 @@ package org.helm.chemstrytoolkit.cdk;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
+import java.util.HashMap;
+import java.util.Map;
 
 import org.helm.chemtoolkit.AbstractChemistryManipulator;
 import org.helm.chemtoolkit.AbstractChemistryManipulator.OutputType;
@@ -28,6 +30,7 @@ import org.helm.chemtoolkit.Attachment;
 import org.helm.chemtoolkit.AttachmentList;
 import org.helm.chemtoolkit.CTKException;
 import org.helm.chemtoolkit.CTKSmilesException;
+import org.helm.chemtoolkit.IAtomBase;
 import org.helm.chemtoolkit.ManipulatorFactory;
 import org.helm.chemtoolkit.ManipulatorFactory.ManipulatorType;
 import org.helm.chemtoolkit.MoleculeInfo;
@@ -317,5 +320,42 @@ public class CDKTest {
 
     }
 
+  }
+
+  @Test(groups = {"CDKTest"})
+  public void getRibose() throws IOException, CTKException {
+    String ribose = "[H][C@@]1([*])O[C@H](CO[*])[C@@H](O[*])[C@H]1O |$;;_R1;;;;;_R3;;;_R2;;$|";
+
+    String riboseR1 = "[*][H] |$_R3;$|";
+    String riboseR2 = "[*][H] |$_R2;$|";
+    String riboseR3 = "O[*] |$;_R1$|";
+
+    AttachmentList groupsRibose = new AttachmentList();
+    groupsRibose.add(new Attachment("R3-H", "R3", "H", riboseR1));
+    groupsRibose.add(new Attachment("R2-H", "R2", "H", riboseR2));
+    groupsRibose.add(new Attachment("R1-OH", "R1", "OH", riboseR3));
+    AbstractChemistryManipulator manipulator = getManipulator();
+    AbstractMolecule molecule = manipulator.getMolecule(ribose, groupsRibose);
+    Map<AbstractMolecule, Map<IAtomBase, IAtomBase>> groupsToMerge = new HashMap<>();
+    for (Attachment attachment : molecule.getAttachments()) {
+      int groupId = AbstractMolecule.getIdFromLabel(attachment.getLabel());
+      String smiles = attachment.getSmiles();
+      LOG.debug(smiles);
+
+      AbstractMolecule rMol = manipulator.getMolecule(smiles, null);
+      Map<IAtomBase, IAtomBase> atoms = new HashMap<>();
+      atoms.put(molecule.getRGroupAtom(groupId, true), rMol.getRGroupAtom(groupId, true));
+      groupsToMerge.put(rMol, atoms);
+    }
+    for (AbstractMolecule mol : groupsToMerge.keySet()) {
+      for (IAtomBase atom : groupsToMerge.get(mol).keySet()) {
+        molecule =
+            manipulator.merge(molecule, atom, mol, groupsToMerge.get(mol).get(atom));
+
+      }
+    }
+    molecule.generateCoordinates();
+    String result = manipulator.convertMolecule(molecule, StType.MOLFILE);
+    LOG.debug("molfile=" + result);
   }
 }
