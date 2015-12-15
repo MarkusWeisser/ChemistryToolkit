@@ -63,7 +63,7 @@ public class ChemaxonTest {
     return result;
   }
 
-  @Test
+  @Test(groups = {"MarvinTest"})
   void getMoleculeInfoTest() throws CTKException, IOException {
     String smiles = "CCc1nn(C)c2c(=O)[nH]c(nc12)c3cc(ccc3OCC)S(=O)(=O)N4CCN(C)CC4";
     // String smiles = "[*]N1CC[C@H]1C([*])=O |r,$_R2;;;;;;_R1;$|";
@@ -74,7 +74,7 @@ public class ChemaxonTest {
     Assert.assertEquals(moleculeInfo.getMolecularFormula(), "C21H28N6O4S");
   }
 
-  @Test
+  @Test(groups = {"MarvinTest"})
   public void smiles2MolTest() throws CTKException {
     String smiles = "[*]N1CC[C@H]1C([*])=O |r,$_R2;;;;;;_R1;$";
     // String smiles = "[H]C1(OC(CO*)C(O*)C1O)N2C=NC3=C2N=CN=C3N";
@@ -84,7 +84,7 @@ public class ChemaxonTest {
 
   }
 
-  @Test
+  @Test(groups = {"MarvinTest"})
   public void mol2SmilesTest() throws CTKException {
     String molFile = "\n" +
         "  Marvin  11261512352D\n" +
@@ -128,7 +128,7 @@ public class ChemaxonTest {
 
   }
 
-  @Test
+  @Test(groups = {"MarvinTest"})
   public void canonicalizeTest() throws CTKSmilesException, CTKException {
     String smiles = "CCc1nn(C)c2c(=O)[nH]c(nc12)c3cc(ccc3OCC)S(=O)(=O)N4CCN(C)CC4";
     String result = getManipulator().canonicalize(smiles);
@@ -138,7 +138,7 @@ public class ChemaxonTest {
 
   }
 
-  @Test
+  @Test(groups = {"MarvinTest"})
   public void renderMolTest() throws CTKException, IOException {
     String molFile = "\n" + "  ACCLDraw11131512172D\n" + "\n" + " 32 35  0  0  0  0  0  0  0  0999 V2000\n"
         + "    7.6862   -7.0367    0.0000 C   0  0  0  0  0  0  0  0  0  0  0  0\n"
@@ -192,12 +192,7 @@ public class ChemaxonTest {
 
   }
 
-  /*
-   * @Test public void convertSeq2MolFileTest() throws CTKException { String sequence = "GGT"; String result =
-   * getManipulator().convert(sequence, InputType.SEQUENCE); LOG.debug(result); }
-   */
-
-  @Test
+  @Test(groups = {"MarvinTest"})
   public void getExactMoleculeInfo() throws IOException, CTKException {
     AttachmentList groups = new AttachmentList();
     groups.add(new Attachment("R2-OH", "R2", "OH", "O[*] |$;_R2$|"));
@@ -372,14 +367,11 @@ public class ChemaxonTest {
     AbstractMolecule mergedMolecule =
         manipulator.merge(absMol1, absMol1.getRGroupAtom(2, true), absMol2, absMol2.getRGroupAtom(1, true));
 
-    String result = manipulator.convertMolecule(mergedMolecule, StType.MOLFILE);
-    LOG.debug(result);
+    String result = manipulator.convertMolecule(mergedMolecule, StType.SMILES);
 
-    for (Attachment attachment : mergedMolecule.getAttachments()) {
-      LOG.debug("label=" + attachment.getLabel());
+    String expected = "[*]N[C@@H](CC([*])=O)C(=O)N[C@@H](CCC([*])=O)C([*])=O";
 
-    }
-
+    Assert.assertEquals(result, expected);
   }
 
   @Test(groups = {"MarvinTest"})
@@ -413,7 +405,8 @@ public class ChemaxonTest {
       }
     }
     molecule.generateCoordinates();
-    String result = manipulator.convertMolecule(molecule, StType.MOLFILE);
+    String result = manipulator.convertMolecule(molecule, StType.SMILES);
     LOG.debug("result=" + result);
+    Assert.assertEquals(result, "[H]OC[C@H]1O[C@H](O)[C@H](O)[C@@H]1O[H]");
   }
 }

@@ -71,7 +71,7 @@ public class CDKTest {
 
   }
 
-  @Test
+  @Test(groups = {"CDKTest"})
   public void getMoleculeInfoTest() throws CTKException, IOException {
     String smiles = "CCOC1=C(C=C(C=C1)S(=O)(=O)N1CCN(C)CC1)C1=NC2=C(N(C)N=C2CC)C(=O)N1";
     // String smiles = "[*]N1CC[C@H]1C([*])=O |r,$_R2;;;;;;_R1;$|";
@@ -83,18 +83,18 @@ public class CDKTest {
 
   }
 
-  @Test
+  @Test(groups = {"CDKTest"})
   public void convertSMILES2MolFile() throws CTKException, Exception {
     // String smiles =
     // "CCc1nn(C)c2c(=O)[nH]c(nc12)c3cc(ccc3OCC)S(=O)(=O)N4CCN(C)CC4";
     String smiles = "[*]N1CC[C@H]1C([*])=O |r,$_R1;;;;;;_R2;$|";
     // String molFile = getManipulator().convertSMILES2MolFile(smiles);
-    String molFile = getManipulator().convert(smiles, StType.SMILES);
-    LOG.debug(molFile);
+    String molfile = getManipulator().convert(smiles, StType.SMILES);
+    LOG.debug(molfile);
 
   }
 
-  @Test
+  @Test(groups = {"CDKTest"})
   void convertMolFile2SMILES() throws CTKException, IOException {
     String molFile = "\n" +
         "  Marvin  12081516212D\n" +
@@ -156,11 +156,11 @@ public class CDKTest {
     LOG.debug("res=" + result);
     result = getManipulator().canonicalize(result);
     LOG.debug("cann=" + result);
-    // Assert.assertEquals(result, "O=C1NC(=NC=2C(=NN(C12)C)CC)C3=CC(=CC=C3OCC)S(=O)(=O)N4CCN(C)CC4");
+    Assert.assertEquals(result, "*OCC1OC([H])(N2C=NC3=C(N=CN=C32)N)C(O)C1O*");
 
   }
 
-  @Test
+  @Test(groups = {"CDKTest"})
   public void canonicalizeTest() throws CTKSmilesException, CTKException {
     String smiles = "CCOc1ccc(cc1-c1nc2c(CC)nn(C)c2c(=O)[nH]1)S(=O)(=O)N1CCN(C)CC1";
     String result = getManipulator().canonicalize(smiles);
@@ -169,7 +169,7 @@ public class CDKTest {
 
   }
 
-  @Test
+  @Test(groups = {"CDKTest"})
   public void renderMolTest() throws CTKException, IOException {
     String molFile = "\n" + "  ACCLDraw11131512172D\n" + "\n" + " 32 35  0  0  0  0  0  0  0  0999 V2000\n"
         + "    7.6862   -7.0367    0.0000 C   0  0  0  0  0  0  0  0  0  0  0  0\n"
@@ -223,7 +223,7 @@ public class CDKTest {
 
   }
 
-  @Test
+  @Test(groups = {"CDKTest"})
   public void renderSequenceTest() throws NumberFormatException, CTKException, IOException {
     String sequence = "GGT";
     byte[] result =
@@ -233,7 +233,7 @@ public class CDKTest {
     }
   }
 
-  @Test
+  @Test(groups = {"CDKTest"})
   public void createGroupMolFile() throws CTKException, IOException {
     String smiles = "[*]N1CC[C@H]1C([*])=O |r,$_R2;;;;;;_R1;$|";
     AbstractChemistryManipulator manipulator = getManipulator();
@@ -242,7 +242,7 @@ public class CDKTest {
     LOG.debug(result);
   }
 
-  @Test
+  @Test(groups = {"CDKTest"})
   public void adeninRiboseMerge() throws IOException, CTKException {
 
     String ribose = "[H][C@@]1([*])O[C@H](CO[*])[C@@H](O[*])[C@H]1O |$;;_R1;;;;;_R3;;;_R2;;$|";
