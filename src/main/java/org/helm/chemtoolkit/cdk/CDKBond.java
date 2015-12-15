@@ -21,6 +21,7 @@ import java.util.List;
 
 import org.helm.chemtoolkit.IAtomBase;
 import org.helm.chemtoolkit.IBondBase;
+import org.helm.chemtoolkit.IStereoElementBase;
 import org.openscience.cdk.interfaces.IBond;
 
 /**
@@ -30,6 +31,8 @@ import org.openscience.cdk.interfaces.IBond;
 public class CDKBond implements IBondBase {
 
   protected IBond bond;
+
+  protected CDKStereoElement stereoElement;
 
   protected List<IBond> bonds;
 
@@ -44,6 +47,13 @@ public class CDKBond implements IBondBase {
     this.bond = bond;
     bonds = new ArrayList<>();
     bonds.add(bond);
+  }
+
+  public CDKBond(IBond bond, IStereoElementBase stereo) {
+    new CDKBond(bond);
+    if (stereo != null && stereo instanceof CDKStereoElement)
+      this.stereoElement = (CDKStereoElement) stereo;
+
   }
 
   /**
@@ -64,6 +74,15 @@ public class CDKBond implements IBondBase {
   public IAtomBase getIAtom2() {
 
     return new CDKAtom(bond.getAtom(1), 0, bonds);
+  }
+
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public IStereoElementBase getStereoElement() {
+
+    return stereoElement;
   }
 
 }

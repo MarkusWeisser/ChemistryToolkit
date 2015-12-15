@@ -26,8 +26,6 @@ public interface IBondBase extends IChemObjectBase {
 
   public IAtomBase getIAtom2();
 
-
-
-
+  public IStereoElementBase getStereoElement();
 
 }

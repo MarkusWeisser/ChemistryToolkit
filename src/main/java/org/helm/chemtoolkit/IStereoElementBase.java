@@ -21,7 +21,7 @@ package org.helm.chemtoolkit;
  * @author <a href="mailto:chistyakov@quattro-research.com">Dmitry Chistyakov</a>
  * @version $Id$
  */
-public interface IStereoElementBase {
+public interface IStereoElementBase extends IChemObjectBase {
 
   public Object getStereoElement();
 

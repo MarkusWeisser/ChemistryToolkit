@@ -16,6 +16,7 @@
  ******************************************************************************/
 package org.helm.chemtoolkit.chemaxon;
 
+import org.helm.chemtoolkit.AbstractMolecule.Flag;
 import org.helm.chemtoolkit.IAtomBase;
 import org.helm.chemtoolkit.IBondBase;
 
@@ -25,7 +26,7 @@ import chemaxon.struc.MolAtom;
  * @author chistyakov
  *
  */
-public class ChemAtom implements IAtomBase {
+public class ChemAtom extends IAtomBase {
 
   private MolAtom atom;
 
@@ -37,6 +38,7 @@ public class ChemAtom implements IAtomBase {
 
   public ChemAtom(MolAtom atom) {
     this.atom = atom;
+    this.flag = Flag.NONE;
 
   }
 
@@ -112,6 +114,7 @@ public class ChemAtom implements IAtomBase {
   @Override
   public void setRgroup(int rGroup) {
     atom.setRgroup(rGroup);
+    this.flag = Flag.PROCESSED;
 
   }
 

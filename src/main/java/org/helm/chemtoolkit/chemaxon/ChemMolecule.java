@@ -42,6 +42,8 @@ public class ChemMolecule extends AbstractMolecule {
 
   private Molecule molecule;
 
+  private List<IAtomBase> atoms;
+
   @Override
   public Molecule getMolecule() {
     return this.molecule;
@@ -53,7 +55,10 @@ public class ChemMolecule extends AbstractMolecule {
   }
 
   public ChemMolecule(Molecule molecule, AttachmentList attachments) {
-    this.molecule = molecule;
+    this(molecule);
+    atoms = new ArrayList<>();
+    for (MolAtom a : molecule.getAtomArray())
+      atoms.add(new ChemAtom(a));
     if (attachments != null) {
       this.attachments =
           attachments.cloneList();
@@ -64,16 +69,18 @@ public class ChemMolecule extends AbstractMolecule {
   /**
    * 
    * {@inheritDoc}
+   * 
+   * @throws CTKException
    */
   @Override
-  public void removeINode(IAtomBase node) {
-    for (MolAtom atom : molecule.getAtomArray()) {
-      if (atom.equals(((ChemAtom) node).getMolAtom())) {
-        LOG.debug("atom founded in the molecule");
-      }
-    }
+  public void removeINode(IAtomBase node) throws CTKException {
+
     if (node instanceof ChemAtom) {
-      molecule.removeNode(((ChemAtom) node).getMolAtom());
+      if (atoms.contains(node)) {
+        molecule.removeNode(((ChemAtom) node).getMolAtom());
+        atoms.remove(node);
+      } else
+        throw new CTKException("the atom not found in the molecule");
     }
   }
 
@@ -83,12 +90,8 @@ public class ChemMolecule extends AbstractMolecule {
    */
   @Override
   public List<IAtomBase> getIAtomArray() {
-    MolAtom[] parent = molecule.getAtomArray();
-    List<IAtomBase> target = new ArrayList<>();
-    for (int i = 0; i < parent.length; i++) {
-      target.add(new ChemAtom(parent[i]));
-    }
-    return target;
+
+    return atoms;
   }
 
   /**
@@ -97,11 +100,23 @@ public class ChemMolecule extends AbstractMolecule {
    */
   @Override
   public void addIBase(IChemObjectBase node) {
-
-    if (node instanceof ChemAtom) {
+    if (node instanceof ChemMolecule) {
+      Molecule nodeMolecule = ((ChemMolecule) node).getMolecule();
+      for (MolAtom atom : nodeMolecule.getAtomArray()) {
+        molecule.add(atom);
+        atoms.add(new ChemAtom(atom));
+      }
+      for (MolBond bond : nodeMolecule.getBondArray()) {
+        molecule.add(bond);
+      }
+    } else if (node instanceof ChemAtom) {
       molecule.add(((ChemAtom) node).getMolAtom());
+      atoms.add((ChemAtom) node);
     } else if (node instanceof ChemBond) {
       molecule.add(((ChemBond) node).getMolBond());
+    }
+    if (node instanceof ChemStereoElement) {
+      molecule.add(((ChemStereoElement) node).getStereoElement());
     }
 
   }
@@ -173,11 +188,33 @@ public class ChemMolecule extends AbstractMolecule {
   @Override
   public void changeAtomLabel(int index, int toIndex) throws CTKException {
     for (IAtomBase atom : getIAtomArray()) {
-      if (atom.getRgroup() == index) {
+      if (atom.getFlag() != Flag.PROCESSED && atom.getRgroup() == index) {
         atom.setRgroup(toIndex);
       }
     }
 
+  }
+
+  /**
+   * {@inheritDoc}
+   * 
+   * @throws CTKException
+   */
+  @Override
+  public boolean isSingleStereo(IAtomBase atom) throws CTKException {
+    if (atom instanceof ChemAtom) {
+      MolAtom rAtom = (MolAtom) atom.getMolAtom();
+      int bondCount = rAtom.getBondCount();
+      if (bondCount != 1) {
+        throw new CTKException("RGroup is allowed to have single connection to other atom");
+      }
+
+      MolBond bond = rAtom.getBond(0);
+      int bondType = bond.getFlags() & MolBond.STEREO1_MASK;
+
+      return bondType == MolBond.UP || bondType == MolBond.DOWN || bondType == MolBond.WAVY;
+    } else
+      throw new CTKException("invalid atom!");
   }
 
 }

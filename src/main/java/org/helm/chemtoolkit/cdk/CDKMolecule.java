@@ -32,7 +32,10 @@ import org.openscience.cdk.interfaces.IAtom;
 import org.openscience.cdk.interfaces.IAtomContainer;
 import org.openscience.cdk.interfaces.IBond;
 import org.openscience.cdk.interfaces.IPseudoAtom;
+import org.openscience.cdk.interfaces.IStereoElement;
+import org.openscience.cdk.interfaces.ITetrahedralChirality;
 import org.openscience.cdk.layout.StructureDiagramGenerator;
+import org.openscience.cdk.stereo.TetrahedralChirality;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -101,17 +104,19 @@ public class CDKMolecule extends AbstractMolecule {
   @Override
   public void removeINode(IAtomBase node) throws CTKException {
     if (node instanceof CDKAtom) {
+      if (atomArray.contains(node)) {
+        molecule.removeAtomAndConnectedElectronContainers(((CDKAtom) node).atom);
 
-      molecule.removeAtomAndConnectedElectronContainers(((CDKAtom) node).atom);
-
-      for (int i = 0; i < atomArray.size(); i++) {
-        if (((CDKAtom) atomArray.get(i)).compare(node)) {
-          atomArray.remove(i);
-          break;
+        for (int i = 0; i < atomArray.size(); i++) {
+          if (((CDKAtom) atomArray.get(i)).compare(node)) {
+            atomArray.remove(i);
+            break;
+          }
         }
-      }
-
-    }
+      } else
+        throw new CTKException("the atom not found in the molecule");
+    } else
+      throw new CTKException("invalid atom");
 
   }
 
@@ -133,12 +138,29 @@ public class CDKMolecule extends AbstractMolecule {
   public void addIBase(IChemObjectBase object) {
     if (object instanceof CDKMolecule) {
       molecule.add(((CDKMolecule) object).molecule);
+      for (IAtom atom : molecule.atoms()) {
+        int rGroupId = 0;
+        if (atom instanceof IPseudoAtom) {
+          atom.setSymbol("R");
+          rGroupId = AbstractMolecule.getIdFromLabel(((IPseudoAtom) atom).getLabel());
+        }
+        List<IBond> bonds = molecule.getConnectedBondsList(atom);
+        atomArray.add(new CDKAtom(atom, rGroupId, bonds));
+      }
     } else if (object instanceof CDKAtom) {
-
-      molecule.addAtom(((CDKAtom) object).atom);
+      IAtom atom = ((CDKAtom) object).atom;
+      molecule.addAtom(atom);
+      int rGroupId = 0;
+      if (atom instanceof IPseudoAtom) {
+        atom.setSymbol("R");
+        rGroupId = AbstractMolecule.getIdFromLabel(((IPseudoAtom) atom).getLabel());
+      }
+      List<IBond> bonds = molecule.getConnectedBondsList(atom);
+      atomArray.add(new CDKAtom(atom, rGroupId, bonds));
     } else if (object instanceof CDKBond) {
-
       molecule.addBond(((CDKBond) object).bond);
+    } else if (object instanceof CDKStereoElement) {
+      molecule.addStereoElement(((CDKStereoElement) object).getStereoElement());
     }
 
   }
@@ -207,12 +229,54 @@ public class CDKMolecule extends AbstractMolecule {
   @Override
   public void changeAtomLabel(int index, int toIndex) throws CTKException {
     for (IAtomBase atom : getIAtomArray()) {
-      if (atom.getMolAtom() instanceof IPseudoAtom) {
+      if (atom.getFlag() != Flag.PROCESSED && atom.getMolAtom() instanceof IPseudoAtom) {
         int currIndex = AbstractMolecule.getIdFromLabel(((IPseudoAtom) atom.getMolAtom()).getLabel());
         if (currIndex == index)
           atom.setRgroup(toIndex);
       }
     }
+
+  }
+
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public boolean isSingleStereo(IAtomBase atom) throws CTKException {
+    if (atom instanceof CDKAtom) {
+      if (atom.getIBondCount() != 1) {
+        throw new CTKException("RGroup is allowed to have single connection to other atom");
+      }
+      IAtom rAtom = (IAtom) atom.getMolAtom();
+      for (IStereoElement element : molecule.stereoElements()) {
+        if (element.contains(rAtom))
+          return true;
+      }
+      return false;
+    } else
+      throw new CTKException("invalid atom");
+  }
+
+  protected IStereoElement getStereoInformation(IAtom rGroup, IAtom atom) {
+    IStereoElement elementToAdd = null;
+    for (IStereoElement element : molecule.stereoElements()) {
+      if (element.contains(rGroup)) {
+        if (element instanceof ITetrahedralChirality) {
+          IAtom[] atomArray = ((ITetrahedralChirality) element).getLigands();
+          for (int i = 0; i < atomArray.length; i++) {
+            if (atomArray[i].equals(rGroup)) {
+              atomArray[i] = atom;
+            }
+
+          }
+          elementToAdd =
+              new TetrahedralChirality(((ITetrahedralChirality) element).getChiralAtom(), atomArray,
+                  (((ITetrahedralChirality) element).getStereo()));
+        }
+      }
+    }
+
+    return elementToAdd;
 
   }
 

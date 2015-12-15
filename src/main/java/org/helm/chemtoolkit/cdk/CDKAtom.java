@@ -19,6 +19,7 @@ package org.helm.chemtoolkit.cdk;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.helm.chemtoolkit.AbstractMolecule.Flag;
 import org.helm.chemtoolkit.CTKException;
 import org.helm.chemtoolkit.IAtomBase;
 import org.helm.chemtoolkit.IBondBase;
@@ -31,7 +32,7 @@ import org.openscience.cdk.interfaces.IPseudoAtom;
  * @author chistyakov
  *
  */
-public class CDKAtom implements IAtomBase {
+public class CDKAtom extends IAtomBase {
 
   protected IAtom atom;
 
@@ -66,11 +67,13 @@ public class CDKAtom implements IAtomBase {
    */
   public CDKAtom(IAtom atom, int rGroup, List<IBond> bonds) {
     this.atom = atom;
+    this.flag = Flag.NONE;
     this.rGroup = rGroup;
     this.bonds = new ArrayList<CDKBond>();
     for (IBond bond : bonds) {
       this.bonds.add(new CDKBond(bond));
     }
+
   }
 
   /**
@@ -153,6 +156,7 @@ public class CDKAtom implements IAtomBase {
     if (atom instanceof IPseudoAtom) {
       ((IPseudoAtom) atom).setLabel(((IPseudoAtom) atom).getLabel().replace(String.valueOf(this.rGroup), String.valueOf(rGroup)));
       this.rGroup = rGroup;
+      this.flag = Flag.PROCESSED;
     } else
       throw new CTKException("unable to set group id, the atom is not a PseudoAtom");
 

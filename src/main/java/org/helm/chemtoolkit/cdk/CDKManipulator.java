@@ -410,7 +410,7 @@ public class CDKManipulator extends AbstractChemistryManipulator {
   }
 
   @Override
-  public IBondBase bindAtoms(IAtomBase atom1, IAtomBase atom2) throws CTKException {
+  protected IBondBase bindAtoms(IAtomBase atom1, IAtomBase atom2) throws CTKException {
     IBondBase bond = null;
     if ((atom1 instanceof CDKAtom) && (atom1 instanceof CDKAtom)) {
 
@@ -426,43 +426,43 @@ public class CDKManipulator extends AbstractChemistryManipulator {
     return bond;
   }
 
-  @Override
-  public AbstractMolecule merge(AbstractMolecule firstContainer, IAtomBase firstRgroup,
-      AbstractMolecule secondContainer,
-      IAtomBase secondRgroup) throws CTKException {
-// if (firstMolecule == secondMolecule) {
-// firstMolecule.dearomatize();
-// IAtomBase atom1 = getNeighborAtom(firstMolecule, firstRgroup);
-// IAtomBase atom2 = getNeighborAtom(secondMolecule, secondRgroup);
+// @Override
+// public AbstractMolecule merge(AbstractMolecule firstContainer, IAtomBase firstRgroup,
+// AbstractMolecule secondContainer,
+// IAtomBase secondRgroup) throws CTKException {
+// if (firstContainer.isSingleStereo(firstRgroup) && secondContainer.isSingleStereo(secondRgroup)) {
+// throw new CTKException("Both R atoms are connected to chiral centers");
+// }
+// firstContainer.dearomatize();
+// secondContainer.dearomatize();
 //
+// IAtomBase atom1 = getNeighborAtom(firstRgroup);
+// IAtomBase atom2 = getNeighborAtom(secondRgroup);
+// // create a new bond
 // IBondBase bond = bindAtoms(atom1, atom2);
-// firstMolecule.addIBase(bond);
-// } else
+// IStereoElement elementToAdd = null;
+// if (firstContainer.isSingleStereo(firstRgroup)) {
+// elementToAdd =
+// (IStereoElement) getStereoInformation(firstContainer, firstRgroup, atom1).getStereoElement();
+// } else if (secondContainer.isSingleStereo(secondRgroup)) {
+// elementToAdd =
+// (IStereoElement) getStereoInformation(firstContainer, firstRgroup, atom1).getStereoElement();
+// }
+// firstContainer.removeAttachment(firstRgroup);
+// secondContainer.removeAttachment(secondRgroup);
 //
-// {
-    firstContainer.dearomatize();
-    secondContainer.dearomatize();
-    IAtomBase atom1 = getNeighborAtom(firstRgroup);
-    IAtomBase atom2 = getNeighborAtom(secondRgroup);
-    // create a new bond
-    IBondBase bond = bindAtoms(atom1, atom2);
-    IStereoElement elementToAdd =
-        (IStereoElement) getStereoInformation(firstContainer, firstRgroup, atom1).getStereoElement();
-    firstContainer.removeAttachment(firstRgroup);
-    secondContainer.removeAttachment(secondRgroup);
-
-    firstContainer.removeINode(firstRgroup);
-    secondContainer.removeINode(secondRgroup);
-    AttachmentList mergedAttacments = mergeAttachments(firstContainer, secondContainer);
-    firstContainer.addIBase(secondContainer);
-    firstContainer.addIBase(bond);
-    ((CDKMolecule) firstContainer).getMolecule().addStereoElement(elementToAdd);
-
-    firstContainer.setAttachments(mergedAttacments);
-
-    return firstContainer;
-
-  }
+// firstContainer.removeINode(firstRgroup);
+// secondContainer.removeINode(secondRgroup);
+// AttachmentList mergedAttacments = mergeAttachments(firstContainer, secondContainer);
+// firstContainer.addIBase(secondContainer);
+// firstContainer.addIBase(bond);
+// ((CDKMolecule) firstContainer).getMolecule().addStereoElement(elementToAdd);
+//
+// firstContainer.setAttachments(mergedAttacments);
+//
+// return firstContainer;
+//
+// }
 
   /**
    * @param molecule
@@ -472,7 +472,7 @@ public class CDKManipulator extends AbstractChemistryManipulator {
    */
 
   @Override
-  public IStereoElementBase getStereoInformation(AbstractMolecule molecule, IAtomBase rGroup, IAtomBase atom) {
+  protected IStereoElementBase getStereoInformation(AbstractMolecule molecule, IAtomBase rGroup, IAtomBase atom) {
     IStereoElement elementToAdd = null;
     for (IStereoElement element : (((CDKMolecule) molecule).getMolecule().stereoElements())) {
       if (element.contains(((CDKAtom) rGroup).getMolAtom())) {
@@ -535,4 +535,15 @@ public class CDKManipulator extends AbstractChemistryManipulator {
     return result;
   }
 
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  protected boolean setStereoInformation(AbstractMolecule firstContainer, IAtomBase firstRgroup,
+      AbstractMolecule secondContainer, IAtomBase secondRgroup, IAtomBase atom1, IAtomBase atom2) throws CTKException {
+    boolean isStereo =
+        super.setStereoInformation(firstContainer, firstRgroup, secondContainer, secondRgroup, atom1, atom2);
+    firstContainer.addIBase(bindAtoms(atom1, atom2));
+    return isStereo;
+  }
 }

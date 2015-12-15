@@ -16,27 +16,38 @@
  ******************************************************************************/
 package org.helm.chemtoolkit;
 
+import org.helm.chemtoolkit.AbstractMolecule.Flag;
+
 /**
  * @author chistyakov
  *
  */
-public interface IAtomBase extends IChemObjectBase {
+public abstract class IAtomBase implements IChemObjectBase {
+  protected Flag flag;
 
-  public int getIBondCount();
+  public abstract int getIBondCount();
 
-  public IBondBase getIBond(int arg0) throws CTKException;
+  public abstract IBondBase getIBond(int arg0) throws CTKException;
 
-  public int getRgroup();
+  public abstract int getRgroup();
 
-  public int getIAtno();
+  public abstract int getIAtno();
 
-  public void setRgroup(int rGroup) throws CTKException;
+  public abstract void setRgroup(int rGroup) throws CTKException;
 
   /**
    * @return
    */
-  public Object getMolAtom();
+  public abstract Object getMolAtom();
 
-  public boolean compare(Object obj);
+  public abstract boolean compare(Object obj);
+
+  public void setFlag(Flag flag) {
+    this.flag = flag;
+  }
+
+  public Flag getFlag() {
+    return this.flag;
+  }
 
 }

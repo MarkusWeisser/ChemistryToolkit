@@ -333,7 +333,7 @@ public class ChemaxonTest {
     LOG.debug("atom R" + molecule.getRGroupAtom(2, true).getMolAtom());
     LOG.debug("atom R" + molecule.getRGroupAtom(3, true).getMolAtom());
 
-// LOG.debug(manipulator.convertMolecule(molecule, StType.MOLFILE));
+    LOG.debug(manipulator.convertMolecule(molecule, StType.MOLFILE));
 
     for (Attachment attachment : molecule.getAttachments()) {
 
@@ -341,8 +341,45 @@ public class ChemaxonTest {
       LOG.debug("name=" + attachment.getName());
       LOG.debug("label=" + attachment.getLabel());
       LOG.debug("smiles=" + attachment.getSmiles());
+    }
+  }
+
+  @Test(groups = {"MarvinTest"})
+  public void mergeTest() throws ClassNotFoundException, NoSuchMethodException, SecurityException,
+      InstantiationException, IllegalAccessException, IllegalArgumentException, InvocationTargetException, IOException,
+      CTKException {
+    String molecule1 = "[*]N[C@@H](CC([*])=O)C([*])=O |$_R1;;;;;_R3;;;_R2;$|";
+    String molecule2 = "[*]N[C@@H](CCC([*])=O)C([*])=O |$_R1;;;;;;_R3;;;_R2;$|";
+    String mol1Gruppe1 = "[*][H] |$_R1;$|";
+    String mol1Gruppe2 = "O[*] |$_R2;$|";
+    String mol1Gruppe3 = "O[*] |$;_R3$|";
+    String mol2Gruppe1 = "[*][H] |$_R1;$|";
+    String mol2Gruppe2 = "O[*] |$_R2;$|";
+    String mol2Gruppe3 = "O[*] |$;_R3$|";
+
+    AttachmentList mol1Attachments = new AttachmentList();
+    mol1Attachments.add(new Attachment("R3-OH", "R3", "OH", mol1Gruppe3));
+    mol1Attachments.add(new Attachment("R1-H", "R1", "H", mol1Gruppe1));
+    mol1Attachments.add(new Attachment("R2-OH", "R2", "OH", mol1Gruppe2));
+
+    AttachmentList mol2Attachments = new AttachmentList();
+    mol2Attachments.add(new Attachment("R3-OH", "R3", "OH", mol2Gruppe3));
+    mol2Attachments.add(new Attachment("R1-H", "R1", "H", mol2Gruppe1));
+    mol2Attachments.add(new Attachment("R2-OH", "R2", "OH", mol2Gruppe2));
+    AbstractChemistryManipulator manipulator = ManipulatorFactory.buildManipulator(ManipulatorType.MARVIN);
+    AbstractMolecule absMol1 = manipulator.getMolecule(molecule1, mol1Attachments);
+    AbstractMolecule absMol2 = manipulator.getMolecule(molecule2, mol2Attachments);
+    AbstractMolecule mergedMolecule =
+        manipulator.merge(absMol1, absMol1.getRGroupAtom(2, true), absMol2, absMol2.getRGroupAtom(1, true));
+
+    String result = manipulator.convertMolecule(mergedMolecule, StType.MOLFILE);
+    LOG.debug(result);
+
+    for (Attachment attachment : mergedMolecule.getAttachments()) {
+      LOG.debug("label=" + attachment.getLabel());
 
     }
 
   }
+
 }

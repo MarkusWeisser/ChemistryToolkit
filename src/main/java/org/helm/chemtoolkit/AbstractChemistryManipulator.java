@@ -95,7 +95,6 @@ public abstract class AbstractChemistryManipulator {
    * @throws Exception java exception
    */
 
-
   /**
    * 
    * @param molfile
@@ -104,7 +103,6 @@ public abstract class AbstractChemistryManipulator {
    * @throws IOException java exception
    * @throws CDKException
    */
-
 
   /**
    * 
@@ -155,44 +153,55 @@ public abstract class AbstractChemistryManipulator {
   public AbstractMolecule merge(AbstractMolecule firstContainer, IAtomBase firstRgroup,
       AbstractMolecule secondContainer,
       IAtomBase secondRgroup) throws CTKException {
-    if (firstContainer == secondContainer) {
-      firstContainer.dearomatize();
-      IAtomBase atom1 = getNeighborAtom(firstRgroup);
-      IAtomBase atom2 = getNeighborAtom(secondRgroup);
 
-      IBondBase bond = bindAtoms(atom1, atom2);
-      firstContainer.addIBase(bond);
-    } else {
-      firstContainer.dearomatize();
-      secondContainer.dearomatize();
-      IAtomBase atom1 = getNeighborAtom(firstRgroup);
-      IAtomBase atom2 = getNeighborAtom(secondRgroup);
-
-      firstContainer.removeAttachment(firstRgroup);
-      secondContainer.removeAttachment(secondRgroup);
-
-      firstContainer.removeINode(firstRgroup);
-      secondContainer.removeINode(secondRgroup);
-
-      AttachmentList mergedAttachments = mergeAttachments(firstContainer, secondContainer);
-
-      List<IAtomBase> atoms = secondContainer.getIAtomArray();
-      for (int i = 0; i < atoms.size(); i++) {
-        firstContainer.addIBase(atoms.get(i));
-      }
-
-      List<IBondBase> bonds = secondContainer.getIBondArray();
-      for (int i = 0; i < bonds.size(); i++) {
-        firstContainer.addIBase(bonds.get(i));
-      }
-
-      IBondBase bond = bindAtoms(atom1, atom2);
-      firstContainer.addIBase(bond);
-      firstContainer.setAttachments(mergedAttachments);
-
-
+    if (firstContainer.isSingleStereo(firstRgroup) && secondContainer.isSingleStereo(secondRgroup)) {
+      throw new CTKException("Both R atoms are connected to chiral centers");
     }
+    firstContainer.dearomatize();
+    secondContainer.dearomatize();
+    IAtomBase atom1 = getNeighborAtom(firstRgroup);
+    IAtomBase atom2 = getNeighborAtom(secondRgroup);
+
+    firstContainer.removeAttachment(firstRgroup);
+    secondContainer.removeAttachment(secondRgroup);
+    setStereoInformation(firstContainer, firstRgroup, secondContainer, secondRgroup, atom1, atom2);
+    firstContainer.removeINode(firstRgroup);
+    secondContainer.removeINode(secondRgroup);
+
+    AttachmentList mergedAttachments = mergeAttachments(firstContainer, secondContainer);
+
+    firstContainer.addIBase(secondContainer);
+
+    firstContainer.setAttachments(mergedAttachments);
+    firstContainer.generateCoordinates();
+    // }
     return firstContainer;
+  }
+
+  /**
+   * @param firstContainer
+   * @param firstRgroup
+   * @param secondContainer
+   * @param secondRgroup
+   * @param atom1
+   * @param atom2
+   * @throws CTKException
+   */
+  protected boolean setStereoInformation(AbstractMolecule firstContainer, IAtomBase firstRgroup,
+      AbstractMolecule secondContainer, IAtomBase secondRgroup, IAtomBase atom1, IAtomBase atom2) throws CTKException {
+    IStereoElementBase stereo = null;
+    boolean result = false;
+    if (firstContainer.isSingleStereo(firstRgroup)) {
+      stereo = getStereoInformation(firstContainer, firstRgroup, atom1);
+    }
+    if (secondContainer.isSingleStereo(secondRgroup)) {
+      stereo = getStereoInformation(secondContainer, secondRgroup, atom2);
+    }
+    if (stereo != null) {
+      firstContainer.addIBase(stereo);
+      result = true;
+    }
+    return result;
   }
 
   /**
@@ -201,7 +210,7 @@ public abstract class AbstractChemistryManipulator {
    * @return
    */
 
-  public LinkedHashMap<Integer, String> getRGroupsFromExtendedSmiles(String extendedSmiles) {
+  protected LinkedHashMap<Integer, String> getRGroupsFromExtendedSmiles(String extendedSmiles) {
     extendedSmiles = getExtension(extendedSmiles);
     LinkedHashMap<Integer, String> list = new LinkedHashMap<Integer, String>();
     if (extendedSmiles != null) {
@@ -249,7 +258,7 @@ public abstract class AbstractChemistryManipulator {
     return list;
   }
 
-  public IAtomBase getNeighborAtom(IAtomBase rgroup) throws CTKException {
+  protected IAtomBase getNeighborAtom(IAtomBase rgroup) throws CTKException {
     IAtomBase atom = null;
     if (rgroup.getIBondCount() == 1) {
       IBondBase bond = rgroup.getIBond(0);
@@ -287,7 +296,7 @@ public abstract class AbstractChemistryManipulator {
    * @return
    * @throws CTKException
    */
-  public abstract IBondBase bindAtoms(IAtomBase atom1, IAtomBase atom2) throws CTKException;
+  protected abstract IBondBase bindAtoms(IAtomBase atom1, IAtomBase atom2) throws CTKException;
 
   /**
    * @param first
@@ -296,7 +305,7 @@ public abstract class AbstractChemistryManipulator {
    * @throws CTKException
    */
 
-  public AttachmentList mergeAttachments(AbstractMolecule container, AbstractMolecule secondContainer)
+  protected AttachmentList mergeAttachments(AbstractMolecule container, AbstractMolecule secondContainer)
       throws CTKException {
     AttachmentList result = new AttachmentList();
     int index = 1;
@@ -315,7 +324,8 @@ public abstract class AbstractChemistryManipulator {
       result.add(a);
       index++;
     }
-
+    container.clearFlags();
+    secondContainer.clearFlags();
     return result;
   }
 
@@ -326,7 +336,10 @@ public abstract class AbstractChemistryManipulator {
    * @param rGroup
    * @param atom
    * @return
+   * @throws CTKException
    */
-  public abstract IStereoElementBase getStereoInformation(AbstractMolecule container, IAtomBase rGroup, IAtomBase atom);
+  protected abstract IStereoElementBase getStereoInformation(AbstractMolecule container, IAtomBase rGroup,
+      IAtomBase atom)
+          throws CTKException;
 
 }

@@ -29,6 +29,10 @@ import org.slf4j.LoggerFactory;
  */
 public abstract class AbstractMolecule implements IChemObjectBase {
 
+  public enum Flag {
+    NONE, PROCESSED
+  }
+
   private static final Logger LOG = LoggerFactory.getLogger(AbstractMolecule.class);
 
   protected AttachmentList attachments;
@@ -89,6 +93,11 @@ public abstract class AbstractMolecule implements IChemObjectBase {
 
   }
 
+  public void clearFlags() {
+    for (IAtomBase atom : getIAtomArray())
+      atom.setFlag(Flag.NONE);
+  }
+
   public abstract Object getMolecule();
 
   public abstract void dearomatize() throws CTKException;
@@ -106,6 +115,8 @@ public abstract class AbstractMolecule implements IChemObjectBase {
   public abstract AbstractMolecule cloneMolecule() throws CTKException;
 
   public abstract void changeAtomLabel(int index, int toIndex) throws CTKException;
+
+  public abstract boolean isSingleStereo(IAtomBase atom) throws CTKException;
 
   /**
    * @param firstRgroup

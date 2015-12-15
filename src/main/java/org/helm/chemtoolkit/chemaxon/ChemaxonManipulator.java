@@ -311,11 +311,18 @@ public class ChemaxonManipulator extends AbstractChemistryManipulator {
 
   /**
    * {@inheritDoc}
+   * 
+   * @throws CTKException
    */
   @Override
-  public IStereoElementBase getStereoInformation(AbstractMolecule molecule, IAtomBase rGroup, IAtomBase atom) {
-    // TODO Auto-generated method stub
-    return null;
+  public IStereoElementBase getStereoInformation(AbstractMolecule molecule, IAtomBase rGroup, IAtomBase atom)
+      throws CTKException {
+    if (molecule instanceof ChemMolecule && rGroup instanceof ChemAtom && atom instanceof ChemAtom) {
+      MolAtom rAtom = (MolAtom) rGroup.getMolAtom();
+      MolBond chiralBond = rAtom.getBond(0);
+      return new ChemStereoElement(chiralBond);
+    } else
+      throw new CTKException("invalid input data");
   }
 
   /**
@@ -350,6 +357,20 @@ public class ChemaxonManipulator extends AbstractChemistryManipulator {
     }
 
     return result;
+  }
+
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  protected boolean setStereoInformation(AbstractMolecule firstContainer, IAtomBase firstRgroup,
+      AbstractMolecule secondContainer, IAtomBase secondRgroup, IAtomBase atom1, IAtomBase atom2) throws CTKException {
+    boolean isStereo =
+        super.setStereoInformation(firstContainer, firstRgroup, secondContainer, secondRgroup, atom1, atom2);
+    if (!isStereo) {
+      firstContainer.addIBase(bindAtoms(atom1, atom2));
+    }
+    return isStereo;
   }
 
 }

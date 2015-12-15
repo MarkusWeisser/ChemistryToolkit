@@ -17,6 +17,7 @@
 package org.helm.chemtoolkit.chemaxon;
 
 import org.helm.chemtoolkit.IBondBase;
+import org.helm.chemtoolkit.IStereoElementBase;
 
 import chemaxon.struc.MolBond;
 
@@ -28,11 +29,19 @@ public class ChemBond implements IBondBase {
 
   private MolBond bond;
 
+  private ChemStereoElement stereoElement;
+
   /**
    * @param arg0
    */
   protected ChemBond(MolBond bond) {
     this.bond = bond;
+  }
+
+  public ChemBond(MolBond bond, IStereoElementBase stereoElement) {
+    new ChemBond(bond);
+    if (stereoElement != null && stereoElement instanceof ChemStereoElement)
+      this.stereoElement = (ChemStereoElement) stereoElement;
   }
 
   /**
@@ -59,6 +68,15 @@ public class ChemBond implements IBondBase {
   public MolBond getMolBond() {
 
     return bond;
+  }
+
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public IStereoElementBase getStereoElement() {
+
+    return stereoElement;
   }
 
 }
