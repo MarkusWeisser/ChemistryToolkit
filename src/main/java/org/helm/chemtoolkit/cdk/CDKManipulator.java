@@ -140,8 +140,8 @@ public class CDKManipulator extends AbstractChemistryManipulator {
       IAtomContainer molecule = smilesParser.parseSmiles(smiles);
 
     } catch (InvalidSmilesException e) {
-
       return false;
+
     }
     return true;
   }

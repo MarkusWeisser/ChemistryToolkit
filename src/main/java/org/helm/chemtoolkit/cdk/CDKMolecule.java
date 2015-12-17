@@ -46,7 +46,7 @@ import org.slf4j.LoggerFactory;
 public class CDKMolecule extends AbstractMolecule {
   private static final Logger LOG = LoggerFactory.getLogger(CDKMolecule.class);
 
-  protected IAtomContainer molecule;
+  private IAtomContainer molecule;
 
   public CDKMolecule(IAtomContainer molecule) {
     this(molecule, new AttachmentList());

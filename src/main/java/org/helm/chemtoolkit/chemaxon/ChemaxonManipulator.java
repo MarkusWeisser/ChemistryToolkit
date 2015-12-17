@@ -126,7 +126,7 @@ public class ChemaxonManipulator extends AbstractChemistryManipulator {
    * {@inheritDoc}
    */
   @Override
-  public boolean validateSMILES(String smiles) throws CTKException {
+  public boolean validateSMILES(String smiles) {
     Molecule mol;
     try {
       mol = getMolecule(smiles);
@@ -136,10 +136,9 @@ public class ChemaxonManipulator extends AbstractChemistryManipulator {
         if (a.hasValenceError()) {
           return false;
         }
-
       }
     } catch (IOException e) {
-      throw new CTKException("unable to get molecule from SMILES", e);
+      return false;
     }
     return true;
   }

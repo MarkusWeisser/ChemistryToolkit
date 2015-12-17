@@ -90,9 +90,8 @@ public abstract class AbstractChemistryManipulator {
    * 
    * @param smiles to validate
    * @return true if smiles valid
-   * @throws CTKException
    */
-  public abstract boolean validateSMILES(String smiles) throws CTKException;
+  public abstract boolean validateSMILES(String smiles);
 
   /**
    * returns molecule info like molecular formula,exact mass and molecular weight
