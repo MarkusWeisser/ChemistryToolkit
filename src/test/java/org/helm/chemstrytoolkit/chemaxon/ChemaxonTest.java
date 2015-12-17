@@ -95,7 +95,6 @@ public class ChemaxonTest extends TestBase {
     super.renderMolTest();
   }
 
-
   @Override
   @Test(groups = {"MarvinTest"})
   public void createGroupMolFile() throws CTKException, IOException {
@@ -118,6 +117,12 @@ public class ChemaxonTest extends TestBase {
     super.mergeTest();
     LOG.debug(testResult);
 
+  }
+
+  @Override
+  @Test(groups = {"MarvinTest"})
+  public void renderSequenceTest() throws NumberFormatException, CTKException, IOException {
+    super.renderSequenceTest();
   }
 
   @Override

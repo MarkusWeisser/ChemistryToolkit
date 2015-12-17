@@ -188,7 +188,7 @@ public abstract class TestBase {
   }
 
   public void renderSequenceTest() throws NumberFormatException, CTKException, IOException {
-    String sequence = "GGT";
+    String sequence = "cgt";
     byte[] result =
         manipulator.renderSequence(sequence, OutputType.PNG, 1000, 1000, (int) Long.parseLong("D3D3D3", 16));
     try (FileOutputStream out = new FileOutputStream("test-output\\Sequence.png")) {

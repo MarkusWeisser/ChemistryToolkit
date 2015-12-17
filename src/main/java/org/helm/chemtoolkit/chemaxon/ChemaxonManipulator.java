@@ -274,11 +274,12 @@ public class ChemaxonManipulator extends AbstractChemistryManipulator {
   /**
    * 
    * {@inheritDoc}
+   * 
    */
   @Override
   public byte[] renderSequence(String sequence, OutputType outputType, int width, int height, int rgb)
       throws CTKException {
-    // TODO Auto-generated method stub
+    // TODO
     return null;
   }
 
