@@ -48,8 +48,6 @@ public class CDKMolecule extends AbstractMolecule {
 
   protected IAtomContainer molecule;
 
-  protected List<IAtomBase> atomArray;
-
   public CDKMolecule(IAtomContainer molecule) {
     this(molecule, new AttachmentList());
 
@@ -61,16 +59,15 @@ public class CDKMolecule extends AbstractMolecule {
       this.attachments = attachments;
     else
       this.attachments = new AttachmentList();
-    atomArray = new ArrayList<>();
+    atoms = new ArrayList<>();
     for (IAtom atom : molecule.atoms()) {
       int rGroupId = 0;
-      // IAtom atom = molecule.getAtom(i);
       if (atom instanceof IPseudoAtom) {
         atom.setSymbol("R");
         rGroupId = AbstractMolecule.getIdFromLabel(((IPseudoAtom) atom).getLabel());
       }
       List<IBond> bonds = molecule.getConnectedBondsList(atom);
-      atomArray.add(new CDKAtom(atom, rGroupId, bonds));
+      atoms.add(new CDKAtom(atom, rGroupId, bonds));
     }
 
   }
@@ -107,12 +104,12 @@ public class CDKMolecule extends AbstractMolecule {
   @Override
   public void removeINode(IAtomBase node) throws CTKException {
     if (node instanceof CDKAtom) {
-      if (atomArray.contains(node)) {
+      if (atoms.contains(node)) {
         molecule.removeAtomAndConnectedElectronContainers(((CDKAtom) node).atom);
 
-        for (int i = 0; i < atomArray.size(); i++) {
-          if (((CDKAtom) atomArray.get(i)).compare(node)) {
-            atomArray.remove(i);
+        for (int i = 0; i < atoms.size(); i++) {
+          if (((CDKAtom) atoms.get(i)).compare(node)) {
+            atoms.remove(i);
             break;
           }
         }
@@ -128,39 +125,15 @@ public class CDKMolecule extends AbstractMolecule {
    * {@inheritDoc}
    */
   @Override
-  public List<IAtomBase> getIAtomArray() {
-
-    return atomArray;
-  }
-
-  /**
-   * 
-   * {@inheritDoc}
-   */
-  @Override
   public void addIBase(IChemObjectBase object) {
     if (object instanceof CDKMolecule) {
-      IAtomContainer container = ((CDKMolecule) object).molecule;
-      molecule.add(container);
-      for (IAtom atom : container.atoms()) {
-        int rGroupId = 0;
-        if (atom instanceof IPseudoAtom) {
-          atom.setSymbol("R");
-          rGroupId = AbstractMolecule.getIdFromLabel(((IPseudoAtom) atom).getLabel());
-        }
-        List<IBond> bonds = molecule.getConnectedBondsList(atom);
-        atomArray.add(new CDKAtom(atom, rGroupId, bonds));
-      }
+      CDKMolecule container = (CDKMolecule) object;
+      molecule.add(container.getMolecule());
+      atoms.addAll(container.getIAtomArray());
     } else if (object instanceof CDKAtom) {
-      IAtom atom = ((CDKAtom) object).atom;
-      molecule.addAtom(atom);
-      int rGroupId = 0;
-      if (atom instanceof IPseudoAtom) {
-        atom.setSymbol("R");
-        rGroupId = AbstractMolecule.getIdFromLabel(((IPseudoAtom) atom).getLabel());
-      }
-      List<IBond> bonds = molecule.getConnectedBondsList(atom);
-      atomArray.add(new CDKAtom(atom, rGroupId, bonds));
+      CDKAtom atom = (CDKAtom) object;
+      molecule.addAtom(atom.getMolAtom());
+      atoms.add(atom);
     } else if (object instanceof CDKBond) {
       molecule.addBond(((CDKBond) object).bond);
     } else if (object instanceof CDKStereoElement) {

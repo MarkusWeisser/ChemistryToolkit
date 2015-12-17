@@ -84,13 +84,14 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class CDKManipulator extends AbstractChemistryManipulator {
-  // private static final String SMILES_EXTENSION_SEPARATOR_REGEX = "\\|";
+
   private static final Logger LOG = LoggerFactory.getLogger(CDKManipulator.class);
 
   /**
+   * removes a extended part of smiles if exists
    * 
-   * @param smiles extended SMILES (Chemaxon)
-   * @return normalized SMILES
+   * @param smiles to normalize
+   * @return a normalized smiles
    */
   private String normalize(String smiles) {
     String result = null;
@@ -100,6 +101,13 @@ public class CDKManipulator extends AbstractChemistryManipulator {
     return result;
   }
 
+  /**
+   * replace placeholder "*" with "R" for CDK
+   * 
+   * @param extendedSmiles extended smiles
+   * @param groups a list of RGroups
+   * @return a smiles with RGroups in CDK format
+   */
   private String normalize(String extendedSmiles, List<String> groups) {
     String smiles = null;
     String result = "";
@@ -155,6 +163,13 @@ public class CDKManipulator extends AbstractChemistryManipulator {
     return moleculeInfo;
   }
 
+  /**
+   * converts smiles to molfile
+   * 
+   * @param smiles to convert
+   * @return molfile
+   * @throws CTKException
+   */
   private String convertSMILES2MolFile(String smiles) throws CTKException {
     String result = null;
 
@@ -180,6 +195,13 @@ public class CDKManipulator extends AbstractChemistryManipulator {
 
   }
 
+  /**
+   * converts molfile to smiles
+   * 
+   * @param molfile to convert
+   * @return smiles
+   * @throws CTKException
+   */
   private String convertMolFile2SMILES(String molfile) throws CTKException {
     String result = null;
 
@@ -328,11 +350,11 @@ public class CDKManipulator extends AbstractChemistryManipulator {
   }
 
   /**
+   * returns a smiles string represents a given molecule
+   * 
    * @param molecule
-   * @return
+   * @return smiles
    * @throws CTKException
-   * @throws IOException
-   * @throws CDKException
    */
   private String molecule2Smiles(IAtomContainer molecule) throws CTKException {
     String result = null;
@@ -347,6 +369,13 @@ public class CDKManipulator extends AbstractChemistryManipulator {
     return result;
   }
 
+  /**
+   * returns a polymer instance of {@link IAtomContainer}
+   * 
+   * @param sequence
+   * @return a polymer
+   * @throws CTKException
+   */
   private IAtomContainer getPolymer(String sequence) throws CTKException {
     IAtomContainer polymer;
     try {
@@ -379,8 +408,10 @@ public class CDKManipulator extends AbstractChemistryManipulator {
   }
 
   /**
-   * @param smiles
-   * @return
+   * parses smiles to a molecule
+   * 
+   * @param smiles to parse
+   * @return a molecule instance of {@link IAtomContainer}
    * @throws CTKException
    */
   private IAtomContainer getIAtomContainer(String smiles) throws CTKException {
@@ -423,44 +454,6 @@ public class CDKManipulator extends AbstractChemistryManipulator {
 
     return bond;
   }
-
-// @Override
-// public AbstractMolecule merge(AbstractMolecule firstContainer, IAtomBase firstRgroup,
-// AbstractMolecule secondContainer,
-// IAtomBase secondRgroup) throws CTKException {
-// if (firstContainer.isSingleStereo(firstRgroup) && secondContainer.isSingleStereo(secondRgroup)) {
-// throw new CTKException("Both R atoms are connected to chiral centers");
-// }
-// firstContainer.dearomatize();
-// secondContainer.dearomatize();
-//
-// IAtomBase atom1 = getNeighborAtom(firstRgroup);
-// IAtomBase atom2 = getNeighborAtom(secondRgroup);
-// // create a new bond
-// IBondBase bond = bindAtoms(atom1, atom2);
-// IStereoElement elementToAdd = null;
-// if (firstContainer.isSingleStereo(firstRgroup)) {
-// elementToAdd =
-// (IStereoElement) getStereoInformation(firstContainer, firstRgroup, atom1).getStereoElement();
-// } else if (secondContainer.isSingleStereo(secondRgroup)) {
-// elementToAdd =
-// (IStereoElement) getStereoInformation(firstContainer, firstRgroup, atom1).getStereoElement();
-// }
-// firstContainer.removeAttachment(firstRgroup);
-// secondContainer.removeAttachment(secondRgroup);
-//
-// firstContainer.removeINode(firstRgroup);
-// secondContainer.removeINode(secondRgroup);
-// AttachmentList mergedAttacments = mergeAttachments(firstContainer, secondContainer);
-// firstContainer.addIBase(secondContainer);
-// firstContainer.addIBase(bond);
-// ((CDKMolecule) firstContainer).getMolecule().addStereoElement(elementToAdd);
-//
-// firstContainer.setAttachments(mergedAttacments);
-//
-// return firstContainer;
-//
-// }
 
   /**
    * @param molecule

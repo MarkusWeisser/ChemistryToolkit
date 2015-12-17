@@ -358,4 +358,33 @@ public class CDKTest {
     String result = manipulator.convertMolecule(molecule, StType.MOLFILE);
     LOG.debug("molfile=" + result);
   }
+
+  @Test(groups = {"CDKTest"})
+  public void aaMerge() throws IOException, CTKException {
+    String smiles = "[*]NCC([*])=O |$_R1;;;;_R2;$|";
+    String gr1 = "[*][H] |$_R1;$|";
+    String gr2 = "O[*] |$;_R2$|";
+    AttachmentList list1 = new AttachmentList();
+    list1.add(new Attachment("R1-H", "R1", "H", gr1));
+    list1.add(new Attachment("R2-OH", "R2", "OH", gr2));
+    AttachmentList list2 = new AttachmentList();
+    list2.add(new Attachment("R1-H", "R1", "H", gr1));
+    list2.add(new Attachment("R2-OH", "R2", "OH", gr2));
+    AttachmentList list3 = new AttachmentList();
+    list3.add(new Attachment("R1-H", "R1", "H", gr1));
+    list3.add(new Attachment("R2-OH", "R2", "OH", gr2));
+    AbstractChemistryManipulator manipulator = getManipulator();
+    AbstractMolecule molecule1 = manipulator.getMolecule(smiles, list1);
+    AbstractMolecule molecule2 = manipulator.getMolecule(smiles, list2);
+    AbstractMolecule molecule3 = manipulator.getMolecule(smiles, list3);
+    molecule1 =
+        manipulator.merge(molecule1, molecule1.getRGroupAtom(2, true), molecule2, molecule2.getRGroupAtom(1, true));
+
+    molecule1 =
+        manipulator.merge(molecule1, molecule1.getRGroupAtom(2, true), molecule3, molecule3.getRGroupAtom(1, true));
+    molecule1.generateCoordinates();
+    String result = manipulator.convertMolecule(molecule1, StType.MOLFILE);
+    LOG.debug(result);
+
+  }
 }

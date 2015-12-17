@@ -37,6 +37,8 @@ public abstract class AbstractMolecule implements IChemObjectBase {
 
   protected AttachmentList attachments;
 
+  protected List<IAtomBase> atoms;
+
   public AttachmentList getAttachments() {
     return attachments.cloneList();
   }
@@ -106,8 +108,6 @@ public abstract class AbstractMolecule implements IChemObjectBase {
 
   public abstract void removeINode(IAtomBase node) throws CTKException;
 
-  public abstract List<IAtomBase> getIAtomArray();
-
   public abstract void addIBase(IChemObjectBase object);
 
   public abstract List<IBondBase> getIBondArray();
@@ -116,10 +116,19 @@ public abstract class AbstractMolecule implements IChemObjectBase {
 
   public abstract void changeAtomLabel(int index, int toIndex) throws CTKException;
 
+  /**
+   * check a given atom connections
+   * 
+   * @param atom to check
+   * @return true if a atom has a single stereo connection
+   * @throws CTKException
+   */
   public abstract boolean isSingleStereo(IAtomBase atom) throws CTKException;
 
   /**
-   * @param firstRgroup
+   * removes a given attachment from molecule
+   * 
+   * @param toRemove a atom to be removed
    * @throws CTKException
    */
   public void removeAttachment(IAtomBase toRemove) throws CTKException {
@@ -136,6 +145,10 @@ public abstract class AbstractMolecule implements IChemObjectBase {
         }
       }
     }
+  }
+
+  public List<IAtomBase> getIAtomArray() {
+    return atoms;
   }
 
 }

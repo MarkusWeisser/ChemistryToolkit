@@ -42,7 +42,6 @@ public class ChemMolecule extends AbstractMolecule {
 
   private Molecule molecule;
 
-  private List<IAtomBase> atoms;
 
   @Override
   public Molecule getMolecule() {
@@ -89,24 +88,14 @@ public class ChemMolecule extends AbstractMolecule {
    * {@inheritDoc}
    */
   @Override
-  public List<IAtomBase> getIAtomArray() {
-
-    return atoms;
-  }
-
-  /**
-   * 
-   * {@inheritDoc}
-   */
-  @Override
   public void addIBase(IChemObjectBase node) {
     if (node instanceof ChemMolecule) {
-      Molecule nodeMolecule = ((ChemMolecule) node).getMolecule();
-      for (MolAtom atom : nodeMolecule.getAtomArray()) {
-        molecule.add(atom);
-        atoms.add(new ChemAtom(atom));
+      ChemMolecule nodeMolecule = (ChemMolecule) node;
+      for (IAtomBase atom : nodeMolecule.getIAtomArray()) {
+        molecule.add(((ChemAtom) atom).getMolAtom());
+        atoms.add(atom);
       }
-      for (MolBond bond : nodeMolecule.getBondArray()) {
+      for (MolBond bond : nodeMolecule.getMolecule().getBondArray()) {
         molecule.add(bond);
       }
     } else if (node instanceof ChemAtom) {

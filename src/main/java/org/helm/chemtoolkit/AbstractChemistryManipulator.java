@@ -33,9 +33,24 @@ public abstract class AbstractChemistryManipulator {
 
   protected static final String SMILES_EXTENSION_SEPARATOR_REGEX = "\\|";
 
+  /**
+   * 
+   * {@code StType} chemical notation type
+   * 
+   * @author <a href="mailto:chistyakov@quattro-research.com">Dmitry Chistyakov</a>
+   * @version $Id$
+   */
   public enum StType {
     SMILES, MOLFILE, SEQUENCE
   }
+
+  /**
+   * 
+   * {@code OutputType} image type
+   * 
+   * @author <a href="mailto:chistyakov@quattro-research.com">Dmitry Chistyakov</a>
+   * @version $Id$
+   */
 
   public enum OutputType {
     PNG("PNG"), GIF("GIF"), JPG("JPG");
@@ -52,34 +67,37 @@ public abstract class AbstractChemistryManipulator {
   }
 
   /**
+   * produces chemical notation for input molecule
    * 
    * @param molecule
-   * @return
+   * @param type of chemical notation
+   * @return String that represents input molecule
    * @throws CTKException
    */
   public abstract String convertMolecule(AbstractMolecule container, StType type) throws CTKException;
 
   /**
+   * convert input notation to another
    * 
-   * @param data SMILES or Molfile
-   * @param type type of input data
-   * @return SMILES or Molfile
-   * @throws Exception
+   * @param data chemical notation to convert
+   * @param type type of input data instance of {@link StType}
+   * @return chemical notation
    * @throws CTKException
    */
   public abstract String convert(String data, StType type) throws CTKException;
 
   /**
    * 
-   * @param smiles
+   * @param smiles to validate
    * @return true if smiles valid
    * @throws CTKException
    */
   public abstract boolean validateSMILES(String smiles) throws CTKException;
 
   /**
+   * returns molecule info like molecular formula,exact mass and molecular weight
    * 
-   * @param smiles
+   * @param molecule input AbstractMolecule
    * @return org.helm.chemtoolkit.MoleculeInfo object
    * @throws CTKException general ChemToolKit exception passed to HELMToolKit
    */
@@ -87,65 +105,64 @@ public abstract class AbstractChemistryManipulator {
   public abstract MoleculeInfo getMoleculeInfo(AbstractMolecule container) throws CTKException;
 
   /**
+   * returns canonical smiles
    * 
-   * @param smiles
-   * @return MolFile string
-   * @throws CTKException general ChemToolKit exception passed to HELMToolKit
-   * @throws Exception java exception
-   */
-
-  /**
-   * 
-   * @param molfile
-   * @return SMILES string
-   * @throws CTKException general ChemToolKit exception passed to HELMToolKit
-   * @throws IOException java exception
-   * @throws CDKException
-   */
-
-  /**
-   * 
-   * @param smiles
+   * @param smiles to canonicalize
    * @return canonicalized smiles
    * @throws CTKException general ChemToolkit exception passed to HELMToolkit
    */
   public abstract String canonicalize(String data) throws CTKException, CTKSmilesException;
 
   /**
+   * renders a image of given molecule
    * 
-   * @param molFile
-   * @param width
-   * @param height
-   * @param rgb
-   * @return
+   * @param molFile for rendering
+   * @param outputType a image type instance of {@link OutputType}
+   * @param width the image width
+   * @param height the image height
+   * @param rgb a color code of image background
+   * @return image
    * @throws CTKException
    */
   public abstract byte[] renderMol(String molFile, OutputType outputType, int width, int height, int rgb)
       throws CTKException;
 
   /**
+   * renders a image of molecule
    * 
-   * @param sequence
-   * @param outputType
-   * @param width
-   * @param height
-   * @param rgb
-   * @return
+   * @param sequence for rendering
+   * @param outputType a image type instance of {@link OutputType}
+   * @param width the image width
+   * @param height the image height
+   * @param rgb a color code of image background
+   * @return image
    * @throws CTKException
    */
   public abstract byte[] renderSequence(String sequence, OutputType outputType, int width, int height, int rgb)
       throws CTKException;
 
+  /**
+   * returns a molecule instance of {@link AbstractMolecule}
+   * 
+   * @param smiles smiles string
+   * @param attachments instance of {@link AttachmentList}
+   * @return molecule instance of {@link AbstractMolecule}
+   * @throws IOException
+   * @throws CTKException
+   */
   public abstract AbstractMolecule getMolecule(String smiles, AttachmentList attachments) throws IOException,
       CTKException;
 
   /**
+   * merges second molecule to first using given rGroups
    * 
-   * @param first
-   * @param firstRgroup
-   * @param second
-   * @param secondRgroup
-   * @return
+   * @param firstContainer a first molecule to merge instance of {@link AbstractMolecule}
+   * @param firstRgroup atom of first molecule to be removed, the connected atom is used for merging, instance of
+   *          {@link IAtomBase}
+   * @param secondContainer a second molecule to merge, instance of {@link AbstractMolecule}
+   * @param secondRgroup of second molecule to be removed, the connected atom is used for merging, instance of
+   *          {@link IAtomBase}
+   * @return merged molecule instance of {@link AbstractMolecule}
    * @throws CTKException
    * 
    */
@@ -172,18 +189,19 @@ public abstract class AbstractChemistryManipulator {
     firstContainer.addIBase(secondContainer);
 
     firstContainer.setAttachments(mergedAttachments);
-    // firstContainer.generateCoordinates();
-    // }
+
     return firstContainer;
   }
 
   /**
-   * @param firstContainer
-   * @param firstRgroup
-   * @param secondContainer
-   * @param secondRgroup
-   * @param atom1
-   * @param atom2
+   * recycles and set stereo information on firstContaner
+   * 
+   * @param firstContainer a first molecule instance of {@link AbstractMolecule}
+   * @param firstRgroup atom to remove, instance of {@link IAtomBase}
+   * @param secondContainer a second molecule, instance of {@link AbstractMolecule}
+   * @param secondRgroup atom to remove, instance of {@link IAtomBase}
+   * @param atom1 atom connected to firstGroup
+   * @param atom2 atom connected to secondGroup
    * @throws CTKException
    */
   protected boolean setStereoInformation(AbstractMolecule firstContainer, IAtomBase firstRgroup,
