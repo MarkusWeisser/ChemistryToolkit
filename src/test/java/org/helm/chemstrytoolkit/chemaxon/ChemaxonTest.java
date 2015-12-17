@@ -122,7 +122,7 @@ public class ChemaxonTest extends TestBase {
   @Override
   @Test(groups = {"MarvinTest"})
   public void renderSequenceTest() throws NumberFormatException, CTKException, IOException {
-    super.renderSequenceTest();
+    // TODO
   }
 
   @Override
