@@ -14,6 +14,7 @@
  */
 package org.helm.chemistrytoolkit;
 
+import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
@@ -182,7 +183,7 @@ public abstract class TestBase {
         + " 30 29  2  0  0  0  0\n" + " 30 20  1  0  0  0  0\n" + " 31 30  1  0  0  0  0\n"
         + " 32 31  1  0  0  0  0\n" + "M  END";
     byte[] result = manipulator.renderMol(molFile, OutputType.PNG, 1000, 1000, (int) Long.parseLong("D3D3D3", 16));
-    try (FileOutputStream out = new FileOutputStream("test-output\\TestBild.png")) {
+    try (FileOutputStream out = new FileOutputStream("test-output" + File.separator + "TestBild.png")) {
       out.write(result);
     }
   }
@@ -191,7 +192,7 @@ public abstract class TestBase {
     String sequence = "CGT";
     byte[] result =
         manipulator.renderSequence(sequence, OutputType.PNG, 1000, 1000, (int) Long.parseLong("D3D3D3", 16));
-    try (FileOutputStream out = new FileOutputStream("test-output\\Sequence.png")) {
+    try (FileOutputStream out = new FileOutputStream("test-output" + File.separator + "Sequence.png")) {
       out.write(result);
     }
   }

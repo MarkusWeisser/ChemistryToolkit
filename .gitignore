@@ -171,4 +171,5 @@ test-output/
 ##################
 
 target/
+test-output/
 

@@ -69,7 +69,9 @@ import org.openscience.cdk.renderer.font.AWTFontManager;
 import org.openscience.cdk.renderer.generators.BasicAtomGenerator;
 import org.openscience.cdk.renderer.generators.BasicBondGenerator;
 import org.openscience.cdk.renderer.generators.BasicSceneGenerator;
+import org.openscience.cdk.renderer.generators.ExtendedAtomGenerator;
 import org.openscience.cdk.renderer.generators.IGenerator;
+import org.openscience.cdk.renderer.generators.IGeneratorParameter;
 import org.openscience.cdk.renderer.visitor.AWTDrawVisitor;
 import org.openscience.cdk.silent.SilentChemObjectBuilder;
 import org.openscience.cdk.smiles.SmilesGenerator;
@@ -303,6 +305,24 @@ public class CDKManipulator extends AbstractChemistryManipulator {
         generators.add(new BasicSceneGenerator());
         generators.add(new BasicBondGenerator());
         generators.add(new BasicAtomGenerator());
+
+        //
+        CDKAtomTypeMatcher matcher = CDKAtomTypeMatcher.getInstance(mol.getBuilder());
+        for (IAtom atom : mol.atoms()) {
+          IAtomType type = matcher.findMatchingAtomType(mol, atom);
+          AtomTypeManipulator.configure(atom, type);
+        }
+        CDKHydrogenAdder adder = CDKHydrogenAdder.getInstance(mol.getBuilder());
+        adder.addImplicitHydrogens(mol);
+
+        ExtendedAtomGenerator gen = new ExtendedAtomGenerator();
+        for (IGeneratorParameter<?> param : gen.getParameters())
+          if (param instanceof BasicAtomGenerator.ShowExplicitHydrogens) {
+            ((BasicAtomGenerator.ShowExplicitHydrogens) param).setValue(true);
+          }
+
+        //
+        // generators.add(gen);
 
         AtomContainerRenderer renderer = new AtomContainerRenderer(generators, new AWTFontManager());
 

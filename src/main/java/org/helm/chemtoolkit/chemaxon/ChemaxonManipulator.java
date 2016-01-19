@@ -254,6 +254,7 @@ public class ChemaxonManipulator extends AbstractChemistryManipulator {
       MolPrinter printer = new MolPrinter(mol);
       // printer.setImplicitH(DispOptConsts.IMPLICITH_OFF_S);
       printer.setImplicitH(DispOptConsts.IMPLICITH_ALL_S);
+
       System.out.println(printer.getImplicitH());
       printer.setScale(printer.maxScale(drawArea));
       printer.setBackgroundColor(new Color(rgb));
