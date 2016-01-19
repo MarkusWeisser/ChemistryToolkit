@@ -18,6 +18,8 @@ package org.helm.chemstrytoolkit.chemaxon;
 
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 
 import org.helm.chemistrytoolkit.TestBase;
 import org.helm.chemtoolkit.CTKException;
@@ -39,7 +41,7 @@ public class ChemaxonTest extends TestBase {
   private static final Logger LOG = LoggerFactory.getLogger(ChemaxonTest.class);
 
   @BeforeSuite(groups = {"MarvinTest"})
-  public void initialize() throws CTKException {
+  public void initialize() throws CTKException, IOException {
 
     try {
       LOG.debug("initialize");
@@ -47,6 +49,10 @@ public class ChemaxonTest extends TestBase {
     } catch (ClassNotFoundException | NoSuchMethodException | SecurityException | InstantiationException
         | IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
       throw new CTKException("unable to invoke a manipulator");
+    }
+
+    if (!Files.exists(Paths.get("test-output"))) {
+      Files.createDirectories(Paths.get("test-output"));
     }
   }
 
