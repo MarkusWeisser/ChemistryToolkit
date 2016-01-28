@@ -52,7 +52,7 @@ public class CDKTest extends TestBase {
     }
 
     if (!Files.exists(Paths.get("test-output"))) {
-        Files.createDirectories(Paths.get("test-output"));
+      Files.createDirectories(Paths.get("test-output"));
     }
   }
 
@@ -151,5 +151,13 @@ public class CDKTest extends TestBase {
       CTKException {
     super.mergePhosphatRiboseTest();
     LOG.debug(testResult);
+  }
+
+  @Override
+  @Test(groups = {"CDKTest"})
+  public void mergeSelfCycle() throws CTKException, IOException {
+    super.mergeSelfCycle();
+    LOG.debug(testResult);
+
   }
 }

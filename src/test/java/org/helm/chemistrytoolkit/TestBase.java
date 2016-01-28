@@ -1,24 +1,18 @@
 /**
- * *****************************************************************************
- * Copyright C 2015, The Pistoia Alliance
+ * ***************************************************************************** Copyright C 2015, The Pistoia Alliance
  *
- * Permission is hereby granted, free of charge, to any person obtaining a copy
- * of this software and associated documentation files (the "Software"), to deal
- * in the Software without restriction, including without limitation the rights
- * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
- * copies of the Software, and to permit persons to whom the Software is
- * furnished to do so, subject to the following conditions:
+ * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated
+ * documentation files (the "Software"), to deal in the Software without restriction, including without limitation the
+ * rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to
+ * permit persons to whom the Software is furnished to do so, subject to the following conditions:
  *
- * The above copyright notice and this permission notice shall be included in
- * all copies or substantial portions of the Software.
+ * The above copyright notice and this permission notice shall be included in all copies or substantial portions of the
+ * Software.
  *
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
- * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
- * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
- * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
- * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
- * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
- * SOFTWARE.
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE
+ * WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR
+ * COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR
+ * OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  *****************************************************************************
  */
 package org.helm.chemistrytoolkit;
@@ -39,8 +33,6 @@ import org.helm.chemtoolkit.AttachmentList;
 import org.helm.chemtoolkit.CTKException;
 import org.helm.chemtoolkit.CTKSmilesException;
 import org.helm.chemtoolkit.IAtomBase;
-import org.helm.chemtoolkit.ManipulatorFactory;
-import org.helm.chemtoolkit.ManipulatorFactory.ManipulatorType;
 import org.helm.chemtoolkit.MoleculeInfo;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -350,15 +342,39 @@ public abstract class TestBase {
     groupsRibose.add(new Attachment("R2-H", "R2", "H", riboseR2));
 
     AttachmentList groupsPhosphat = new AttachmentList();
-    groupsPhosphat.add(new Attachment("R1-H", "R1", "OH", phosphatR1));
-    groupsPhosphat.add(new Attachment("R2-H", "R2", "OH", phosphatR2));
+    groupsPhosphat.add(new Attachment("R1-OH", "R1", "OH", phosphatR1));
+    groupsPhosphat.add(new Attachment("R2-OH", "R2", "OH", phosphatR2));
 
-    AbstractChemistryManipulator manipulator = ManipulatorFactory.buildManipulator(ManipulatorType.MARVIN);
+    // AbstractChemistryManipulator manipulator = ManipulatorFactory.buildManipulator(ManipulatorType.MARVIN);
     AbstractMolecule riboseMolecule = manipulator.getMolecule(ribose, groupsRibose);
     AbstractMolecule phosphatMolecule = manipulator.getMolecule(phosphat, groupsPhosphat);
     AbstractMolecule molecule =
         manipulator.merge(riboseMolecule, riboseMolecule.getRGroupAtom(2, true), phosphatMolecule, phosphatMolecule.getRGroupAtom(1, true));
 
     testResult = manipulator.convertMolecule(molecule, StType.MOLFILE);
+  }
+
+  public void mergeSelfCycle() throws CTKException, IOException {
+    String a = "C[C@H](N[*])C([*])=O |$;;;_R1;;_R2;$|";
+    String aR1 = "[*][H] |$_R1;$|";
+    String aR2 = "O[*] |$;_R2$|";
+    AttachmentList groupsA = new AttachmentList();
+    groupsA.add(new Attachment("R1-H", "R1", "H", aR1));
+    groupsA.add(new Attachment("R2-OH", "R2", "OH", aR2));
+    AbstractMolecule a1 = manipulator.getMolecule(a, groupsA);
+    IAtomBase a1group1 = a1.getRGroupAtom(1, true);
+    IAtomBase a1group2 = a1.getRGroupAtom(2, true);
+    AbstractMolecule a2 = manipulator.getMolecule(a, groupsA.cloneList());
+    IAtomBase a2group1 = a2.getRGroupAtom(1, true);
+    IAtomBase a2group2 = a2.getRGroupAtom(2, true);
+    AbstractMolecule a3 = manipulator.getMolecule(a, groupsA.cloneList());
+    IAtomBase a3group1 = a3.getRGroupAtom(1, true);
+    IAtomBase a3group2 = a3.getRGroupAtom(2, true);
+    AbstractMolecule molecule = manipulator.merge(a1, a1group2, a2, a2group1);
+    molecule = manipulator.merge(molecule, a2group2, a3, a3group1);
+    molecule = manipulator.merge(molecule, a3group2, molecule, a1group1);
+    molecule.generateCoordinates();
+    testResult = manipulator.convertMolecule(molecule, StType.MOLFILE);
+
   }
 }

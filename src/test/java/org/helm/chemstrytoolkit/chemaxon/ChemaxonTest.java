@@ -153,4 +153,12 @@ public class ChemaxonTest extends TestBase {
     LOG.debug(testResult);
   }
 
+  @Override
+  @Test(groups = {"MarvinTest"})
+  public void mergeSelfCycle() throws CTKException, IOException {
+    super.mergeSelfCycle();
+    LOG.debug(testResult);
+
+  }
+
 }

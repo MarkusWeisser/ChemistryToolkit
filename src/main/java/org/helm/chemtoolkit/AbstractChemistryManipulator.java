@@ -172,22 +172,34 @@ public abstract class AbstractChemistryManipulator {
     if (firstContainer.isSingleStereo(firstRgroup) && secondContainer.isSingleStereo(secondRgroup)) {
       throw new CTKException("Both R atoms are connected to chiral centers");
     }
-    firstContainer.dearomatize();
-    secondContainer.dearomatize();
-    IAtomBase atom1 = getNeighborAtom(firstRgroup);
-    IAtomBase atom2 = getNeighborAtom(secondRgroup);
+    if (firstContainer == secondContainer) {
+      firstContainer.dearomatize();
+      IAtomBase atom1 = getNeighborAtom(firstRgroup);
+      IAtomBase atom2 = getNeighborAtom(secondRgroup);
+      firstContainer.removeAttachment(firstRgroup);
+      firstContainer.removeAttachment(secondRgroup);
+      setStereoInformation(firstContainer, firstRgroup, firstContainer, secondRgroup, atom1, atom2);
+      firstContainer.removeINode(firstRgroup);
+      firstContainer.removeINode(secondRgroup);
+    } else {
 
-    firstContainer.removeAttachment(firstRgroup);
-    secondContainer.removeAttachment(secondRgroup);
-    setStereoInformation(firstContainer, firstRgroup, secondContainer, secondRgroup, atom1, atom2);
-    firstContainer.removeINode(firstRgroup);
-    secondContainer.removeINode(secondRgroup);
+      firstContainer.dearomatize();
+      secondContainer.dearomatize();
+      IAtomBase atom1 = getNeighborAtom(firstRgroup);
+      IAtomBase atom2 = getNeighborAtom(secondRgroup);
 
-    AttachmentList mergedAttachments = mergeAttachments(firstContainer, secondContainer);
+      firstContainer.removeAttachment(firstRgroup);
+      secondContainer.removeAttachment(secondRgroup);
+      setStereoInformation(firstContainer, firstRgroup, secondContainer, secondRgroup, atom1, atom2);
+      firstContainer.removeINode(firstRgroup);
+      secondContainer.removeINode(secondRgroup);
 
-    firstContainer.addIBase(secondContainer);
+      AttachmentList mergedAttachments = mergeAttachments(firstContainer, secondContainer);
 
-    firstContainer.setAttachments(mergedAttachments);
+      firstContainer.addIBase(secondContainer);
+
+      firstContainer.setAttachments(mergedAttachments);
+    }
 
     return firstContainer;
   }
@@ -344,8 +356,6 @@ public abstract class AbstractChemistryManipulator {
     secondContainer.clearFlags();
     return result;
   }
-
-  // public abstract void changeAtomLabel(AbstractMolecule container, int index, int toIndex);
 
   /**
    * @param molecule
