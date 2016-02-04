@@ -199,6 +199,7 @@ public class ChemMolecule extends AbstractMolecule {
       }
 
       MolBond bond = rAtom.getBond(0);
+
       int bondType = bond.getFlags() & MolBond.STEREO1_MASK;
 
       return bondType == MolBond.UP || bondType == MolBond.DOWN || bondType == MolBond.WAVY;

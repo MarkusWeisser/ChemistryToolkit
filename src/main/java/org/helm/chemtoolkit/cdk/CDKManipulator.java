@@ -362,6 +362,7 @@ public class CDKManipulator extends AbstractChemistryManipulator {
       throws CTKException {
     String molFile;
     IAtomContainer molecule = getPolymer(sequence);
+
     molFile = convertSMILES2MolFile(molecule2Smiles(molecule));
     System.out.println(molFile);
 
@@ -423,8 +424,9 @@ public class CDKManipulator extends AbstractChemistryManipulator {
   @Override
   public AbstractMolecule getMolecule(String smiles, AttachmentList attachments) throws CTKException {
     IAtomContainer molecule = getIAtomContainer(smiles);
+    CDKMolecule result = new CDKMolecule(molecule, attachments);
 
-    return new CDKMolecule(molecule, attachments);
+    return result;
   }
 
   /**

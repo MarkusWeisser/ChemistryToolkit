@@ -22,6 +22,9 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 
 import org.helm.chemistrytoolkit.TestBase;
+import org.helm.chemtoolkit.AbstractMolecule;
+import org.helm.chemtoolkit.Attachment;
+import org.helm.chemtoolkit.AttachmentList;
 import org.helm.chemtoolkit.CTKException;
 import org.helm.chemtoolkit.CTKSmilesException;
 import org.helm.chemtoolkit.ManipulatorFactory;
@@ -158,6 +161,38 @@ public class ChemaxonTest extends TestBase {
   public void mergeSelfCycle() throws CTKException, IOException {
     super.mergeSelfCycle();
     LOG.debug(testResult);
+
+  }
+
+  @Override
+  @Test(groups = {"MarvinTest"})
+  public void merge2Ribose() throws IOException {
+    String ribose = "O[C@H]1[C@H]([*])O[C@H](CO[*])[C@H]1O[*] |$;;;_R3;;;;;_R1;;;_R2$|";
+
+    String riboseR1 = "[*][H] |$_R1;$|";
+    String riboseR2 = "[*][H] |$_R2;$|";
+    String riboseR3 = "O[*] |$;_R3$|";
+
+    AttachmentList groupsRibose = new AttachmentList();
+
+    groupsRibose.add(new Attachment("R1-H", "R1", "H", riboseR1));
+    groupsRibose.add(new Attachment("R2-H", "R2", "H", riboseR2));
+    groupsRibose.add(new Attachment("R3-OH", "R3", "OH", riboseR3));
+
+    AbstractMolecule ribose1;
+    try {
+      ribose1 = manipulator.getMolecule(ribose, groupsRibose);
+      ribose1.generateCoordinates();
+      AbstractMolecule ribose2 = manipulator.getMolecule(ribose, groupsRibose.cloneList());
+      ribose2.generateCoordinates();
+      @SuppressWarnings("unused")
+      AbstractMolecule molecule =
+          manipulator.merge(ribose1, ribose1.getRGroupAtom(3, true), ribose2, ribose2.getRGroupAtom(3, true));
+    } catch (CTKException e) {
+      testResult = e.getMessage();
+      LOG.debug(testResult);
+    }
+    Assert.assertEquals(true, testResult != null);
 
   }
 
