@@ -139,7 +139,7 @@ public class CDKTest extends TestBase {
   @Test(groups = {"CDKTest"})
   public void getRibose() throws IOException, CTKException {
     super.getRibose();
-    Assert.assertEquals(testResult, "O[C@H]1[C@H](O[C@H](CO[H])[C@H]1O[H])O");
+    Assert.assertEquals(testResult, "O[C@H]1[C@@H](O[C@H](CO[H])[C@H]1O[H])O");
   }
 
   @Override
