@@ -199,6 +199,7 @@ public abstract class AbstractChemistryManipulator {
       firstContainer.addIBase(secondContainer);
 
       firstContainer.setAttachments(mergedAttachments);
+
     }
 
     return firstContainer;
@@ -220,12 +221,13 @@ public abstract class AbstractChemistryManipulator {
     IStereoElementBase stereo = null;
     boolean result = false;
     if (firstContainer.isSingleStereo(firstRgroup)) {
-      stereo = getStereoInformation(firstContainer, firstRgroup, atom1);
+      stereo = getStereoInformation(firstContainer, firstRgroup, atom2);
     }
     if (secondContainer.isSingleStereo(secondRgroup)) {
-      stereo = getStereoInformation(secondContainer, secondRgroup, atom2);
+      stereo = getStereoInformation(secondContainer, secondRgroup, atom1);
     }
     if (stereo != null) {
+
       firstContainer.addIBase(stereo);
       result = true;
     }

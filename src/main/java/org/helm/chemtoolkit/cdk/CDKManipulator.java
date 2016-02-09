@@ -424,7 +424,21 @@ public class CDKManipulator extends AbstractChemistryManipulator {
   @Override
   public AbstractMolecule getMolecule(String smiles, AttachmentList attachments) throws CTKException {
     IAtomContainer molecule = getIAtomContainer(smiles);
+
     CDKMolecule result = new CDKMolecule(molecule, attachments);
+
+    for (IStereoElement element : (result.getMolecule().stereoElements())) {
+      // if (element.contains(((CDKAtom) rGroup).getMolAtom())) {
+      if (element instanceof ITetrahedralChirality) {
+        IAtom[] atomArray = ((ITetrahedralChirality) element).getLigands();
+        for (IAtom atom : atomArray) {
+          LOG.debug("atom=" + atom.getSymbol());
+        }
+        LOG.debug("stereo=" + ((ITetrahedralChirality) element).getStereo());
+      }
+
+    }
+    // }
 
     return result;
   }
@@ -494,12 +508,15 @@ public class CDKManipulator extends AbstractChemistryManipulator {
           for (int i = 0; i < atomArray.length; i++) {
             if (atomArray[i].equals(((CDKAtom) rGroup).getMolAtom())) {
               atomArray[i] = (IAtom) atom.getMolAtom();
+              LOG.debug("atom=" + atomArray[i].getSymbol());
             }
 
           }
+
           elementToAdd =
               new TetrahedralChirality(((ITetrahedralChirality) element).getChiralAtom(), atomArray,
                   (((ITetrahedralChirality) element).getStereo()));
+          LOG.debug("stereo after=" + ((ITetrahedralChirality) elementToAdd).getStereo());
         }
       }
     }
@@ -556,6 +573,7 @@ public class CDKManipulator extends AbstractChemistryManipulator {
       AbstractMolecule secondContainer, IAtomBase secondRgroup, IAtomBase atom1, IAtomBase atom2) throws CTKException {
     boolean isStereo =
         super.setStereoInformation(firstContainer, firstRgroup, secondContainer, secondRgroup, atom1, atom2);
+
     firstContainer.addIBase(bindAtoms(atom1, atom2));
     return isStereo;
   }

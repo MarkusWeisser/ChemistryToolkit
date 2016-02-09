@@ -42,7 +42,6 @@ public class ChemMolecule extends AbstractMolecule {
 
   private Molecule molecule;
 
-
   @Override
   public Molecule getMolecule() {
     return this.molecule;
@@ -165,7 +164,7 @@ public class ChemMolecule extends AbstractMolecule {
    */
   @Override
   public void generateCoordinates() throws CTKException {
-    molecule.clean(2, null);
+    molecule.clean(3, null);
 
   }
 

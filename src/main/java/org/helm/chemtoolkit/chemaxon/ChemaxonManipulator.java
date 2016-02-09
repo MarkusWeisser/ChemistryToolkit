@@ -224,6 +224,7 @@ public class ChemaxonManipulator extends AbstractChemistryManipulator {
     Molecule molecule = null;
     if (data != null) {
       molecule = MolImporter.importMol(data);
+      molecule.clean(3, null);
     }
     return molecule;
   }

@@ -138,7 +138,7 @@ public class ChemaxonTest extends TestBase {
   @Test(groups = {"MarvinTest"})
   public void getRibose() throws IOException, CTKException {
     super.getRibose();
-    Assert.assertEquals(testResult, "[H]OC[C@H]1O[C@H](O)[C@H](O)[C@@H]1O[H]");
+    Assert.assertEquals(testResult, "[H]OC[C@H]1O[C@@H](O)[C@H](O)[C@@H]1O[H]");
   }
 
   @Override

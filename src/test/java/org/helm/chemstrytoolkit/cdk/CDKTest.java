@@ -22,6 +22,7 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 
 import org.helm.chemistrytoolkit.TestBase;
+import org.helm.chemtoolkit.AbstractChemistryManipulator.StType;
 import org.helm.chemtoolkit.AbstractMolecule;
 import org.helm.chemtoolkit.Attachment;
 import org.helm.chemtoolkit.AttachmentList;
@@ -192,5 +193,15 @@ public class CDKTest extends TestBase {
       LOG.debug(testResult);
     }
     Assert.assertEquals(true, testResult != null);
+  }
+
+  @Test(groups = {"CDKTest"})
+  public void getMolecule() throws IOException, CTKException {
+    String ribose = "O[C@H]1[C@H]([*])O[C@H](CO[*])[C@H]1O[*]";
+    // String ribose = "O[C@H]1[C@H](O[C@H](CO[H])[C@H]1O[H])O";
+    AbstractMolecule molecule = manipulator.getMolecule(ribose, null);
+    String res = manipulator.convertMolecule(molecule, StType.SMILES);
+    LOG.debug(res);
+
   }
 }

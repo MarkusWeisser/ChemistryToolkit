@@ -320,7 +320,7 @@ public abstract class TestBase {
             manipulator.merge(molecule, atom, mol, groupsToMerge.get(mol).get(atom));
       }
     }
-    molecule.generateCoordinates();
+
     testResult = manipulator.convertMolecule(molecule, StType.SMILES);
 
   }
