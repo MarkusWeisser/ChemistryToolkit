@@ -427,19 +427,6 @@ public class CDKManipulator extends AbstractChemistryManipulator {
 
     CDKMolecule result = new CDKMolecule(molecule, attachments);
 
-    for (IStereoElement element : (result.getMolecule().stereoElements())) {
-      // if (element.contains(((CDKAtom) rGroup).getMolAtom())) {
-      if (element instanceof ITetrahedralChirality) {
-        IAtom[] atomArray = ((ITetrahedralChirality) element).getLigands();
-        for (IAtom atom : atomArray) {
-          LOG.debug("atom=" + atom.getSymbol());
-        }
-        LOG.debug("stereo=" + ((ITetrahedralChirality) element).getStereo());
-      }
-
-    }
-    // }
-
     return result;
   }
 
@@ -508,7 +495,7 @@ public class CDKManipulator extends AbstractChemistryManipulator {
           for (int i = 0; i < atomArray.length; i++) {
             if (atomArray[i].equals(((CDKAtom) rGroup).getMolAtom())) {
               atomArray[i] = (IAtom) atom.getMolAtom();
-              LOG.debug("atom=" + atomArray[i].getSymbol());
+              break;
             }
 
           }
