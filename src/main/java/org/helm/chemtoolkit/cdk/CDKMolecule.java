@@ -177,7 +177,7 @@ public class CDKMolecule extends AbstractMolecule {
    * @throws CTKException
    */
   @Override
-  public void generateCoordinates() throws CTKException {
+  public void generateCoordinates(int dem) throws CTKException {
 
     StructureDiagramGenerator sdg = new StructureDiagramGenerator();
     sdg.setMolecule(molecule);
@@ -254,6 +254,15 @@ public class CDKMolecule extends AbstractMolecule {
     }
 
     return elementToAdd;
+
+  }
+
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public void removeIBase(IChemObjectBase object) {
+    // TODO Auto-generated method stub
 
   }
 

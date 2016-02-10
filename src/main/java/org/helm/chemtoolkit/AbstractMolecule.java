@@ -104,11 +104,13 @@ public abstract class AbstractMolecule implements IChemObjectBase {
 
   public abstract void dearomatize() throws CTKException;
 
-  public abstract void generateCoordinates() throws CTKException;
+  public abstract void generateCoordinates(int dem) throws CTKException;
 
   public abstract void removeINode(IAtomBase node) throws CTKException;
 
   public abstract void addIBase(IChemObjectBase object);
+
+  public abstract void removeIBase(IChemObjectBase object);
 
   public abstract List<IBondBase> getIBondArray();
 

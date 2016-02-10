@@ -20,8 +20,10 @@ import java.awt.Color;
 import java.awt.Graphics2D;
 import java.awt.Rectangle;
 import java.awt.image.BufferedImage;
+import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 
 import javax.imageio.ImageIO;
 import javax.imageio.stream.ImageOutputStream;
@@ -223,8 +225,16 @@ public class ChemaxonManipulator extends AbstractChemistryManipulator {
   private Molecule getMolecule(String data) throws IOException {
     Molecule molecule = null;
     if (data != null) {
-      molecule = MolImporter.importMol(data);
-      molecule.clean(3, null);
+      // molecule = MolImporter.importMol(data);
+      InputStream is = new ByteArrayInputStream(data.getBytes());
+      MolImporter importer = new MolImporter(is);
+      molecule = importer.read();
+      molecule.clean(2, null);
+// for (MolBond bond : molecule.getBondArray()) {
+// bond.calcStereo2();
+// }
+// molecule.clean(2, null);
+
     }
     return molecule;
   }
@@ -317,12 +327,18 @@ public class ChemaxonManipulator extends AbstractChemistryManipulator {
    * @throws CTKException
    */
   @Override
-  public IStereoElementBase getStereoInformation(AbstractMolecule molecule, IAtomBase rGroup, IAtomBase atom)
-      throws CTKException {
-    if (molecule instanceof ChemMolecule && rGroup instanceof ChemAtom && atom instanceof ChemAtom) {
+  public IStereoElementBase getStereoInformation(AbstractMolecule molecule, IAtomBase rGroup, IAtomBase atom1,
+      IAtomBase atom2)
+          throws CTKException {
+    if (molecule instanceof ChemMolecule && rGroup instanceof ChemAtom && atom1 instanceof ChemAtom
+        && atom2 instanceof ChemAtom) {
       MolAtom rAtom = (MolAtom) rGroup.getMolAtom();
       MolBond chiralBond = rAtom.getBond(0);
-      return new ChemStereoElement(chiralBond);
+      MolBond mergedBond = chiralBond.cloneBond((MolAtom) atom2.getMolAtom(), (MolAtom) atom1.getMolAtom());
+      LOG.debug("chiral flags=" + chiralBond.getFlags());
+      // mergedBond.setFlags(chiralBond.getFlags());
+      return new ChemStereoElement(mergedBond);
+      // return new ChemStereoElement(chiralBond);
     } else
       throw new CTKException("invalid input data");
   }
@@ -367,10 +383,12 @@ public class ChemaxonManipulator extends AbstractChemistryManipulator {
   @Override
   protected boolean setStereoInformation(AbstractMolecule firstContainer, IAtomBase firstRgroup,
       AbstractMolecule secondContainer, IAtomBase secondRgroup, IAtomBase atom1, IAtomBase atom2) throws CTKException {
+
     boolean isStereo =
         super.setStereoInformation(firstContainer, firstRgroup, secondContainer, secondRgroup, atom1, atom2);
     if (!isStereo) {
       firstContainer.addIBase(bindAtoms(atom1, atom2));
+
     }
     return isStereo;
   }

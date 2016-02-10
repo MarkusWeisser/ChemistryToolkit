@@ -174,6 +174,8 @@ public abstract class AbstractChemistryManipulator {
     }
     if (firstContainer == secondContainer) {
       firstContainer.dearomatize();
+      secondContainer.dearomatize();
+
       IAtomBase atom1 = getNeighborAtom(firstRgroup);
       IAtomBase atom2 = getNeighborAtom(secondRgroup);
       firstContainer.removeAttachment(firstRgroup);
@@ -185,6 +187,7 @@ public abstract class AbstractChemistryManipulator {
 
       firstContainer.dearomatize();
       secondContainer.dearomatize();
+
       IAtomBase atom1 = getNeighborAtom(firstRgroup);
       IAtomBase atom2 = getNeighborAtom(secondRgroup);
 
@@ -221,14 +224,18 @@ public abstract class AbstractChemistryManipulator {
     IStereoElementBase stereo = null;
     boolean result = false;
     if (firstContainer.isSingleStereo(firstRgroup)) {
-      stereo = getStereoInformation(firstContainer, firstRgroup, atom2);
+      stereo = getStereoInformation(firstContainer, firstRgroup, atom2, atom1);
+
+
     }
     if (secondContainer.isSingleStereo(secondRgroup)) {
-      stereo = getStereoInformation(secondContainer, secondRgroup, atom1);
+      stereo = getStereoInformation(secondContainer, secondRgroup, atom1, atom2);
+
     }
     if (stereo != null) {
 
       firstContainer.addIBase(stereo);
+
       result = true;
     }
     return result;
@@ -367,7 +374,7 @@ public abstract class AbstractChemistryManipulator {
    * @throws CTKException
    */
   protected abstract IStereoElementBase getStereoInformation(AbstractMolecule container, IAtomBase rGroup,
-      IAtomBase atom)
+      IAtomBase atom1, IAtomBase atom2)
           throws CTKException;
 
 }

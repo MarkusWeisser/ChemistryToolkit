@@ -166,8 +166,8 @@ public class CDKTest extends TestBase {
   }
 
   @Override
-  @Test(groups = {"CDKTest"})
-  public void merge2Ribose() throws IOException {
+  @Test(groups = {"CDKTest"}, expectedExceptions = CTKException.class)
+  public void merge2Ribose() throws IOException, CTKException {
     String ribose = "O[C@H]1[C@H]([*])O[C@H](CO[*])[C@H]1O[*] |$;;;_R3;;;;;_R1;;;_R2$|";
 
     String riboseR1 = "[*][H] |$_R1;$|";
@@ -180,7 +180,7 @@ public class CDKTest extends TestBase {
     groupsRibose.add(new Attachment("R2-H", "R2", "H", riboseR2));
     groupsRibose.add(new Attachment("R3-OH", "R3", "OH", riboseR3));
 
-    try {
+
       AbstractMolecule ribose1 = manipulator.getMolecule(ribose, groupsRibose);
 
       AbstractMolecule ribose2 = manipulator.getMolecule(ribose, groupsRibose.cloneList());
@@ -188,11 +188,7 @@ public class CDKTest extends TestBase {
       @SuppressWarnings("unused")
       AbstractMolecule molecule =
           manipulator.merge(ribose1, ribose1.getRGroupAtom(3, true), ribose2, ribose2.getRGroupAtom(3, true));
-    } catch (CTKException e) {
-      testResult = e.getMessage();
-      LOG.debug(testResult);
-    }
-    Assert.assertEquals(true, testResult != null);
+
   }
 
   @Test(groups = {"CDKTest"})

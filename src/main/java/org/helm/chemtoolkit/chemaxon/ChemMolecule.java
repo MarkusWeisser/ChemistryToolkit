@@ -163,8 +163,8 @@ public class ChemMolecule extends AbstractMolecule {
    * {@inheritDoc}
    */
   @Override
-  public void generateCoordinates() throws CTKException {
-    molecule.clean(3, null);
+  public void generateCoordinates(int dem) throws CTKException {
+    molecule.clean(dem, null);
 
   }
 
@@ -204,6 +204,20 @@ public class ChemMolecule extends AbstractMolecule {
       return bondType == MolBond.UP || bondType == MolBond.DOWN || bondType == MolBond.WAVY;
     } else
       throw new CTKException("invalid atom!");
+  }
+
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public void removeIBase(IChemObjectBase node) {
+    if (node instanceof ChemBond) {
+      molecule.removeEdge(((ChemBond) node).getMolBond());
+    }
+    if (node instanceof ChemStereoElement) {
+      molecule.removeEdge(((ChemStereoElement) node).getStereoElement());
+    }
+
   }
 
 }

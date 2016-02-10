@@ -227,7 +227,7 @@ public abstract class TestBase {
     AbstractMolecule molecule =
         manipulator.merge(riboseMolecule, riboseMolecule.getRGroupAtom(1, true), adeninMolecule, adeninMolecule.getRGroupAtom(1, true));
 
-    molecule.generateCoordinates();
+    // molecule.generateCoordinates(2);
     testResult = manipulator.convertMolecule(molecule, StType.MOLFILE);
 
   }
@@ -284,7 +284,7 @@ public abstract class TestBase {
 
     molecule1 =
         manipulator.merge(molecule1, molecule1.getRGroupAtom(2, true), molecule3, molecule3.getRGroupAtom(1, true));
-    molecule1.generateCoordinates();
+    // molecule1.generateCoordinates(2);
     String result = manipulator.convertMolecule(molecule1, StType.MOLFILE);
     LOG.debug(result);
 
@@ -304,12 +304,15 @@ public abstract class TestBase {
     groupsRibose.add(new Attachment("R2-H", "R2", "H", riboseR2));
 // AbstractChemistryManipulator manipulator = getManipulator();
     AbstractMolecule molecule = manipulator.getMolecule(ribose, groupsRibose);
+    // molecule.generateCoordinates(3);
+
     Map<AbstractMolecule, Map<IAtomBase, IAtomBase>> groupsToMerge = new HashMap<>();
     for (Attachment attachment : molecule.getAttachments()) {
       int groupId = AbstractMolecule.getIdFromLabel(attachment.getLabel());
       String smiles = attachment.getSmiles();
-      LOG.debug(smiles);
+      // LOG.debug(smiles);
       AbstractMolecule rMol = manipulator.getMolecule(smiles, null);
+      // rMol.generateCoordinates(3);
       Map<IAtomBase, IAtomBase> atoms = new HashMap<>();
       atoms.put(molecule.getRGroupAtom(groupId, true), rMol.getRGroupAtom(groupId, true));
       groupsToMerge.put(rMol, atoms);
@@ -318,6 +321,7 @@ public abstract class TestBase {
       for (IAtomBase atom : groupsToMerge.get(mol).keySet()) {
         molecule =
             manipulator.merge(molecule, atom, mol, groupsToMerge.get(mol).get(atom));
+        LOG.debug("smiles=" + manipulator.convertMolecule(molecule, StType.SMILES));
       }
     }
 
@@ -373,7 +377,7 @@ public abstract class TestBase {
     AbstractMolecule molecule = manipulator.merge(a1, a1group2, a2, a2group1);
     molecule = manipulator.merge(molecule, a2group2, a3, a3group1);
     molecule = manipulator.merge(molecule, a3group2, molecule, a1group1);
-    molecule.generateCoordinates();
+    // molecule.generateCoordinates(2);
     testResult = manipulator.convertMolecule(molecule, StType.MOLFILE);
 
   }
@@ -392,9 +396,9 @@ public abstract class TestBase {
     groupsRibose.add(new Attachment("R3-OH", "R3", "OH", riboseR3));
 
     AbstractMolecule ribose1 = manipulator.getMolecule(ribose, groupsRibose);
-    // ribose1.generateCoordinates();
+    // ribose1.generateCoordinates(3);
     AbstractMolecule ribose2 = manipulator.getMolecule(ribose, groupsRibose.cloneList());
-    // ribose2.generateCoordinates();
+    // ribose2.generateCoordinates(3);
     AbstractMolecule molecule =
         manipulator.merge(ribose1, ribose1.getRGroupAtom(3, true), ribose2, ribose2.getRGroupAtom(3, true));
 
