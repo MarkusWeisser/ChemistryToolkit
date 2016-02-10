@@ -140,6 +140,9 @@ public class CDKManipulator extends AbstractChemistryManipulator {
       @SuppressWarnings("unused")
       // nothing TODO with molecule, only used for validation
       IAtomContainer molecule = smilesParser.parseSmiles(smiles);
+      if (molecule.getAtomCount() == 0) {
+        throw new InvalidSmilesException("invalid smiles!");
+      }
 
     } catch (InvalidSmilesException e) {
       return false;
@@ -205,7 +208,12 @@ public class CDKManipulator extends AbstractChemistryManipulator {
    * @throws CTKException
    */
   private String convertMolFile2SMILES(String molfile) throws CTKException {
-    String result = null;
+
+    return convertMolecule(new CDKMolecule(getIAtomContainerFromMolFile(molfile)), StType.SMILES);
+  }
+
+  private IAtomContainer getIAtomContainerFromMolFile(String molfile) throws CTKException {
+    IAtomContainer result = null;
 
     try (StringReader stringReader = new StringReader(molfile);
         MDLV2000Reader reader = new MDLV2000Reader(stringReader)) {
@@ -223,8 +231,7 @@ public class CDKManipulator extends AbstractChemistryManipulator {
       AtomContainerManipulator.percieveAtomTypesAndConfigureAtoms(molecule);
       aromaticity.apply(molecule);
 
-      CDKMolecule container = new CDKMolecule(molecule);
-      result = convertMolecule(container, StType.SMILES);
+      result = molecule;
 
     } catch (IllegalArgumentException e) {
       System.out.println(e.getMessage());
@@ -422,8 +429,13 @@ public class CDKManipulator extends AbstractChemistryManipulator {
    * {@inheritDoc}
    */
   @Override
-  public AbstractMolecule getMolecule(String smiles, AttachmentList attachments) throws CTKException {
-    IAtomContainer molecule = getIAtomContainer(smiles);
+  public AbstractMolecule getMolecule(String data, AttachmentList attachments) throws CTKException {
+    IAtomContainer molecule = null;
+
+    if (validateSMILES(data))
+      molecule = getIAtomContainer(data);
+    else
+      molecule = getIAtomContainerFromMolFile(data);
 
     CDKMolecule result = new CDKMolecule(molecule, attachments);
 
