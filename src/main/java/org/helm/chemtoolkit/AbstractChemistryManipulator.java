@@ -254,7 +254,7 @@ public abstract class AbstractChemistryManipulator {
       Integer currIndex = 0;
       char[] items = extendedSmiles.toCharArray();
       List<Integer> indexes = new ArrayList<Integer>();
-      // currIndex = currIndex + extendedSmiles.indexOf("_R");
+
       while (extendedSmiles.indexOf("_R", currIndex) > 0) {
         currIndex = extendedSmiles.indexOf("_R", currIndex);
         indexes.add(currIndex);
@@ -284,8 +284,6 @@ public abstract class AbstractChemistryManipulator {
           }
 
           if (numbers.length() > 0) {
-            // numbers = "R" + numbers;
-            // Integer value = Integer.valueOf(numbers);
             list.add("R" + numbers);
           }
         }

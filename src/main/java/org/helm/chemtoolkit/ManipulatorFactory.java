@@ -1,24 +1,18 @@
 /**
- * *****************************************************************************
- * Copyright C 2015, The Pistoia Alliance
+ * ***************************************************************************** Copyright C 2015, The Pistoia Alliance
  *
- * Permission is hereby granted, free of charge, to any person obtaining a copy
- * of this software and associated documentation files (the "Software"), to deal
- * in the Software without restriction, including without limitation the rights
- * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
- * copies of the Software, and to permit persons to whom the Software is
- * furnished to do so, subject to the following conditions:
+ * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated
+ * documentation files (the "Software"), to deal in the Software without restriction, including without limitation the
+ * rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to
+ * permit persons to whom the Software is furnished to do so, subject to the following conditions:
  *
- * The above copyright notice and this permission notice shall be included in
- * all copies or substantial portions of the Software.
+ * The above copyright notice and this permission notice shall be included in all copies or substantial portions of the
+ * Software.
  *
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
- * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
- * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
- * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
- * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
- * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
- * SOFTWARE.
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE
+ * WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR
+ * COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR
+ * OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  *****************************************************************************
  */
 package org.helm.chemtoolkit;
@@ -39,25 +33,11 @@ public class ManipulatorFactory {
   /** The Logger for this class */
   private static final Logger LOG = LoggerFactory.getLogger(ManipulatorFactory.class);
 
-  public enum ManipulatorType {
-    MARVIN, CDK
-  }
-
-  public static AbstractChemistryManipulator buildManipulator(ManipulatorType type) throws ClassNotFoundException,
+  public static AbstractChemistryManipulator buildManipulator(String className) throws ClassNotFoundException,
       NoSuchMethodException, SecurityException, InstantiationException, IllegalAccessException,
       IllegalArgumentException, InvocationTargetException {
     AbstractChemistryManipulator manipulator = null;
-    String className = null;
-    switch (type) {
-    case MARVIN:
-      className = "org.helm.chemtoolkit.chemaxon.ChemaxonManipulator";
-      break;
-    case CDK:
-      className = "org.helm.chemtoolkit.cdk.CDKManipulator";
-      break;
-    default:
-      break;
-    }
+
     if (className != null) {
       Class<?> clazz = Class.forName(className);
       manipulator = (AbstractChemistryManipulator) clazz.getConstructor().newInstance();

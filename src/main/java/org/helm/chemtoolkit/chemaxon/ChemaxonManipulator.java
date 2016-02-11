@@ -335,10 +335,9 @@ public class ChemaxonManipulator extends AbstractChemistryManipulator {
       MolAtom rAtom = (MolAtom) rGroup.getMolAtom();
       MolBond chiralBond = rAtom.getBond(0);
       MolBond mergedBond = chiralBond.cloneBond((MolAtom) atom2.getMolAtom(), (MolAtom) atom1.getMolAtom());
-      LOG.debug("chiral flags=" + chiralBond.getFlags());
-      // mergedBond.setFlags(chiralBond.getFlags());
+
       return new ChemStereoElement(mergedBond);
-      // return new ChemStereoElement(chiralBond);
+
     } else
       throw new CTKException("invalid input data");
   }

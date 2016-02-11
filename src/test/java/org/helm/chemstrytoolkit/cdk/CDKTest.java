@@ -29,7 +29,6 @@ import org.helm.chemtoolkit.AttachmentList;
 import org.helm.chemtoolkit.CTKException;
 import org.helm.chemtoolkit.CTKSmilesException;
 import org.helm.chemtoolkit.ManipulatorFactory;
-import org.helm.chemtoolkit.ManipulatorFactory.ManipulatorType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.testng.Assert;
@@ -44,12 +43,14 @@ public class CDKTest extends TestBase {
 
   private static final Logger LOG = LoggerFactory.getLogger(CDKTest.class);
 
+  private final String ClassName = "org.helm.chemtoolkit.cdk.CDKManipulator";
+
   @BeforeSuite(groups = {"CDKTest"})
   public void initialize() throws CTKException, IOException {
 
     try {
       LOG.debug("initialize");
-      manipulator = ManipulatorFactory.buildManipulator(ManipulatorType.CDK);
+      manipulator = ManipulatorFactory.buildManipulator(ClassName);
     } catch (ClassNotFoundException | NoSuchMethodException | SecurityException | InstantiationException
         | IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
       throw new CTKException("unable to invoke a manipulator");
@@ -180,14 +181,13 @@ public class CDKTest extends TestBase {
     groupsRibose.add(new Attachment("R2-H", "R2", "H", riboseR2));
     groupsRibose.add(new Attachment("R3-OH", "R3", "OH", riboseR3));
 
+    AbstractMolecule ribose1 = manipulator.getMolecule(ribose, groupsRibose);
 
-      AbstractMolecule ribose1 = manipulator.getMolecule(ribose, groupsRibose);
+    AbstractMolecule ribose2 = manipulator.getMolecule(ribose, groupsRibose.cloneList());
 
-      AbstractMolecule ribose2 = manipulator.getMolecule(ribose, groupsRibose.cloneList());
-
-      @SuppressWarnings("unused")
-      AbstractMolecule molecule =
-          manipulator.merge(ribose1, ribose1.getRGroupAtom(3, true), ribose2, ribose2.getRGroupAtom(3, true));
+    @SuppressWarnings("unused")
+    AbstractMolecule molecule =
+        manipulator.merge(ribose1, ribose1.getRGroupAtom(3, true), ribose2, ribose2.getRGroupAtom(3, true));
 
   }
 

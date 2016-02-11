@@ -28,7 +28,6 @@ import org.helm.chemtoolkit.AttachmentList;
 import org.helm.chemtoolkit.CTKException;
 import org.helm.chemtoolkit.CTKSmilesException;
 import org.helm.chemtoolkit.ManipulatorFactory;
-import org.helm.chemtoolkit.ManipulatorFactory.ManipulatorType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.testng.Assert;
@@ -43,12 +42,14 @@ public class ChemaxonTest extends TestBase {
 
   private static final Logger LOG = LoggerFactory.getLogger(ChemaxonTest.class);
 
+  private static final String ClassName = "org.helm.chemtoolkit.chemaxon.ChemaxonManipulator";
+
   @BeforeSuite(groups = {"MarvinTest"})
   public void initialize() throws CTKException, IOException {
 
     try {
       LOG.debug("initialize");
-      manipulator = ManipulatorFactory.buildManipulator(ManipulatorType.MARVIN);
+      manipulator = ManipulatorFactory.buildManipulator(ClassName);
     } catch (ClassNotFoundException | NoSuchMethodException | SecurityException | InstantiationException
         | IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
       throw new CTKException("unable to invoke a manipulator");
@@ -180,13 +181,11 @@ public class ChemaxonTest extends TestBase {
     groupsRibose.add(new Attachment("R3-OH", "R3", "OH", riboseR3));
 
     AbstractMolecule ribose1 = manipulator.getMolecule(ribose, groupsRibose);
-    // ribose1.generateCoordinates(2);
-      AbstractMolecule ribose2 = manipulator.getMolecule(ribose, groupsRibose.cloneList());
-    // ribose2.generateCoordinates(2);
-      @SuppressWarnings("unused")
-      AbstractMolecule molecule =
-          manipulator.merge(ribose1, ribose1.getRGroupAtom(3, true), ribose2, ribose2.getRGroupAtom(3, true));
 
+    AbstractMolecule ribose2 = manipulator.getMolecule(ribose, groupsRibose.cloneList());
+    @SuppressWarnings("unused")
+    AbstractMolecule molecule =
+        manipulator.merge(ribose1, ribose1.getRGroupAtom(3, true), ribose2, ribose2.getRGroupAtom(3, true));
 
   }
 

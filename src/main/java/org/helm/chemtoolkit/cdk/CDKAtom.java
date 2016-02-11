@@ -143,14 +143,6 @@ public class CDKAtom extends IAtomBase {
 
     }
 
-// if ((toCompare instanceof Atom) && (atom instanceof Atom)) {
-// return ((Atom) atom).compare(obj);
-//
-// } else if ((toCompare instanceof IPseudoAtom) && (atom instanceof IPseudoAtom)) {
-//
-// return ((IPseudoAtom) atom).getLabel().equals(((IPseudoAtom) toCompare).getLabel());
-// }
-
     return false;
   }
 

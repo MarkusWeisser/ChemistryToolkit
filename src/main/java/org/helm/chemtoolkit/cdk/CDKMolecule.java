@@ -33,9 +33,7 @@ import org.openscience.cdk.interfaces.IAtomContainer;
 import org.openscience.cdk.interfaces.IBond;
 import org.openscience.cdk.interfaces.IPseudoAtom;
 import org.openscience.cdk.interfaces.IStereoElement;
-import org.openscience.cdk.interfaces.ITetrahedralChirality;
 import org.openscience.cdk.layout.StructureDiagramGenerator;
-import org.openscience.cdk.stereo.TetrahedralChirality;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -235,28 +233,7 @@ public class CDKMolecule extends AbstractMolecule {
       throw new CTKException("invalid atom");
   }
 
-  protected IStereoElement getStereoInformation(IAtom rGroup, IAtom atom) {
-    IStereoElement elementToAdd = null;
-    for (IStereoElement element : molecule.stereoElements()) {
-      if (element.contains(rGroup)) {
-        if (element instanceof ITetrahedralChirality) {
-          IAtom[] atomArray = ((ITetrahedralChirality) element).getLigands();
-          for (int i = 0; i < atomArray.length; i++) {
-            if (atomArray[i].equals(rGroup)) {
-              atomArray[i] = atom;
-            }
 
-          }
-          elementToAdd =
-              new TetrahedralChirality(((ITetrahedralChirality) element).getChiralAtom(), atomArray,
-                  (((ITetrahedralChirality) element).getStereo()));
-        }
-      }
-    }
-
-    return elementToAdd;
-
-  }
 
   /**
    * {@inheritDoc}

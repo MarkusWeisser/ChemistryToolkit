@@ -138,8 +138,6 @@ public class CDKManipulator extends AbstractChemistryManipulator {
     smiles = normalize(smiles);
     SmilesParser smilesParser = new SmilesParser(SilentChemObjectBuilder.getInstance());
     try {
-      @SuppressWarnings("unused")
-      // nothing TODO with molecule, only used for validation
       IAtomContainer molecule = smilesParser.parseSmiles(smiles);
       if (molecule.getAtomCount() == 0) {
         throw new InvalidSmilesException("invalid smiles!");
@@ -226,14 +224,11 @@ public class CDKManipulator extends AbstractChemistryManipulator {
       CycleFinder cycles = Cycles.cdkAromaticSet();
       Aromaticity aromaticity = new Aromaticity(model, cycles);
 
-      // apply our configured model to each molecule, the CDK model
-      // requires that atom types are perceived
-
       AtomContainerManipulator.percieveAtomTypesAndConfigureAtoms(molecule);
       aromaticity.apply(molecule);
       for (IAtom atom : molecule.atoms()) {
         if (atom instanceof IPseudoAtom) {
-          System.out.println("pseudo atom=" + atom.getSymbol());
+
           atom.setSymbol("R");
         }
 
@@ -334,9 +329,6 @@ public class CDKManipulator extends AbstractChemistryManipulator {
           if (param instanceof BasicAtomGenerator.ShowExplicitHydrogens) {
             ((BasicAtomGenerator.ShowExplicitHydrogens) param).setValue(true);
           }
-
-        //
-        // generators.add(gen);
 
         AtomContainerRenderer renderer = new AtomContainerRenderer(generators, new AWTFontManager());
 
@@ -487,7 +479,7 @@ public class CDKManipulator extends AbstractChemistryManipulator {
     if ((atom1 instanceof CDKAtom) && (atom1 instanceof CDKAtom)) {
 
       IBond newBond = new Bond(((CDKAtom) atom1).getMolAtom(), ((CDKAtom) atom2).getMolAtom());
-      // newBond.setStereo(stereo);
+
       bond = new CDKBond(newBond);
 
     } else {
@@ -555,7 +547,7 @@ public class CDKManipulator extends AbstractChemistryManipulator {
     String result = null;
 
     IAtomContainer molecule = (IAtomContainer) container.getMolecule();
-    // container.generateCoordinates(1);
+
     switch (type) {
     case SMILES:
       result = molecule2Smiles(molecule);
