@@ -56,7 +56,7 @@ public class CDKMolecule extends AbstractMolecule {
   public CDKMolecule(IAtomContainer molecule, AttachmentList attachments) {
     this.molecule = molecule;
     if (attachments != null)
-      this.attachments = attachments;
+      setAttachments(attachments);
     else
       this.attachments = new AttachmentList();
     atoms = new ArrayList<>();
@@ -138,6 +138,7 @@ public class CDKMolecule extends AbstractMolecule {
       molecule.addBond(((CDKBond) object).bond);
     } else if (object instanceof CDKStereoElement) {
       molecule.addStereoElement(((CDKStereoElement) object).getStereoElement());
+      molecule.addBond(((CDKStereoElement) object).getBond());
     }
 
   }

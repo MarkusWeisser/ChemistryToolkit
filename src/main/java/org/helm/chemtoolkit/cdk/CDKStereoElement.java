@@ -24,6 +24,7 @@
 package org.helm.chemtoolkit.cdk;
 
 import org.helm.chemtoolkit.IStereoElementBase;
+import org.openscience.cdk.interfaces.IBond;
 import org.openscience.cdk.interfaces.IStereoElement;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -41,6 +42,16 @@ public class CDKStereoElement implements IStereoElementBase {
   private static final Logger LOG = LoggerFactory.getLogger(CDKStereoElement.class);
 
   private IStereoElement stereoElement;
+
+  private IBond bond;
+
+  public IBond getBond() {
+    return this.bond;
+  }
+
+  public void setBond(IBond bond) {
+    this.bond = bond;
+  }
 
   @Override
   public IStereoElement getStereoElement() {

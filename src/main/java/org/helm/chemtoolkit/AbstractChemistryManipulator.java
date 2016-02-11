@@ -193,6 +193,7 @@ public abstract class AbstractChemistryManipulator {
 
       firstContainer.removeAttachment(firstRgroup);
       secondContainer.removeAttachment(secondRgroup);
+
       setStereoInformation(firstContainer, firstRgroup, secondContainer, secondRgroup, atom1, atom2);
       firstContainer.removeINode(firstRgroup);
       secondContainer.removeINode(secondRgroup);
@@ -225,7 +226,6 @@ public abstract class AbstractChemistryManipulator {
     boolean result = false;
     if (firstContainer.isSingleStereo(firstRgroup)) {
       stereo = getStereoInformation(firstContainer, firstRgroup, atom2, atom1);
-
 
     }
     if (secondContainer.isSingleStereo(secondRgroup)) {

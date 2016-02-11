@@ -58,6 +58,7 @@ import org.openscience.cdk.interfaces.IAtom;
 import org.openscience.cdk.interfaces.IAtomContainer;
 import org.openscience.cdk.interfaces.IAtomType;
 import org.openscience.cdk.interfaces.IBond;
+import org.openscience.cdk.interfaces.IBond.Stereo;
 import org.openscience.cdk.interfaces.IPseudoAtom;
 import org.openscience.cdk.interfaces.IStereoElement;
 import org.openscience.cdk.interfaces.ITetrahedralChirality;
@@ -230,7 +231,13 @@ public class CDKManipulator extends AbstractChemistryManipulator {
 
       AtomContainerManipulator.percieveAtomTypesAndConfigureAtoms(molecule);
       aromaticity.apply(molecule);
+      for (IAtom atom : molecule.atoms()) {
+        if (atom instanceof IPseudoAtom) {
+          System.out.println("pseudo atom=" + atom.getSymbol());
+          atom.setSymbol("R");
+        }
 
+      }
       result = molecule;
 
     } catch (IllegalArgumentException e) {
@@ -501,12 +508,24 @@ public class CDKManipulator extends AbstractChemistryManipulator {
   protected IStereoElementBase getStereoInformation(AbstractMolecule molecule, IAtomBase rGroup, IAtomBase atom1,
       IAtomBase atom2) {
     IStereoElement elementToAdd = null;
+    IBond bondToAdd = null;
     for (IStereoElement element : (((CDKMolecule) molecule).getMolecule().stereoElements())) {
       if (element.contains(((CDKAtom) rGroup).getMolAtom())) {
         if (element instanceof ITetrahedralChirality) {
           IAtom[] atomArray = ((ITetrahedralChirality) element).getLigands();
           for (int i = 0; i < atomArray.length; i++) {
             if (atomArray[i].equals(((CDKAtom) rGroup).getMolAtom())) {
+
+              Stereo st = null;
+              try {
+                st = ((CDKBond) rGroup.getIBond(0)).bond.getStereo();
+              } catch (CTKException e) {
+                // TODO Auto-generated catch block
+                e.printStackTrace();
+              }
+              bondToAdd = new Bond((IAtom) atom1.getMolAtom(), (IAtom) atom2.getMolAtom());
+              bondToAdd.setStereo(st);
+
               atomArray[i] = (IAtom) atom1.getMolAtom();
 
               break;
@@ -521,7 +540,9 @@ public class CDKManipulator extends AbstractChemistryManipulator {
         }
       }
     }
-    return new CDKStereoElement(elementToAdd);
+    CDKStereoElement stereo = new CDKStereoElement(elementToAdd);
+    stereo.setBond(bondToAdd);
+    return stereo;
   }
 
   /**
@@ -532,7 +553,9 @@ public class CDKManipulator extends AbstractChemistryManipulator {
   @Override
   public String convertMolecule(AbstractMolecule container, StType type) throws CTKException {
     String result = null;
+
     IAtomContainer molecule = (IAtomContainer) container.getMolecule();
+    // container.generateCoordinates(1);
     switch (type) {
     case SMILES:
       result = molecule2Smiles(molecule);
@@ -574,8 +597,8 @@ public class CDKManipulator extends AbstractChemistryManipulator {
       AbstractMolecule secondContainer, IAtomBase secondRgroup, IAtomBase atom1, IAtomBase atom2) throws CTKException {
     boolean isStereo =
         super.setStereoInformation(firstContainer, firstRgroup, secondContainer, secondRgroup, atom1, atom2);
-
-    firstContainer.addIBase(bindAtoms(atom1, atom2));
+    if (!isStereo)
+      firstContainer.addIBase(bindAtoms(atom1, atom2));
     return isStereo;
   }
 
