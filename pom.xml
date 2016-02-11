@@ -9,58 +9,7 @@
 
 	<name>ChemistryToolkit</name>
 	<url>http://maven.apache.org</url>
-	<!-- profiles -->
-	<profiles>
-		<profile>
-			<id>default</id>
-			<activation>
-				<activeByDefault>true</activeByDefault>
-			</activation>
-			<dependencies>
-				<dependency>
-					<groupId>chemaxon</groupId>
-					<artifactId>MarvinBeans</artifactId>
-					<version>5.0</version>
-				</dependency>
-				<dependency>
-					<groupId>org.openscience.cdk</groupId>
-					<artifactId>cdk-bundle</artifactId>
-					<version>1.5.11</version>
-				</dependency>
-			</dependencies>
-			<properties>
-				<srcPath>**/chemtoolkit/**</srcPath>
-			</properties>
-		</profile>
-		<profile>
-			<id>CDK</id>
-			<dependencies>
-				<dependency>
-					<groupId>org.openscience.cdk</groupId>
-					<artifactId>cdk-bundle</artifactId>
-					<version>1.5.11</version>
-				</dependency>
-			</dependencies>
-			<properties>
-				<srcPath>**/chemtoolkit/cdk/*.java</srcPath>
-				<tstGroups>CDKTest</tstGroups>
-			</properties>
-		</profile>
-		<profile>
-			<id>MarvinBeans</id>
-			<dependencies>
-				<dependency>
-					<groupId>chemaxon</groupId>
-					<artifactId>MarvinBeans</artifactId>
-					<version>5.0</version>
-				</dependency>
-			</dependencies>
-			<properties>
-				<srcPath>**/chemtoolkit/chemaxon/*.java</srcPath>
-				<tstGroups>MarvinTest</tstGroups>
-			</properties>
-		</profile>
-	</profiles>
+
 	<build>
 		<plugins>
 			<plugin>
@@ -70,23 +19,17 @@
 				<configuration>
 					<source>1.7</source>
 					<target>1.7</target>
-					<includes>
-						<include>**/chemtoolkit/*.java</include>
-						<include>${srcPath}</include>
-					</includes>
-				</configuration>
-			</plugin>
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-surefire-plugin</artifactId>
-				<version>2.18</version>
-				<configuration>
-					<groups>${tstGroups}</groups>
+
 				</configuration>
 			</plugin>
 
 		</plugins>
+
 	</build>
+	<organization>
+		<name>Pistoia Alliance</name>
+		<url>http://www.pistoiaalliance.org/</url>
+	</organization>
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 	</properties>

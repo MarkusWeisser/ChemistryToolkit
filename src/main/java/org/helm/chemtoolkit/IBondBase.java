@@ -28,4 +28,6 @@ public interface IBondBase extends IChemObjectBase {
 
   public IStereoElementBase getStereoElement();
 
+  public int getType();
+
 }
