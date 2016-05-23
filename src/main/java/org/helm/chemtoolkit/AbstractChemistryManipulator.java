@@ -19,6 +19,9 @@ package org.helm.chemtoolkit;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -85,7 +88,57 @@ public abstract class AbstractChemistryManipulator {
    * @throws CTKException
    */
   public abstract String convert(String data, StType type) throws CTKException;
-
+  
+  /**
+   * convert extended smiles format to smiles with atom mappings
+   * 
+   * @param data chemical notation to convert
+   * @return chemical notation
+   */
+  public String convertExtendedSmiles(String data){
+	  if(data != null){
+	  Pattern pattern = Pattern.compile("\\[\\*\\]");
+	  Matcher matcher = pattern.matcher(data);
+	  	if(matcher  != null){
+	  		String smiles = data.split("\\|")[0];
+	  		List<Integer> rgroupInformation = extractRgroups(data);
+	  		StringBuilder sb = new StringBuilder();
+	  		int start = 0;
+	  		int index = 0;
+	  		String rGroup = "";
+	  		while(matcher.find() && rgroupInformation.size() > 0){
+	  			rGroup = smiles.substring(start, matcher.end());
+	  			rGroup = rGroup.replace(matcher.group(),  "[*:"  +rgroupInformation.get(index) + "]");
+	  			sb.append(rGroup);
+	  			index ++;
+	  			start = matcher.end();
+	  		}
+	  		if( start < smiles.length()){
+	  			sb.append(smiles.substring(start));
+	  		}
+	  		return sb.toString();
+	  	}
+	  }
+	  return data;
+  }
+  
+  /**
+   * extract Rgroups from extended smiles
+   * 
+   * @param data extended smiles
+   * @return List of Rgroups
+   */
+  private List<Integer> extractRgroups(String data){
+	  Pattern pattern = Pattern.compile("R[1-9]\\d*");
+	  Matcher matcher = pattern.matcher(data);
+	  List<Integer> listValues = new ArrayList<Integer>();
+	  
+	  while(matcher.find()){
+		listValues.add(Integer.parseInt(matcher.group().split("R")[1]));  
+	  }
+	  return listValues;
+  }
+  
   /**
    * 
    * @param smiles to validate
@@ -141,7 +194,7 @@ public abstract class AbstractChemistryManipulator {
       throws CTKException;
 
   /**
-   * returns a molecule instance of {@link AbstractMolecule}
+   * returns a molecule i)nstance of {@link AbstractMolecule}
    * 
    * @param smiles smiles string
    * @param attachments instance of {@link AttachmentList}
@@ -247,8 +300,8 @@ public abstract class AbstractChemistryManipulator {
    * @return
    */
 
-  protected List<String> getRGroupsFromExtendedSmiles(String extendedSmiles) {
-    extendedSmiles = getExtension(extendedSmiles);
+  protected List<String> getRGroupsFromExtendedSmiles(String smiles) {
+  String  extendedSmiles = getExtension(smiles);
     List<String> list = new ArrayList<>();
     if (extendedSmiles != null) {
       Integer currIndex = 0;
@@ -288,6 +341,24 @@ public abstract class AbstractChemistryManipulator {
           }
         }
       }
+    }
+    
+    if(extendedSmiles == null){
+    	Pattern pattern = Pattern.compile("\\[\\*:([1-9]\\d*)\\]|\\[\\w+:([1-9]\\d*)");
+    	Matcher matcher = pattern.matcher(smiles);
+
+  	  
+  	  while(matcher.find()){
+  		  String info = "";
+  		  if(matcher.group(1) != null){
+  			  info = matcher.group(1);
+  		  }
+  		  if(matcher.group(2) != null){
+  			  info = matcher.group(2);
+  		  }
+  		  
+  		  list.add("R" + info);
+  	  }
     }
 
     return list;
@@ -374,5 +445,8 @@ public abstract class AbstractChemistryManipulator {
   protected abstract IStereoElementBase getStereoInformation(AbstractMolecule container, IAtomBase rGroup,
       IAtomBase atom1, IAtomBase atom2)
           throws CTKException;
+  
+  
+ 
 
 }
