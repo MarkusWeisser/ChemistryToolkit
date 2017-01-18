@@ -171,5 +171,7 @@ test-output/
 ##################
 
 target/
-test-output/
+
+#NetBeans
+nb-configuration.xml
 
