@@ -72,10 +72,10 @@ public abstract class AbstractChemistryManipulator {
   /**
    * produces chemical notation for input molecule
    * 
-   * @param molecule
+   * @param container chemical molecule
    * @param type of chemical notation
    * @return String that represents input molecule
-   * @throws CTKException
+   * @throws CTKException general ChemToolKit exception passed to HELMToolKit
    */
   public abstract String convertMolecule(AbstractMolecule container, StType type) throws CTKException;
 
@@ -85,7 +85,7 @@ public abstract class AbstractChemistryManipulator {
    * @param data chemical notation to convert
    * @param type type of input data instance of {@link StType}
    * @return chemical notation
-   * @throws CTKException
+   * @throws CTKException general ChemToolKit exception passed to HELMToolKit
    */
   public abstract String convert(String data, StType type) throws CTKException;
   
@@ -149,7 +149,7 @@ public abstract class AbstractChemistryManipulator {
   /**
    * returns molecule info like molecular formula,exact mass and molecular weight
    * 
-   * @param molecule input AbstractMolecule
+   * @param container input AbstractMolecule
    * @return org.helm.chemtoolkit.MoleculeInfo object
    * @throws CTKException general ChemToolKit exception passed to HELMToolKit
    */
@@ -159,9 +159,10 @@ public abstract class AbstractChemistryManipulator {
   /**
    * returns canonical smiles
    * 
-   * @param smiles to canonicalize
+   * @param data smiles to canonicalize
    * @return canonicalized smiles
    * @throws CTKException general ChemToolkit exception passed to HELMToolkit
+   * @throws CTKSmilesException if the smiles is not valid
    */
   public abstract String canonicalize(String data) throws CTKException, CTKSmilesException;
 
@@ -174,7 +175,7 @@ public abstract class AbstractChemistryManipulator {
    * @param height the image height
    * @param rgb a color code of image background
    * @return image
-   * @throws CTKException
+   * @throws CTKException general ChemToolKit exception passed to HELMToolKit
    */
   public abstract byte[] renderMol(String molFile, OutputType outputType, int width, int height, int rgb)
       throws CTKException;
@@ -188,7 +189,7 @@ public abstract class AbstractChemistryManipulator {
    * @param height the image height
    * @param rgb a color code of image background
    * @return image
-   * @throws CTKException
+   * @throws CTKException general ChemToolKit exception passed to HELMToolKit
    */
   public abstract byte[] renderSequence(String sequence, OutputType outputType, int width, int height, int rgb)
       throws CTKException;
@@ -199,8 +200,8 @@ public abstract class AbstractChemistryManipulator {
    * @param smiles smiles string
    * @param attachments instance of {@link AttachmentList}
    * @return molecule instance of {@link AbstractMolecule}
-   * @throws IOException
-   * @throws CTKException
+   * @throws IOException smiles can not be converted to a molecule
+   * @throws CTKException general ChemToolKit exception passed to HELMToolKit
    */
   public abstract AbstractMolecule getMolecule(String smiles, AttachmentList attachments) throws IOException,
       CTKException;
@@ -215,7 +216,7 @@ public abstract class AbstractChemistryManipulator {
    * @param secondRgroup of second molecule to be removed, the connected atom is used for merging, instance of
    *          {@link IAtomBase}
    * @return merged molecule instance of {@link AbstractMolecule}
-   * @throws CTKException
+   * @throws CTKException general ChemToolKit exception passed to HELMToolKit
    * 
    */
   public AbstractMolecule merge(AbstractMolecule firstContainer, IAtomBase firstRgroup,
@@ -271,7 +272,8 @@ public abstract class AbstractChemistryManipulator {
    * @param secondRgroup atom to remove, instance of {@link IAtomBase}
    * @param atom1 atom connected to firstGroup
    * @param atom2 atom connected to secondGroup
-   * @throws CTKException
+   * @return true, if stereo information was set, false otherwise
+   * @throws CTKException general ChemToolKit exception passed to HELMToolKit
    */
   protected boolean setStereoInformation(AbstractMolecule firstContainer, IAtomBase firstRgroup,
       AbstractMolecule secondContainer, IAtomBase secondRgroup, IAtomBase atom1, IAtomBase atom2) throws CTKException {
@@ -296,8 +298,8 @@ public abstract class AbstractChemistryManipulator {
 
   /**
    * 
-   * @param extendedSmiles
-   * @return
+   * @param smiles  extended smiles
+   * @return List containing all rgroups from the given smiles
    */
 
   protected List<String> getRGroupsFromExtendedSmiles(String smiles) {
@@ -397,18 +399,18 @@ public abstract class AbstractChemistryManipulator {
   }
 
   /**
-   * @param atom1
-   * @param atom2
-   * @return
-   * @throws CTKException
+   * @param atom1 first atom
+   * @param atom2 second atom
+   * @return bond betwenn the given atoms
+   * @throws CTKException general ChemToolKit exception passed to HELMToolKit
    */
   protected abstract IBondBase bindAtoms(IAtomBase atom1, IAtomBase atom2) throws CTKException;
 
   /**
-   * @param first
-   * @param second
-   * @return
-   * @throws CTKException
+   * @param container first molecule
+   * @param secondContainer second molecule
+   * @return AttachmentList containing all attachments from the merged molecules
+   * @throws CTKException general ChemToolKit exception passed to HELMToolKit
    */
 
   protected AttachmentList mergeAttachments(AbstractMolecule container, AbstractMolecule secondContainer)
@@ -436,11 +438,12 @@ public abstract class AbstractChemistryManipulator {
   }
 
   /**
-   * @param molecule
-   * @param rGroup
-   * @param atom
-   * @return
-   * @throws CTKException
+   * @param container molecule
+   * @param rGroup rgroup of the given molecule
+   * @param atom1 first atom
+   * @param atom2 second atom
+   * @return StereoElement of the given molecule
+   * @throws CTKException general ChemToolKit exception passed to HELMToolKit
    */
   protected abstract IStereoElementBase getStereoInformation(AbstractMolecule container, IAtomBase rGroup,
       IAtomBase atom1, IAtomBase atom2)

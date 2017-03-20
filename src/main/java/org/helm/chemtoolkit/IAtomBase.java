@@ -36,7 +36,7 @@ public abstract class IAtomBase implements IChemObjectBase {
   public abstract void setRgroup(int rGroup) throws CTKException;
 
   /**
-   * @return
+   * @return atom
    */
   public abstract Object getMolAtom();
 

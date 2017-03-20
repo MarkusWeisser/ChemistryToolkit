@@ -123,7 +123,7 @@ public abstract class AbstractMolecule implements IChemObjectBase {
    * 
    * @param atom to check
    * @return true if a atom has a single stereo connection
-   * @throws CTKException
+   * @throws CTKException general ChemToolKit exception passed to HELMToolKit
    */
   public abstract boolean isSingleStereo(IAtomBase atom) throws CTKException;
 
@@ -131,7 +131,7 @@ public abstract class AbstractMolecule implements IChemObjectBase {
    * removes a given attachment from molecule
    * 
    * @param toRemove a atom to be removed
-   * @throws CTKException
+   * @throws CTKException general ChemToolKit exception passed to HELMToolKit
    */
   public void removeAttachment(IAtomBase toRemove) throws CTKException {
 
