@@ -3,11 +3,11 @@
 	<modelVersion>4.0.0</modelVersion>
 
 	<groupId>org.pistoiaalliance.helm</groupId>
-	<artifactId>helm2-ChemistryToolkit</artifactId>
+	<artifactId>helm2-chemistrytoolkit</artifactId>
 	<version>1.0.0</version>
 	<packaging>jar</packaging>
 
-	<name>helm2-ChemistryToolkit</name>
+	<name>helm2-chemistrytoolkit</name>
 	<description>Enables inclusion various chemical toolkits to HELMNotationToolkit</description>
 	<url>https://github.com/PistoiaHELM/ChemistryToolkit</url>
 	
