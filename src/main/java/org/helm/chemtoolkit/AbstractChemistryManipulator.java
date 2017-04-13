@@ -79,6 +79,8 @@ public abstract class AbstractChemistryManipulator {
    */
   public abstract String convertMolecule(AbstractMolecule container, StType type) throws CTKException;
 
+  
+  public abstract String convertMolIntoSmilesWithAtomMapping(String molfile) throws CTKException;
   /**
    * convert input notation to another
    * 
