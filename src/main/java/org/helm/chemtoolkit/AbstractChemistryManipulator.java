@@ -99,7 +99,7 @@ public abstract class AbstractChemistryManipulator {
    */
   public String convertExtendedSmiles(String data){
 	  if(data != null){
-	  Pattern pattern = Pattern.compile("\\[\\*\\]");
+	  Pattern pattern = Pattern.compile("\\[\\*\\]|\\*");
 	  Matcher matcher = pattern.matcher(data);
 	  	if(matcher  != null){
 	  		String smiles = data.split("\\|")[0];
@@ -110,7 +110,7 @@ public abstract class AbstractChemistryManipulator {
 	  		String rGroup = "";
 	  		while(matcher.find() && rgroupInformation.size() > 0){
 	  			rGroup = smiles.substring(start, matcher.end());
-	  			rGroup = rGroup.replace(matcher.group(),  "[*:"  +rgroupInformation.get(index) + "]");
+	  			rGroup = rGroup.replace(matcher.group(),  "[H:"  +rgroupInformation.get(index) + "]");
 	  			sb.append(rGroup);
 	  			index ++;
 	  			start = matcher.end();
