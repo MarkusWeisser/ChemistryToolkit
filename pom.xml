@@ -4,7 +4,7 @@
 
 	<groupId>org.pistoiaalliance.helm</groupId>
 	<artifactId>helm2-chemistrytoolkit</artifactId>
-	<version>1.2.2</version>
+	<version>1.2.3</version>
 	<packaging>jar</packaging>
 
 	<name>helm2-chemistrytoolkit</name>

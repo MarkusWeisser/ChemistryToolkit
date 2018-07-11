@@ -110,7 +110,7 @@ public abstract class AbstractChemistryManipulator {
 	  		String rGroup = "";
 	  		while(matcher.find() && rgroupInformation.size() > 0){
 	  			rGroup = smiles.substring(start, matcher.end());
-	  			rGroup = rGroup.replace(matcher.group(),  "[H:"  +rgroupInformation.get(index) + "]");
+	  			rGroup = rGroup.replace(matcher.group(),  "[*:"  +rgroupInformation.get(index) + "]");
 	  			sb.append(rGroup);
 	  			index ++;
 	  			start = matcher.end();
