@@ -81,6 +81,9 @@ public abstract class AbstractChemistryManipulator {
 
   
   public abstract String convertMolIntoSmilesWithAtomMapping(String molfile) throws CTKException;
+  
+  public abstract boolean isConnected(String molfile) throws CTKException;
+  
   /**
    * convert input notation to another
    * 
